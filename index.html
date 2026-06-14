@@ -526,7 +526,8 @@
         .smooth-item.kind-storageSource .item-orb,
         .smooth-item.kind-storageSink .item-orb,
         .smooth-item.kind-splitter .item-orb,
-        .smooth-item.kind-merger .item-orb {
+        .smooth-item.kind-merger .item-orb,
+        .smooth-item.kind-longInserter .item-orb {
             border-radius: 3px;
             font-size: 11px;
             line-height: 1;
@@ -543,6 +544,7 @@
         .smooth-item.kind-storageSink .item-orb   { background: rgba(120,100,0,0.9);  filter: drop-shadow(0 0 4px rgba(220,180,0,0.9)); }
         .smooth-item.kind-splitter .item-orb      { background: rgba(0,100,110,0.9);  filter: drop-shadow(0 0 4px rgba(34,211,238,0.9)); }
         .smooth-item.kind-merger .item-orb        { background: rgba(50,0,120,0.9);   filter: drop-shadow(0 0 4px rgba(99,102,241,0.9)); }
+        .smooth-item.kind-longInserter .item-orb  { background: rgba(120,40,0,0.9);   filter: drop-shadow(0 0 4px rgba(255,100,0,0.9)); }
 
         /* ── ベルトコンベア（流れるアニメーション） ── */
         .belt { background: #0b141e; overflow: hidden; }
@@ -666,6 +668,20 @@
         }
         .fast-inserter .inserter-arm {
             background: linear-gradient(to top, #004010, #40ff80);
+        }
+
+        /* ── ロングアームインサーター ── */
+        .long-inserter {
+            background: #1a0800;
+            border: 1px solid #c05000;
+        }
+        .long-inserter .inserter-hub {
+            background: radial-gradient(circle at 38% 32%, #ffa060, #c05000);
+            box-shadow: 0 0 7px rgba(200,80,0,0.85);
+        }
+        .long-inserter .inserter-arm {
+            background: linear-gradient(to top, #401000, #ff8040);
+            height: 60%;
         }
 
         /* ── 高速組立機 ── */
@@ -1008,6 +1024,10 @@
                     🔁 合流機
                     <span class="part-count" id="parts-merger-count">×0</span>
                 </button>
+                <button class="craft-part-btn" data-unlock="longInserter" onclick="selectCraftTarget('longInserter')" style="display:none">
+                    ⟹ ロングアームインサーター
+                    <span class="part-count" id="parts-longInserter-count">×0</span>
+                </button>
             </div>
             <div class="craft-slots-wrap">
                 <div id="craft-slots-area" class="craft-slots-area"></div>
@@ -1042,6 +1062,7 @@
             <span data-unlock="fastAssembler" style="display:none"><span class="part-label">⚡🟣 高速組立機</span><span class="part-num zero" id="disp-parts-fastAssembler">0</span></span>
             <span data-unlock="splitter" style="display:none"><span class="part-label">🔀 分岐機</span><span class="part-num zero" id="disp-parts-splitter">0</span></span>
             <span data-unlock="merger" style="display:none"><span class="part-label">🔁 合流機</span><span class="part-num zero" id="disp-parts-merger">0</span></span>
+            <span data-unlock="longInserter" style="display:none"><span class="part-label">⟹ ロングアーム</span><span class="part-num zero" id="disp-parts-longInserter">0</span></span>
         </div>
 
         <div id="sector-selector">
@@ -1062,6 +1083,7 @@
             <button data-tool="fast-assembler" data-unlock="fastAssembler" style="display:none">⚡ 高速組立機</button>
             <button data-tool="splitter" data-unlock="splitter" style="display:none">🔀 分岐機</button>
             <button data-tool="merger" data-unlock="merger" style="display:none">🔁 合流機</button>
+            <button data-tool="long-inserter" data-unlock="longInserter" style="display:none">⟹ ロングアームインサーター</button>
         </div>
 
         <div id="info" style="font-size: 12px; color: #aaa; text-align: center; max-width: 800px; line-height: 1.4;">
@@ -1112,7 +1134,7 @@
         let titleClickTimer = null;
 
         // 部品インベントリ
-        let parts = { belt: 0, inserter: 0, assembler: 0, fastBelt: 0, fastInserter: 0, fastAssembler: 0, splitter: 0, merger: 0, storageSource: 0, storageSink: 0 };
+        let parts = { belt: 0, inserter: 0, assembler: 0, fastBelt: 0, fastInserter: 0, fastAssembler: 0, splitter: 0, merger: 0, storageSource: 0, storageSink: 0, longInserter: 0 };
 
         // クラフトモード状態
         let currentMode = 'factory'; // 'factory' | 'craft'
@@ -1129,16 +1151,18 @@
             fastInserter:  { label: '高速インサーター', ingredients: [{ type: 'square', count: 2 }, { type: 'pentagon', count: 1 }, { type: 'triangle', count: 2 }] },
             fastAssembler: { label: '高速組立機',      ingredients: [{ type: 'square', count: 5 }, { type: 'pentagon', count: 2 }, { type: 'hexagon', count: 1 }] },
             splitter:      { label: '分岐機',          ingredients: [{ type: 'square', count: 3 }, { type: 'pentagon', count: 2 }, { type: 'hexagon', count: 1 }] },
-            merger:        { label: '合流機',          ingredients: [{ type: 'square', count: 3 }, { type: 'pentagon', count: 2 }, { type: 'hexagon', count: 1 }] }
+            merger:        { label: '合流機',          ingredients: [{ type: 'square', count: 3 }, { type: 'pentagon', count: 2 }, { type: 'hexagon', count: 1 }] },
+            longInserter:  { label: 'ロングアームインサーター', ingredients: [{ type: 'square', count: 3 }, { type: 'pentagon', count: 1 }, { type: 'hexagon', count: 2 }] }
         };
 
-        const PART_NAMES = { belt: 'ベルト', inserter: 'インサーター', assembler: '組立機', storageSource: '材料ストレージ', storageSink: '完成品ストレージ', fastBelt: '高速ベルト', fastInserter: '高速インサーター', fastAssembler: '高速組立機', splitter: '分岐機', merger: '合流機' };
+        const PART_NAMES = { belt: 'ベルト', inserter: 'インサーター', assembler: '組立機', storageSource: '材料ストレージ', storageSink: '完成品ストレージ', fastBelt: '高速ベルト', fastInserter: '高速インサーター', fastAssembler: '高速組立機', splitter: '分岐機', merger: '合流機', longInserter: 'ロングアームインサーター' };
 
         const CELL_TYPE_TO_PART_KEY = {
             'belt': 'belt', 'inserter': 'inserter', 'assembler': 'assembler',
             'storage-source': 'storageSource', 'storage-sink': 'storageSink',
             'fast-belt': 'fastBelt', 'fast-inserter': 'fastInserter', 'fast-assembler': 'fastAssembler',
-            'splitter': 'splitter', 'merger': 'merger'
+            'splitter': 'splitter', 'merger': 'merger',
+            'long-inserter': 'longInserter'
         };
         const SHAPE_ICONS  = { point: '●', line: '─', triangle: '▲', square: '■', pentagon: '⬠', hexagon: '⬡' };
         const SHAPE_NAMES_JP = { point: '点', line: '線', triangle: '三角形', square: '四角形', pentagon: '五角形', hexagon: '六角形' };
@@ -1223,9 +1247,15 @@
                 reqs: { pentagon: 30, hexagon: 30 }
             },
             {
-                name: "T3-Complete: ティア3完全制覇！",
-                desc: "すべての高速化設備と分岐・合流機が解放されました！究極の自動化工場を構築してください！",
+                name: "3-5: ロングアームインサーターの解放",
+                desc: "六角形50個・四角形30個を納品し、2マス先からアイテムを搬送できるロングアームインサーターをアンロックします。",
                 unlocked: ["point", "line", "triangle", "square", "pentagon", "hexagon", "autoPoint", "autoLine", "fastBelt", "fastInserter", "fastAssembler", "splitter", "merger"],
+                reqs: { hexagon: 50, square: 30 }
+            },
+            {
+                name: "T3-Complete: ティア3完全制覇！",
+                desc: "すべての高速化設備と分岐・合流機、ロングアームインサーターが解放されました！究極の自動化工場を構築してください！",
+                unlocked: ["point", "line", "triangle", "square", "pentagon", "hexagon", "autoPoint", "autoLine", "fastBelt", "fastInserter", "fastAssembler", "splitter", "merger", "longInserter"],
                 reqs: {}
             }
         ];
@@ -1265,6 +1295,9 @@
             { id: 'storageSink',  name: '📤', label: '完成品ストレージ(部品)',
               ingredients: [{ kind: 'square', count: 2 }],
               output: 'storageSink',  ticks: Math.round(4000/TICK_MS),  unlocksAt: 8 },
+            { id: 'longInserter', name: '⟹', label: 'ロングアームインサーター(部品)',
+              ingredients: [{ kind: 'square', count: 3 }, { kind: 'pentagon', count: 1 }, { kind: 'hexagon', count: 2 }],
+              output: 'longInserter', ticks: Math.round(8000/TICK_MS),  unlocksAt: 13 },
         ];
 
         function isRecipeAvailable(recipe) {
@@ -1576,6 +1609,18 @@
                 el.classList.add('building', 'fast-belt');
                 if (cell.dir) el.classList.add('dir-' + cell.dir);
 
+            } else if (cell.type === 'long-inserter') {
+                el.classList.add('building', 'inserter', 'long-inserter');
+                if (cell.dir) el.classList.add('dir-' + cell.dir);
+                const hub = document.createElement('div');
+                hub.className = 'inserter-hub';
+                el.appendChild(hub);
+                const arm = document.createElement('div');
+                arm.className = 'inserter-arm';
+                el.appendChild(arm);
+                if (cell.work && cell.work.state === 'grab') el.classList.add('swing-grab');
+                else if (cell.work && cell.work.state === 'drop') el.classList.add('swing-drop');
+
             } else if (cell.type === 'fast-inserter') {
                 el.classList.add('building', 'inserter', 'fast-inserter');
                 if (cell.dir) el.classList.add('dir-' + cell.dir);
@@ -1703,6 +1748,7 @@
             if (kind === 'assembler') return '🟣';
             if (kind === 'storageSource') return '📦';
             if (kind === 'storageSink') return '📤';
+            if (kind === 'longInserter') return '⟹';
             return '?';
         }
 
@@ -1731,7 +1777,8 @@
                               belt:'▶', inserter:'⇒', assembler:'⚙',
                               fastBelt:'⚡▶', fastInserter:'⚡⇒', fastAssembler:'⚡⚙',
                               storageSource:'📦', storageSink:'📤',
-                              splitter:'🔀', merger:'🔁'
+                              splitter:'🔀', merger:'🔁',
+                              longInserter:'⟹'
                           };
                           if (partOrbIcons[item.kind]) orb.textContent = partOrbIcons[item.kind];
                           dom.appendChild(orb);
@@ -1838,6 +1885,87 @@
             return false;
         }
 
+        // インサーター移動パス（types に含まれるセルタイプを1ティック分処理）
+        function doInserterPass(currentGrid, reserved, types) {
+            for (let y = 0; y < ROWS; y++) {
+                for (let x = 0; x < COLS; x++) {
+                    const cell = currentGrid[y][x];
+                    if (!types.includes(cell.type)) continue;
+                    if (!cell.work) cell.work = { state: 'idle' };
+
+                    const fromDir = getOppositeDir(cell.dir);
+                    const isLong = cell.type === 'long-inserter';
+                    let from = getNeighborInGrid(currentGrid, cell, fromDir);
+                    if (isLong && from) from = getNeighborInGrid(currentGrid, from, fromDir);
+                    const to = getNeighborInGrid(currentGrid, cell, cell.dir);
+
+                    if (!from || !to) { cell.work.state = 'idle'; continue; }
+
+                    let itemToMove = null, shouldShiftFrom = false, isFromSource = false, sourceType = '';
+
+                    if (from.type === 'storage-source') {
+                        const outputKind = (from.work && from.work.kind) ? from.work.kind : 'raw';
+                        const resKey = outputKind === 'raw' ? 'point' : outputKind;
+                        if (resources[resKey] !== undefined && Math.floor(resources[resKey]) >= 1) {
+                            itemToMove = { id: ++itemIdCounter, kind: outputKind };
+                            isFromSource = true;
+                            sourceType = resKey;
+                        }
+                    } else if (from.type === 'belt' || from.type === 'fast-belt') {
+                        if (from.items.length > 0) { itemToMove = { ...from.items[0] }; shouldShiftFrom = true; }
+                    } else if (from.type === 'assembler' || from.type === 'fast-assembler') {
+                        if (from.items.length > 0 && from.items[0].kind !== 'raw' && from.items[0].kind !== 'line') {
+                            itemToMove = { ...from.items[0] }; shouldShiftFrom = true;
+                        }
+                    }
+
+                    let canDrop = false;
+                    if (itemToMove && !reserved[to?.y]?.[to?.x]) {
+                        if ((to.type === 'belt' || to.type === 'fast-belt') && to.items.length === 0) {
+                            canDrop = true;
+                        } else if ((to.type === 'assembler' || to.type === 'fast-assembler') && !to.work.producing) {
+                            const r = RECIPES[to.work.recipeIdx];
+                            const stored = to.work.stored || {};
+                            for (const ing of r.ingredients) {
+                                if (itemToMove.kind === ing.kind && (stored[ing.kind] || 0) < ing.count) {
+                                    canDrop = true; break;
+                                }
+                            }
+                        } else if (to.type === 'storage-sink' && itemToMove.kind !== 'raw' && itemToMove.kind !== 'line') {
+                            const kind = itemToMove.kind;
+                            if (parts[kind] !== undefined) {
+                                canDrop = true;
+                            } else if (resources[kind] !== undefined && Math.floor(resources[kind]) < maxStorage[kind]) {
+                                canDrop = true;
+                            }
+                        }
+                    }
+
+                    if (canDrop) {
+                        if (isFromSource) resources[sourceType] -= 1;
+                        if (shouldShiftFrom) from.items.shift();
+                        if (to.type === 'assembler' || to.type === 'fast-assembler') {
+                            if (!to.work.stored) to.work.stored = {};
+                            to.work.stored[itemToMove.kind] = (to.work.stored[itemToMove.kind] || 0) + 1;
+                        } else if (to.type === 'storage-sink') {
+                            if (parts[itemToMove.kind] !== undefined) {
+                                parts[itemToMove.kind]++;
+                                updatePartsDisplay();
+                            } else {
+                                addResource(itemToMove.kind, 1);
+                            }
+                        } else {
+                            to.items.push(itemToMove);
+                        }
+                        reserved[to.y][to.x] = true;
+                        cell.work.state = cell.work.state === 'grab' ? 'drop' : 'grab';
+                    } else {
+                        cell.work.state = 'idle';
+                    }
+                }
+            }
+        }
+
         // ベルト移動パス（types に含まれるセルタイプを1ティック分移動）
         function doBeltPass(currentGrid, reserved, types) {
             const moves = [];
@@ -1904,102 +2032,10 @@
                 doBeltPass(currentGrid, reserved, ['fast-belt']); // 高速ベルト2回目（2倍速）
                 doBeltPass(currentGrid, reserved, ['splitter']);
 
-                // 2. インサーター・高速インサーター (倉庫連携の最重要ロジック)
-                for (let y = 0; y < ROWS; y++) {
-                    for (let x = 0; x < COLS; x++) {
-                        const cell = currentGrid[y][x];
-                        if (cell.type === 'inserter' || cell.type === 'fast-inserter') {
-                            if (!cell.work) cell.work = { state: 'idle' };
-
-                            const fromDir = getOppositeDir(cell.dir);
-                            // 高速インサーターは2マス先から掴む
-                            const isFastInserter = cell.type === 'fast-inserter';
-                            let from = getNeighborInGrid(currentGrid, cell, fromDir);
-                            if (isFastInserter && from) from = getNeighborInGrid(currentGrid, from, fromDir);
-                            const to = getNeighborInGrid(currentGrid, cell, cell.dir);
-                            
-                            if (!from || !to) {
-                                cell.work.state = 'idle';
-                                continue;
-                            }
-
-                            let itemToMove = null;
-                            let shouldShiftFrom = false;
-                            let isFromSource = false;
-                            let sourceType = "";
-
-                            // 搬出元の在庫確認・アイテム生成
-                            if (from.type === 'storage-source') {
-                                // 設定された種類の在庫を確認して引き抜く
-                                const outputKind = (from.work && from.work.kind) ? from.work.kind : 'raw';
-                                const resKey = outputKind === 'raw' ? 'point' : outputKind;
-                                if (resources[resKey] !== undefined && Math.floor(resources[resKey]) >= 1) {
-                                    itemToMove = { id: ++itemIdCounter, kind: outputKind };
-                                    isFromSource = true;
-                                    sourceType = resKey;
-                                }
-                            } else if (from.type === 'belt' && from.items.length > 0) {
-                                itemToMove = { ...from.items[0] };
-                                shouldShiftFrom = true;
-                            } else if ((from.type === 'assembler' || from.type === 'fast-assembler') && from.items.length > 0 && from.items[0].kind !== 'raw' && from.items[0].kind !== 'line') {
-                                itemToMove = { ...from.items[0] };
-                                shouldShiftFrom = true;
-                            }
-
-                            // 搬入先のキャパシティ確認（倉庫上限との連動）
-                            let canDrop = false;
-                            if (itemToMove && !reserved[to?.y]?.[to?.x]) {
-                                if ((to.type === 'belt' || to.type === 'fast-belt') && to.items.length === 0) {
-                                    canDrop = true;
-                                } else if ((to.type === 'assembler' || to.type === 'fast-assembler') && !to.work.producing) {
-                                    const r = RECIPES[to.work.recipeIdx];
-                                    const stored = to.work.stored || {};
-                                    for (const ing of r.ingredients) {
-                                        if (itemToMove.kind === ing.kind && (stored[ing.kind] || 0) < ing.count) {
-                                            canDrop = true; break;
-                                        }
-                                    }
-                                } else if (to.type === 'storage-sink' && itemToMove.kind !== 'raw' && itemToMove.kind !== 'line') {
-                                    const kind = itemToMove.kind;
-                                    if (parts[kind] !== undefined) {
-                                        canDrop = true; // 部品類は容量制限なし
-                                    } else if (resources[kind] !== undefined && Math.floor(resources[kind]) < maxStorage[kind]) {
-                                        canDrop = true;
-                                    }
-                                }
-                            }
-
-                            // 移動及び倉庫増減の実行
-                            if (canDrop) {
-                                if (isFromSource) {
-                                    // 点源・線源から取り出したので、共通倉庫の在庫を1減少
-                                    resources[sourceType] -= 1;
-                                }
-                                if (shouldShiftFrom) {
-                                    from.items.shift();
-                                }
-                                
-                                if (to.type === 'assembler' || to.type === 'fast-assembler') {
-                                    if (!to.work.stored) to.work.stored = {};
-                                    to.work.stored[itemToMove.kind] = (to.work.stored[itemToMove.kind] || 0) + 1;
-                                } else if (to.type === 'storage-sink') {
-                                    if (parts[itemToMove.kind] !== undefined) {
-                                        parts[itemToMove.kind]++;
-                                        updatePartsDisplay();
-                                    } else {
-                                        addResource(itemToMove.kind, 1);
-                                    }
-                                } else {
-                                    to.items.push(itemToMove);
-                                }
-                                reserved[to.y][to.x] = true;
-                                cell.work.state = cell.work.state === 'grab' ? 'drop' : 'grab';
-                            } else {
-                                cell.work.state = 'idle';
-                            }
-                        }
-                    }
-                }
+                // 2. インサーター・高速インサーター・ロングアーム
+                doInserterPass(currentGrid, reserved, ['inserter', 'long-inserter']);
+                doInserterPass(currentGrid, reserved, ['fast-inserter']); // 1回目
+                doInserterPass(currentGrid, reserved, ['fast-inserter']); // 2回目（2倍速）
 
                 // 3. 組立機・高速組立機（バッファ充填→生産開始→完成品出力）
                 for (let y = 0; y < ROWS; y++) {
@@ -2795,7 +2831,7 @@
         }
 
         function updatePartsDisplay() {
-            const allParts = ['belt', 'inserter', 'assembler', 'storageSource', 'storageSink', 'fastBelt', 'fastInserter', 'fastAssembler', 'splitter', 'merger'];
+            const allParts = ['belt', 'inserter', 'assembler', 'storageSource', 'storageSink', 'fastBelt', 'fastInserter', 'fastAssembler', 'splitter', 'merger', 'longInserter'];
             allParts.forEach(p => {
                 const countEl = document.getElementById(`parts-${p}-count`);
                 if (countEl) countEl.textContent = `×${parts[p]}`;

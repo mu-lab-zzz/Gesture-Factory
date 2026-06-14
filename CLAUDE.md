@@ -60,7 +60,8 @@ fastBelt / fastInserter / fastAssembler / splitter / merger
 | 10    | 3-2 高速インサーター解放 |
 | 11    | 3-3 高速組立機解放 |
 | 12    | 3-4 分岐機＆合流機解放 |
-| 13    | T3-Complete |
+| 13    | 3-5 ロングアームインサーター解放（hexagon×50, square×30） |
+| 14    | T3-Complete（longInserter解放） |
 
 ## 過去に踏んだバグ・注意点
 
@@ -74,3 +75,10 @@ fastBelt / fastInserter / fastAssembler / splitter / merger
 - fast-belt は1tickに2回呼ぶことで2倍速を実現
 - `canBeltPushTo(fromDir, toCell)` で方向チェック
 - `rotateClockwise(dir)` で splitter/merger の分岐方向計算
+
+## インサーター処理
+- `doInserterPass(grid, reserved, types)` で指定セル種類を1パス処理
+- inserter / long-inserter: 1tick1回呼び出し
+- fast-inserter: 1tickに2回呼び出しで2倍速
+- long-inserter: `isLong` フラグで fromDir を2マス先に延長（2マスリーチ）
+- fast-inserter のリーチは通常インサーターと同じ1マス（速度のみ2倍）
