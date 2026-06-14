@@ -1,0 +1,2996 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shape Gesture Factory with Automation</title>
+    <style>
+        :root {
+            --bg-color: #121216;
+            --panel-color: #1a1a24;
+            --canvas-color: #222230;
+            --text-color: #e2e2e9;
+            --accent-point: #00ffcc;
+            --accent-line: #00a2ff;
+            --accent-tri: #ffca28;
+            --accent-squ: #ff3366;
+            --accent-pen: #af40ff;
+            --accent-hex: #ff7700;
+        }
+
+        html {
+            overflow-x: hidden;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            margin: 0;
+            padding: 12px 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: pan-y;
+            box-sizing: border-box;
+            width: 100%;
+            overflow-x: hidden;
+        }
+
+        h1 {
+            margin: 0 0 10px 0;
+            font-size: 26px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            background: linear-gradient(45deg, var(--accent-point), var(--accent-squ));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            cursor: pointer;
+        }
+
+        /* 4タブシステム用スタイル */
+        .tab-container {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 8px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            background-color: var(--panel-color);
+            border: 1px solid #2d2d3d;
+            color: #8a8a9a;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            background-color: #2b2b3d;
+            border-color: var(--accent-point);
+            color: #fff;
+            box-shadow: 0 0 10px rgba(0, 255, 204, 0.2);
+        }
+
+        #content-factory {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #content-automation {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* ティア専用タブパネル */
+        .tier-panel {
+            width: 100%;
+            max-width: 600px;
+            background-color: var(--panel-color);
+            border: 1px solid #2d2d3d;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+            box-sizing: border-box;
+        }
+
+        .tier-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 5px;
+            border-bottom: 2px solid #2d2d3d;
+            padding-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .tier-status {
+            font-size: 13px;
+            color: var(--accent-point);
+        }
+
+        .tier-goal-desc {
+            font-size: 14px;
+            margin: 10px 0;
+            color: #ccc;
+            line-height: 1.4;
+        }
+
+        .tier-requirements {
+            background-color: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 15px;
+        }
+
+        .req-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #252535;
+        }
+        .req-row:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .req-info {
+            display: flex;
+            flex-direction: column;
+            font-family: monospace;
+            font-size: 14px;
+            color: #aaa;
+        }
+
+        .req-info.met {
+            color: var(--accent-point);
+            opacity: 0.6;
+        }
+
+        .req-progress {
+            font-size: 15px;
+            font-weight: bold;
+            color: #fff;
+            margin-top: 2px;
+        }
+
+        .submit-action-btn {
+            background: #2a2a3a;
+            border: 1px solid #00a2ff;
+            color: #00a2ff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .submit-action-btn:hover:not(:disabled) {
+            background: #00a2ff;
+            color: #000;
+        }
+
+        .submit-action-btn:disabled {
+            border-color: #2d2d3d;
+            color: #555565;
+            cursor: not-allowed;
+            background: transparent;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 20px;
+        }
+
+        .resource-card {
+            background-color: var(--panel-color);
+            border: 1px solid #2d2d3d;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .resource-card.locked {
+            opacity: 0.25;
+        }
+
+        .resource-card.point { border-top: 4px solid var(--accent-point); }
+        .resource-card.line { border-top: 4px solid var(--accent-line); }
+        .resource-card.triangle { border-top: 4px solid var(--accent-tri); }
+        .resource-card.square { border-top: 4px solid var(--accent-squ); }
+        .resource-card.pentagon { border-top: 4px solid var(--accent-pen); }
+        .resource-card.hexagon { border-top: 4px solid var(--accent-hex); }
+        
+        .resource-name {
+            font-size: 13px;
+            color: #8a8a9a;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .resource-value {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 12px;
+            font-family: monospace;
+        }
+
+        .resource-value.full {
+            color: #ff3333;
+            animation: pulse 1s infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
+
+        .upgrade-btn {
+            background-color: #2a2a3a;
+            border: 1px solid #44445a;
+            color: #fff;
+            padding: 8px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: bold;
+            transition: all 0.2s;
+            width: 100%;
+        }
+
+        .upgrade-btn:hover:not(:disabled) {
+            background-color: #3b3b54;
+            border-color: #66668a;
+        }
+
+        .upgrade-btn:disabled {
+            color: #555565;
+            background-color: #14141c;
+            border-color: #22222a;
+            cursor: not-allowed;
+        }
+
+        .canvas-container {
+            position: relative;
+            width: 100%;
+        }
+
+        canvas {
+            background-color: var(--canvas-color);
+            border: 2px solid #333345;
+            border-radius: 12px;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.6);
+            cursor: crosshair;
+            display: block;
+            width: 100%;
+            height: 360px;
+            touch-action: none;
+        }
+
+        .feedback {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            font-size: 14px;
+            color: #aaa;
+            pointer-events: none;
+            background: rgba(10, 10, 15, 0.85);
+            padding: 6px 14px;
+            border-radius: 6px;
+            border: 1px solid #333345;
+            font-family: monospace;
+            z-index: 10;
+        }
+
+        .instructions {
+            margin-top: 4px;
+            font-size: 13px;
+            color: #7a7a8a;
+            max-width: 800px;
+            text-align: center;
+            line-height: 1.6;
+            padding-bottom: 20px;
+        }
+
+        .instructions span {
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .mini-inventory {
+            display: flex;
+            gap: 15px;
+            font-family: monospace;
+            font-size: 15px;
+            margin-bottom: 8px;
+            color: #8a8a9a;
+            background-color: var(--panel-color);
+            padding: 6px 18px;
+            border-radius: 20px;
+            border: 1px solid #2d2d3d;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        .mini-inventory span {
+            display: inline-block;
+            transition: color 0.1s;
+        }
+
+        .mini-inventory span.locked-mini {
+            display: none;
+        }
+
+        .flash-point { animation: flash-p 0.5s ease-out; }
+        @keyframes flash-p { 0% { color: var(--accent-point); text-shadow: 0 0 10px var(--accent-point); font-weight: bold; transform: scale(1.1); } 100% { color: #8a8a9a; } }
+        
+        .flash-line { animation: flash-l 0.5s ease-out; }
+        @keyframes flash-l { 0% { color: var(--accent-line); text-shadow: 0 0 10px var(--accent-line); font-weight: bold; transform: scale(1.1); } 100% { color: #8a8a9a; } }
+        
+        .flash-triangle { animation: flash-t 0.5s ease-out; }
+        @keyframes flash-t { 0% { color: var(--accent-tri); text-shadow: 0 0 10px var(--accent-tri); font-weight: bold; transform: scale(1.1); } 100% { color: #8a8a9a; } }
+        
+        .flash-square { animation: flash-s 0.5s ease-out; }
+        @keyframes flash-s { 0% { color: var(--accent-squ); text-shadow: 0 0 10px var(--accent-squ); font-weight: bold; transform: scale(1.1); } 100% { color: #8a8a9a; } }
+        
+        .flash-pentagon { animation: flash-pe 0.5s ease-out; }
+        @keyframes flash-pe { 0% { color: var(--accent-pen); text-shadow: 0 0 10px var(--accent-pen); font-weight: bold; transform: scale(1.1); } 100% { color: #8a8a9a; } }
+        
+        .flash-hexagon { animation: flash-h 0.5s ease-out; }
+        @keyframes flash-h { 0% { color: var(--accent-hex); text-shadow: 0 0 10px var(--accent-hex); font-weight: bold; transform: scale(1.1); } 100% { color: #8a8a9a; } }
+
+        /* 工場自動化レイヤー用の追加CSS */
+        #sector-selector {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--panel-color);
+            padding: 6px 16px;
+            border-radius: 6px;
+            border: 1px solid #2d2d3d;
+            margin-bottom: 4px;
+        }
+        #sector-selector button {
+            padding: 4px 12px;
+            background: #3b82f6;
+            border: none;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        #sector-selector button:disabled {
+            background: #555;
+            cursor: not-allowed;
+        }
+        #sector-display {
+            font-size: 14px;
+            font-family: monospace;
+            font-weight: bold;
+            color: #60a5fa;
+        }
+
+        #toolbar {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 8px;
+            justify-content: center;
+            max-width: 800px;
+        }
+        #toolbar button {
+            padding: 6px 10px;
+            border-radius: 4px;
+            border: 1px solid #333345;
+            background: #1f2933;
+            color: #eee;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        #toolbar button.active {
+            background: #3b82f6;
+            border-color: #60a5fa;
+        }
+
+        #stage-container {
+            position: relative;
+            overflow-x: auto;
+            width: 100%;
+            max-width: 100%;
+        }
+        #grid {
+            display: grid;
+            grid-template-columns: repeat(16, 32px);
+            grid-template-rows: repeat(10, 32px);
+            gap: 1px;
+            background: #333;
+            padding: 4px;
+            border-radius: 4px;
+            touch-action: none;
+        }
+        .cell {
+            width: 32px;
+            height: 32px;
+            background: #1f2933;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            position: relative;
+            box-sizing: border-box;
+            cursor: pointer;
+        }
+        .cell.building {
+            box-shadow: inset 0 0 0 1px #555;
+        }
+        
+        .item-layer {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            width: calc(16 * 32px + 15px);
+            height: calc(10 * 32px + 9px);
+            pointer-events: none;
+            z-index: 10;
+        }
+        .smooth-item {
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: left 0.35s linear, top 0.35s linear, opacity 0.2s;
+            pointer-events: none;
+            z-index: 10;
+        }
+        /* ── ガラス光沢アイテム ── */
+        .item-orb {
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        /* ── 点 (raw) ── */
+        .smooth-item.kind-raw .item-orb {
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 30%, rgba(255,255,255,0.75) 0%, rgba(0,255,204,0.55) 45%, rgba(0,180,130,0.95) 100%);
+            filter: drop-shadow(0 0 5px rgba(0,255,204,0.9));
+        }
+        /* ── 線 (line) ── */
+        .smooth-item.kind-line .item-orb {
+            width: 22px; height: 7px; border-radius: 4px;
+            background: linear-gradient(90deg, rgba(0,100,180,0.7) 0%, rgba(80,200,255,0.95) 50%, rgba(0,100,180,0.7) 100%);
+            filter: drop-shadow(0 0 5px rgba(0,162,255,0.9));
+        }
+        /* ── 三角形 ── */
+        .smooth-item.kind-triangle .item-orb {
+            clip-path: polygon(50% 3%, 3% 97%, 97% 97%);
+            background: linear-gradient(160deg, rgba(255,255,200,0.95) 0%, rgba(255,210,50,0.97) 35%, rgba(200,130,0,1) 100%);
+            filter: drop-shadow(0 0 5px rgba(255,202,40,0.95));
+        }
+        /* ── 四角形 ── */
+        .smooth-item.kind-square .item-orb {
+            border-radius: 3px;
+            background: linear-gradient(135deg, rgba(255,160,180,0.9) 0%, rgba(255,60,110,0.97) 50%, rgba(180,0,50,1) 100%);
+            filter: drop-shadow(0 0 5px rgba(255,51,102,0.95));
+        }
+        /* ── 五角形 ── */
+        .smooth-item.kind-pentagon .item-orb {
+            clip-path: polygon(50% 3%, 97% 37%, 79% 97%, 21% 97%, 3% 37%);
+            background: linear-gradient(150deg, rgba(225,170,255,0.9) 0%, rgba(175,64,255,0.97) 50%, rgba(110,0,200,1) 100%);
+            filter: drop-shadow(0 0 5px rgba(175,64,255,0.95));
+        }
+        /* ── 六角形 ── */
+        .smooth-item.kind-hexagon .item-orb {
+            clip-path: polygon(25% 3%, 75% 3%, 97% 50%, 75% 97%, 25% 97%, 3% 50%);
+            background: linear-gradient(135deg, rgba(255,190,110,0.9) 0%, rgba(255,119,0,0.97) 50%, rgba(180,60,0,1) 100%);
+            filter: drop-shadow(0 0 5px rgba(255,119,0,0.95));
+        }
+        /* ── パーツ共通 ── */
+        .smooth-item.kind-belt .item-orb,
+        .smooth-item.kind-inserter .item-orb,
+        .smooth-item.kind-assembler .item-orb,
+        .smooth-item.kind-fastBelt .item-orb,
+        .smooth-item.kind-fastInserter .item-orb,
+        .smooth-item.kind-fastAssembler .item-orb,
+        .smooth-item.kind-storageSource .item-orb,
+        .smooth-item.kind-storageSink .item-orb,
+        .smooth-item.kind-splitter .item-orb,
+        .smooth-item.kind-merger .item-orb {
+            border-radius: 3px;
+            font-size: 11px;
+            line-height: 1;
+            font-style: normal;
+        }
+        /* ── パーツ個別色 ── */
+        .smooth-item.kind-belt .item-orb         { background: rgba(100,60,20,0.9);  filter: drop-shadow(0 0 4px rgba(160,100,50,0.9)); }
+        .smooth-item.kind-inserter .item-orb      { background: rgba(150,80,0,0.9);   filter: drop-shadow(0 0 4px rgba(217,119,6,0.9)); }
+        .smooth-item.kind-assembler .item-orb     { background: rgba(80,30,130,0.9);  filter: drop-shadow(0 0 4px rgba(168,85,247,0.9)); }
+        .smooth-item.kind-fastBelt .item-orb      { background: rgba(30,80,100,0.9);  filter: drop-shadow(0 0 4px rgba(0,180,220,0.9)); }
+        .smooth-item.kind-fastInserter .item-orb  { background: rgba(0,100,20,0.9);   filter: drop-shadow(0 0 4px rgba(0,200,64,0.9)); }
+        .smooth-item.kind-fastAssembler .item-orb { background: rgba(20,20,80,0.9);   filter: drop-shadow(0 0 4px rgba(100,120,255,0.9)); }
+        .smooth-item.kind-storageSource .item-orb { background: rgba(0,100,40,0.9);   filter: drop-shadow(0 0 4px rgba(0,200,80,0.9)); }
+        .smooth-item.kind-storageSink .item-orb   { background: rgba(120,100,0,0.9);  filter: drop-shadow(0 0 4px rgba(220,180,0,0.9)); }
+        .smooth-item.kind-splitter .item-orb      { background: rgba(0,100,110,0.9);  filter: drop-shadow(0 0 4px rgba(34,211,238,0.9)); }
+        .smooth-item.kind-merger .item-orb        { background: rgba(50,0,120,0.9);   filter: drop-shadow(0 0 4px rgba(99,102,241,0.9)); }
+
+        /* ── ベルトコンベア（流れるアニメーション） ── */
+        .belt { background: #0b141e; overflow: hidden; }
+        .belt.dir-right {
+            background: repeating-linear-gradient(90deg, #1c2e3f 0px, #1c2e3f 8px, #0b141e 8px, #0b141e 16px);
+            animation: belt-flow-right 0.4s linear infinite;
+        }
+        .belt.dir-left {
+            background: repeating-linear-gradient(90deg, #1c2e3f 0px, #1c2e3f 8px, #0b141e 8px, #0b141e 16px);
+            animation: belt-flow-left 0.4s linear infinite;
+        }
+        .belt.dir-down {
+            background: repeating-linear-gradient(180deg, #1c2e3f 0px, #1c2e3f 8px, #0b141e 8px, #0b141e 16px);
+            animation: belt-flow-down 0.4s linear infinite;
+        }
+        .belt.dir-up {
+            background: repeating-linear-gradient(180deg, #1c2e3f 0px, #1c2e3f 8px, #0b141e 8px, #0b141e 16px);
+            animation: belt-flow-up 0.4s linear infinite;
+        }
+        @keyframes belt-flow-right { from { background-position: 0 0; } to { background-position: 16px 0; } }
+        @keyframes belt-flow-left  { from { background-position: 0 0; } to { background-position: -16px 0; } }
+        @keyframes belt-flow-down  { from { background-position: 0 0; } to { background-position: 0 16px; } }
+        @keyframes belt-flow-up    { from { background-position: 0 0; } to { background-position: 0 -16px; } }
+
+        /* ── ストレージ ── */
+        .storage-src      { background: radial-gradient(ellipse, #0a1f1a, #040d0a); border: 1px solid rgba(0,255,204,0.5); }
+        .storage-src-line { background: radial-gradient(ellipse, #0a1525, #04080f); border: 1px solid rgba(0,162,255,0.5); }
+        .storage-snk      { background: radial-gradient(ellipse, #0a1f0a, #040d04); border: 1px solid rgba(0,200,80,0.5); }
+
+        /* ── インサーター（180度回転アーム） ── */
+        .inserter {
+            background: #120a00;
+            border: 1px solid #3a2000;
+        }
+        .inserter-hub {
+            position: absolute;
+            width: 9px;
+            height: 9px;
+            background: radial-gradient(circle at 38% 32%, #ffe060, #d97706);
+            border-radius: 50%;
+            z-index: 3;
+            box-shadow: 0 0 7px rgba(217,119,6,0.85);
+        }
+        .inserter-arm {
+            position: absolute;
+            width: 3px;
+            height: 14px;
+            background: linear-gradient(to top, #7a3800, #fbbf24);
+            transform-origin: bottom center;
+            bottom: 50%;
+            left: calc(50% - 1.5px);
+            transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 2;
+            border-radius: 2px 2px 0 0;
+        }
+        /* SOURCE方向へ掴みに行く → DEST方向へ180度回転して離す */
+        .inserter.dir-right.swing-grab .inserter-arm { transform: rotate(-90deg); }
+        .inserter.dir-right.swing-drop .inserter-arm { transform: rotate(90deg); }
+        .inserter.dir-down.swing-grab  .inserter-arm { transform: rotate(0deg); }
+        .inserter.dir-down.swing-drop  .inserter-arm { transform: rotate(180deg); }
+        .inserter.dir-left.swing-grab  .inserter-arm { transform: rotate(90deg); }
+        .inserter.dir-left.swing-drop  .inserter-arm { transform: rotate(270deg); }
+        .inserter.dir-up.swing-grab    .inserter-arm { transform: rotate(180deg); }
+        .inserter.dir-up.swing-drop    .inserter-arm { transform: rotate(360deg); }
+
+        /* ── 組立機（パルス発光 + プログレスバー） ── */
+        .assembler {
+            background: #0f0518;
+            border: 1px solid #4a1870;
+            font-size: 10px;
+            flex-direction: column;
+            line-height: 1.2;
+            overflow: hidden;
+        }
+        @keyframes asm-pulse {
+            0%,100% { box-shadow: 0 0 4px rgba(168,85,247,0.3), inset 0 0 4px rgba(168,85,247,0.07); border-color: #4a1870; }
+            50%      { box-shadow: 0 0 16px rgba(168,85,247,0.9), inset 0 0 8px rgba(168,85,247,0.25); border-color: #c084fc; }
+        }
+        .assembler.producing { animation: asm-pulse 1.6s ease-in-out infinite; }
+        .assembler-bar-wrap {
+            position: absolute;
+            bottom: 2px; left: 2px; right: 2px;
+            height: 3px;
+            background: rgba(168,85,247,0.15);
+            border-radius: 2px;
+        }
+        .assembler-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #7c3aed, #c084fc);
+            border-radius: 2px;
+            min-width: 2px;
+        }
+
+        /* ── 高速ベルト ── */
+        .fast-belt { background: #050f14; overflow: hidden; }
+        .fast-belt.dir-right {
+            background: repeating-linear-gradient(90deg, #0a3040 0px, #0a3040 8px, #050f14 8px, #050f14 16px);
+            animation: belt-flow-right 0.2s linear infinite;
+        }
+        .fast-belt.dir-left {
+            background: repeating-linear-gradient(90deg, #0a3040 0px, #0a3040 8px, #050f14 8px, #050f14 16px);
+            animation: belt-flow-left 0.2s linear infinite;
+        }
+        .fast-belt.dir-down {
+            background: repeating-linear-gradient(180deg, #0a3040 0px, #0a3040 8px, #050f14 8px, #050f14 16px);
+            animation: belt-flow-down 0.2s linear infinite;
+        }
+        .fast-belt.dir-up {
+            background: repeating-linear-gradient(180deg, #0a3040 0px, #0a3040 8px, #050f14 8px, #050f14 16px);
+            animation: belt-flow-up 0.2s linear infinite;
+        }
+
+        /* ── 高速インサーター ── */
+        .fast-inserter {
+            background: #001a08;
+            border: 1px solid #00802a;
+        }
+        .fast-inserter .inserter-hub {
+            background: radial-gradient(circle at 38% 32%, #60ff80, #00c040);
+            box-shadow: 0 0 7px rgba(0,192,64,0.85);
+        }
+        .fast-inserter .inserter-arm {
+            background: linear-gradient(to top, #004010, #40ff80);
+        }
+
+        /* ── 高速組立機 ── */
+        .fast-assembler {
+            background: #04040f;
+            border: 1px solid #1a1890;
+            font-size: 10px;
+            flex-direction: column;
+            line-height: 1.2;
+            overflow: hidden;
+        }
+        @keyframes fast-asm-pulse {
+            0%,100% { box-shadow: 0 0 4px rgba(80,120,255,0.3), inset 0 0 4px rgba(80,120,255,0.07); border-color: #1a1890; }
+            50%      { box-shadow: 0 0 18px rgba(80,120,255,1.0), inset 0 0 10px rgba(80,120,255,0.4); border-color: #6080ff; }
+        }
+        .fast-assembler.producing { animation: fast-asm-pulse 0.8s ease-in-out infinite; }
+        .fast-assembler .assembler-bar-fill {
+            background: linear-gradient(90deg, #3040d0, #6080ff);
+        }
+
+        /* ── 分岐機 ── */
+        .splitter {
+            background: #1a0800;
+            border: 1px solid #d06000;
+        }
+
+        /* ── 合流機 ── */
+        .merger {
+            background: #10001a;
+            border: 1px solid #8000c0;
+        }
+
+        @media (max-width: 600px) {
+            .dashboard {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* クラフトモード用スタイル */
+        .mode-switch {
+            display: flex;
+            gap: 8px;
+            width: 100%;
+            max-width: 600px;
+        }
+        .mode-btn {
+            flex: 1;
+            padding: 9px 16px;
+            border-radius: 8px;
+            border: 1px solid #333345;
+            background: #1a1a24;
+            color: #8a8a9a;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        .mode-btn.active {
+            background: #2b2b3d;
+            border-color: var(--accent-squ);
+            color: #fff;
+            box-shadow: 0 0 10px rgba(255,51,102,0.2);
+        }
+
+        #craft-panel {
+            width: 100%;
+            max-width: 600px;
+            background: var(--panel-color);
+            border: 1px solid #2d2d3d;
+            border-radius: 12px;
+            padding: 16px 20px;
+            box-sizing: border-box;
+        }
+        .craft-part-selector {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 14px;
+            justify-content: center;
+        }
+        .craft-part-btn {
+            flex: 1;
+            padding: 10px 8px;
+            border-radius: 8px;
+            border: 1px solid #44445a;
+            background: #1f2933;
+            color: #ccc;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            transition: all 0.2s;
+            text-align: center;
+            line-height: 1.6;
+        }
+        .craft-part-btn.selected {
+            background: #2b2b3d;
+            border-color: var(--accent-squ);
+            color: #fff;
+            box-shadow: 0 0 8px rgba(255,51,102,0.25);
+        }
+        .craft-part-btn .part-count {
+            display: block;
+            font-size: 15px;
+            color: var(--accent-point);
+            margin-top: 2px;
+        }
+        .craft-slots-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        .craft-slots-area {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .craft-slot {
+            width: 52px;
+            height: 52px;
+            border-radius: 10px;
+            border: 2px dashed #44445a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            transition: all 0.2s;
+            background: #111827;
+            position: relative;
+        }
+        .craft-slot.filled {
+            border: 2px solid var(--accent-point);
+            background: #0a2a1a;
+            animation: slot-pop 0.3s ease-out;
+        }
+        .craft-slot.next-needed {
+            border: 2px dashed var(--accent-line);
+            box-shadow: 0 0 10px rgba(0,162,255,0.4);
+            animation: slot-pulse 1s ease-in-out infinite alternate;
+        }
+        @keyframes slot-pop {
+            0% { transform: scale(1.35); }
+            100% { transform: scale(1); }
+        }
+        @keyframes slot-pulse {
+            0% { box-shadow: 0 0 6px rgba(0,162,255,0.3); }
+            100% { box-shadow: 0 0 14px rgba(0,162,255,0.7); }
+        }
+        .craft-hint {
+            font-size: 13px;
+            color: #8a8a9a;
+            text-align: center;
+            font-family: monospace;
+        }
+        .craft-complete-flash {
+            animation: complete-flash 0.5s ease-out;
+        }
+        @keyframes complete-flash {
+            0% { background: #0a3a1a; box-shadow: 0 0 20px var(--accent-point); }
+            100% { background: var(--panel-color); }
+        }
+
+        /* 材料投入ボタン */
+        .craft-materials-area {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #2d2d3d;
+        }
+        .craft-material-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 1px solid #44445a;
+            background: #1a1a2e;
+            color: #ccc;
+            cursor: pointer;
+            min-width: 76px;
+            transition: all 0.15s;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .craft-material-btn:active:not([disabled]) {
+            transform: translateY(-5px) scale(1.05);
+            background: #252540;
+            box-shadow: 0 6px 16px rgba(0,255,204,0.3);
+            border-color: var(--accent-point);
+        }
+        .craft-material-btn[disabled] { opacity: 0.3; cursor: not-allowed; }
+        .cmat-icon  { font-size: 22px; line-height: 1; }
+        .cmat-label { font-size: 11px; color: #aaa; }
+        .cmat-need  { font-size: 10px; color: #667; }
+        .cmat-have  { font-size: 11px; font-weight: bold; }
+
+        /* 部品インベントリ（自動化タブ用） */
+        .parts-inventory {
+            display: flex;
+            gap: 14px;
+            font-family: monospace;
+            font-size: 13px;
+            color: #8a8a9a;
+            background: var(--panel-color);
+            padding: 6px 18px;
+            border-radius: 20px;
+            border: 1px solid #2d2d3d;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .parts-inventory .part-label { color: #ccc; }
+        .parts-inventory .part-num {
+            color: var(--accent-squ);
+            font-weight: bold;
+            margin-left: 3px;
+        }
+        .parts-inventory .part-num.zero { color: #555565; }
+    </style>
+</head>
+<body>
+
+    <h1 id="game-title" onclick="handleTitleClick()">Shape Gesture Factory</h1>
+
+    <div class="tab-container">
+        <button class="tab-btn active" id="tab-factory" onclick="switchTab('factory')">⚙️ 工場 (Canvas)</button>
+        <button class="tab-btn" id="tab-automation" onclick="switchTab('automation')">🏭 自動化ライン (Grid)</button>
+        <button class="tab-btn" id="tab-storage" onclick="switchTab('storage')">📦 倉庫 (Inventory)</button>
+        <button class="tab-btn" id="tab-tier" onclick="switchTab('tier')">🏆 ティア (Progress)</button>
+    </div>
+
+    <div class="mini-inventory">
+        <span id="mini-point">⚀ 0</span>
+        <span id="mini-line" class="locked-mini">⚁ 0</span>
+        <span id="mini-triangle" class="locked-mini">⚂ 0</span>
+        <span id="mini-square" class="locked-mini">⚃ 0</span>
+        <span id="mini-pentagon" class="locked-mini">⚄ 0</span>
+        <span id="mini-hexagon" class="locked-mini">⚅ 0</span>
+    </div>
+
+    <div class="dashboard" id="content-storage" style="display: none;">
+        <div class="resource-card point" id="card-point">
+            <div class="resource-name">点 (Points)</div>
+            <div class="resource-value" id="point-val">0 / 20</div>
+            <button class="upgrade-btn" id="up-point" onclick="upgradeStorage('point')" style="margin-bottom: 5px;">📦 拡張 (■×6)</button>
+            <button class="upgrade-btn" id="prod-point" onclick="upgradeProduction('point')" style="margin-bottom: 5px;">⚡ 生産量強化 (🔺×10)</button>
+            <button class="upgrade-btn" id="auto-prod-point" onclick="upgradeAutoProduction('point')">🤖 自動生産強化 (🔺×5, ■×5)</button>
+        </div>
+        <div class="resource-card line locked" id="card-line">
+            <div class="resource-name">線 (Lines) <span style="font-size:10px;color:#ff3366;">[未解放]</span></div>
+            <div class="resource-value" id="line-val">0 / 20</div>
+            <button class="upgrade-btn" id="up-line" onclick="upgradeStorage('line')" disabled style="margin-bottom: 5px;">📦 拡張 (■×6)</button>
+            <button class="upgrade-btn" id="prod-line" onclick="upgradeProduction('line')" disabled style="margin-bottom: 5px;">⚡ 生産量強化 (🔺×15)</button>
+            <button class="upgrade-btn" id="auto-prod-line" onclick="upgradeAutoProduction('line')" disabled>🤖 自動生産強化 (⬠×5, ⬢×5)</button>
+        </div>
+        <div class="resource-card triangle locked" id="card-triangle">
+            <div class="resource-name">三角形 (Triangles) <span style="font-size:10px;color:#ff3366;">[未解放]</span></div>
+            <div class="resource-value" id="triangle-val">0 / 20</div>
+            <button class="upgrade-btn" id="up-triangle" onclick="upgradeStorage('triangle')" disabled>📦 拡張 (■×6)</button>
+        </div>
+        <div class="resource-card square locked" id="card-square">
+            <div class="resource-name">四角形 (Squares) <span style="font-size:10px;color:#ff3366;">[未解放]</span></div>
+            <div class="resource-value" id="square-val">0 / 20</div>
+            <button class="upgrade-btn" id="up-square" onclick="upgradeStorage('square')" disabled>📦 拡張 (■×6)</button>
+        </div>
+        <div class="resource-card pentagon locked" id="card-pentagon">
+            <div class="resource-name">五角形 (Pentagons) <span style="font-size:10px;color:#ff3366;">[未解放]</span></div>
+            <div class="resource-value" id="pentagon-val">0 / 20</div>
+            <button class="upgrade-btn" id="up-pentagon" onclick="upgradeStorage('pentagon')" disabled>📦 拡張 (■×6)</button>
+        </div>
+        <div class="resource-card hexagon locked" id="card-hexagon">
+            <div class="resource-name">六角形 (Hexagons) <span style="font-size:10px;color:#ff3366;">[未解放]</span></div>
+            <div class="resource-value" id="hexagon-val">0 / 20</div>
+            <button class="upgrade-btn" id="up-hexagon" onclick="upgradeStorage('hexagon')" disabled>📦 拡張 (■×6)</button>
+        </div>
+    </div>
+
+    <div id="content-tier" style="display: none; width: 100%; max-width: 800px; justify-content: center;">
+        <div class="tier-panel">
+            <div class="tier-title">
+                <span id="tier-header-title">TIER 1</span>
+                <span class="tier-status" id="tier-name">1-1: 線を解放せよ</span>
+            </div>
+            <div class="tier-goal-desc" id="tier-desc">生産した「点」を納品して、新しいラインテクノロジーをアンロックしましょう。</div>
+            
+            <div class="tier-requirements" id="tier-reqs"></div>
+        </div>
+    </div>
+
+    <div id="content-factory">
+
+        <div id="factory-mode-switch" class="mode-switch" style="display:none;">
+            <button class="mode-btn active" id="btn-mode-factory" onclick="setFactoryMode('factory')">⚙️ 製造モード</button>
+            <button class="mode-btn" id="btn-mode-craft" onclick="setFactoryMode('craft')">🔧 クラフトモード</button>
+        </div>
+
+        <div id="craft-panel" style="display:none;">
+            <div class="craft-part-selector">
+                <button class="craft-part-btn selected" onclick="selectCraftTarget('belt')">
+                    🟫 ベルト
+                    <span class="part-count" id="parts-belt-count">×0</span>
+                </button>
+                <button class="craft-part-btn" onclick="selectCraftTarget('inserter')">
+                    🦾 インサーター
+                    <span class="part-count" id="parts-inserter-count">×0</span>
+                </button>
+                <button class="craft-part-btn" onclick="selectCraftTarget('assembler')">
+                    🟣 組立機
+                    <span class="part-count" id="parts-assembler-count">×0</span>
+                </button>
+                <button class="craft-part-btn" onclick="selectCraftTarget('storageSource')">
+                    📦 材料ストレージ
+                    <span class="part-count" id="parts-storageSource-count">×0</span>
+                </button>
+                <button class="craft-part-btn" onclick="selectCraftTarget('storageSink')">
+                    📤 完成品ストレージ
+                    <span class="part-count" id="parts-storageSink-count">×0</span>
+                </button>
+                <button class="craft-part-btn" data-unlock="fastBelt" onclick="selectCraftTarget('fastBelt')" style="display:none">
+                    ⚡🟫 高速ベルト
+                    <span class="part-count" id="parts-fastBelt-count">×0</span>
+                </button>
+                <button class="craft-part-btn" data-unlock="fastInserter" onclick="selectCraftTarget('fastInserter')" style="display:none">
+                    ⚡🦾 高速インサーター
+                    <span class="part-count" id="parts-fastInserter-count">×0</span>
+                </button>
+                <button class="craft-part-btn" data-unlock="fastAssembler" onclick="selectCraftTarget('fastAssembler')" style="display:none">
+                    ⚡🟣 高速組立機
+                    <span class="part-count" id="parts-fastAssembler-count">×0</span>
+                </button>
+                <button class="craft-part-btn" data-unlock="splitter" onclick="selectCraftTarget('splitter')" style="display:none">
+                    🔀 分岐機
+                    <span class="part-count" id="parts-splitter-count">×0</span>
+                </button>
+                <button class="craft-part-btn" data-unlock="merger" onclick="selectCraftTarget('merger')" style="display:none">
+                    🔁 合流機
+                    <span class="part-count" id="parts-merger-count">×0</span>
+                </button>
+            </div>
+            <div class="craft-slots-wrap">
+                <div id="craft-slots-area" class="craft-slots-area"></div>
+                <div class="craft-hint" id="craft-hint">材料をスワイプ↑ or タップして投入！</div>
+            </div>
+            <div id="craft-materials" class="craft-materials-area"></div>
+        </div>
+
+        <div class="canvas-container">
+            <div class="feedback" id="feedback-msg">ラインを引くか、ジェスチャーをどうぞ</div>
+            <canvas id="gameCanvas"></canvas>
+        </div>
+
+        <div class="instructions">
+            【操作方法】<br>
+            ・<span>タップ（クリック）</span>：点を生産 (+1)<br>
+            ・<span>まっすぐ引いて離す</span>：線を生産 (+1) <span style="color:#8a8a9a;">※要解放</span><br>
+            ・<span>多角形作成</span>：ドラッグして線を引いて<b>一瞬止める(約0.07秒)</b>と、そこが直線でロックされて「角」になります。最後に<b>始点の近くへ持ってくると磁石のようにピタッとくっつく</b>ので、そこで指を離すと合成されます。<br>
+            （🔺三角形:角2 / 🟥四角形:角3 / ⬠五角形:角4 / ⬢六角形:角5以上） <span style="color:#8a8a9a;">※要各解放</span>
+        </div>
+    </div>
+
+    <div id="content-automation" style="display: none;">
+        <div class="parts-inventory" id="parts-display">
+            <span><span class="part-label">🟫 ベルト</span><span class="part-num zero" id="disp-parts-belt">0</span></span>
+            <span><span class="part-label">🦾 インサーター</span><span class="part-num zero" id="disp-parts-inserter">0</span></span>
+            <span><span class="part-label">🟣 組立機</span><span class="part-num zero" id="disp-parts-assembler">0</span></span>
+            <span><span class="part-label">📦 材料ストレージ</span><span class="part-num zero" id="disp-parts-storageSource">0</span></span>
+            <span><span class="part-label">📤 完成品ストレージ</span><span class="part-num zero" id="disp-parts-storageSink">0</span></span>
+            <span data-unlock="fastBelt" style="display:none"><span class="part-label">⚡🟫 高速ベルト</span><span class="part-num zero" id="disp-parts-fastBelt">0</span></span>
+            <span data-unlock="fastInserter" style="display:none"><span class="part-label">⚡🦾 高速インサーター</span><span class="part-num zero" id="disp-parts-fastInserter">0</span></span>
+            <span data-unlock="fastAssembler" style="display:none"><span class="part-label">⚡🟣 高速組立機</span><span class="part-num zero" id="disp-parts-fastAssembler">0</span></span>
+            <span data-unlock="splitter" style="display:none"><span class="part-label">🔀 分岐機</span><span class="part-num zero" id="disp-parts-splitter">0</span></span>
+            <span data-unlock="merger" style="display:none"><span class="part-label">🔁 合流機</span><span class="part-num zero" id="disp-parts-merger">0</span></span>
+        </div>
+
+        <div id="sector-selector">
+            <button id="btn-prev-sector">◀ 前のセクター</button>
+            <div id="sector-display">SECTOR 00</div>
+            <button id="btn-next-sector">次のセクター ▶</button>
+        </div>
+
+        <div id="toolbar">
+            <button data-tool="erase" class="active">消しゴム</button>
+            <button data-tool="storage-source">📦 材料ストレージ (タップで種類変更)</button>
+            <button data-tool="storage-sink">📤 完成品ストレージ</button>
+            <button data-tool="belt">ベルト (スライド方向決定)</button>
+            <button data-tool="inserter">インサーター (スライド方向決定)</button>
+            <button data-tool="assembler">組立機（タップでレシピ切替）</button>
+            <button data-tool="fast-belt" data-unlock="fastBelt" style="display:none">⚡ 高速ベルト</button>
+            <button data-tool="fast-inserter" data-unlock="fastInserter" style="display:none">⚡ 高速インサーター</button>
+            <button data-tool="fast-assembler" data-unlock="fastAssembler" style="display:none">⚡ 高速組立機</button>
+            <button data-tool="splitter" data-unlock="splitter" style="display:none">🔀 分岐機</button>
+            <button data-tool="merger" data-unlock="merger" style="display:none">🔁 合流機</button>
+        </div>
+
+        <div id="info" style="font-size: 12px; color: #aaa; text-align: center; max-width: 800px; line-height: 1.4;">
+            【グリッド操作】マスを<b>タップしたまま進みたい方向へ少しスライドして離す</b>と、その向きで配置されます。<br>
+            すでに配置された<b>組立機をその場でタップするとレシピ（三角形〜六角形）を切り替え</b>られます。<br>
+            <span style="color: var(--accent-point);">※点源・線源は倉庫の在庫を消費し、完成品置き場に届いた図形は倉庫へと直接回収されます！</span>
+        </div>
+
+        <div id="stage-container">
+            <div id="grid"></div>
+            <div id="item-layer" class="item-layer"></div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const feedbackEl = document.getElementById('feedback-msg');
+
+        // カラー定義
+        const COLORS = {
+            point: '#00ffcc',
+            line: '#00a2ff',
+            triangle: '#ffca28',
+            square: '#ff3366',
+            pentagon: '#af40ff',
+            hexagon: '#ff7700',
+            grid: '#2d2d3d'
+        };
+
+        // ゲームリソース状態
+        let resources = { point: 0, line: 0, triangle: 0, square: 0, pentagon: 0, hexagon: 0 };
+        let maxStorage = { point: 20, line: 20, triangle: 20, square: 20, pentagon: 20, hexagon: 20 };
+        
+        // 手動生産量状態（初期値1.0）
+        let productionRates = { point: 1.0, line: 1.0 };
+
+        // 自動生産量状態（初期値0.2）
+        let autoProductionRates = { point: 0.2, line: 0.2 };
+
+        // ティアシステム状態定義
+        let currentTierIndex = 0; 
+        let submittedResources = { point: 0, line: 0, triangle: 0, square: 0, pentagon: 0, hexagon: 0 };
+
+        // デバッグモード状態
+        let isDebugMode = false;
+        let titleClickCount = 0;
+        let titleClickTimer = null;
+
+        // 部品インベントリ
+        let parts = { belt: 0, inserter: 0, assembler: 0, fastBelt: 0, fastInserter: 0, fastAssembler: 0, splitter: 0, merger: 0, storageSource: 0, storageSink: 0 };
+
+        // クラフトモード状態
+        let currentMode = 'factory'; // 'factory' | 'craft'
+        let currentCraftTarget = 'belt';
+        let craftSlots = [];
+
+        const CRAFT_RECIPES = {
+            belt:          { label: 'ベルト',         ingredients: [{ type: 'square', count: 1 }, { type: 'triangle', count: 1 }] },
+            inserter:      { label: 'インサーター',    ingredients: [{ type: 'square', count: 1 }, { type: 'triangle', count: 2 }] },
+            assembler:     { label: '組立機',          ingredients: [{ type: 'square', count: 3 }, { type: 'triangle', count: 2 }, { type: 'pentagon', count: 1 }] },
+            storageSource: { label: '材料ストレージ',  ingredients: [{ type: 'square', count: 2 }] },
+            storageSink:   { label: '完成品ストレージ',ingredients: [{ type: 'square', count: 2 }] },
+            fastBelt:      { label: '高速ベルト',      ingredients: [{ type: 'square', count: 2 }, { type: 'pentagon', count: 1 }, { type: 'triangle', count: 1 }] },
+            fastInserter:  { label: '高速インサーター', ingredients: [{ type: 'square', count: 2 }, { type: 'pentagon', count: 1 }, { type: 'triangle', count: 2 }] },
+            fastAssembler: { label: '高速組立機',      ingredients: [{ type: 'square', count: 5 }, { type: 'pentagon', count: 2 }, { type: 'hexagon', count: 1 }] },
+            splitter:      { label: '分岐機',          ingredients: [{ type: 'square', count: 3 }, { type: 'pentagon', count: 2 }, { type: 'hexagon', count: 1 }] },
+            merger:        { label: '合流機',          ingredients: [{ type: 'square', count: 3 }, { type: 'pentagon', count: 2 }, { type: 'hexagon', count: 1 }] }
+        };
+
+        const PART_NAMES = { belt: 'ベルト', inserter: 'インサーター', assembler: '組立機', storageSource: '材料ストレージ', storageSink: '完成品ストレージ', fastBelt: '高速ベルト', fastInserter: '高速インサーター', fastAssembler: '高速組立機', splitter: '分岐機', merger: '合流機' };
+
+        const CELL_TYPE_TO_PART_KEY = {
+            'belt': 'belt', 'inserter': 'inserter', 'assembler': 'assembler',
+            'storage-source': 'storageSource', 'storage-sink': 'storageSink',
+            'fast-belt': 'fastBelt', 'fast-inserter': 'fastInserter', 'fast-assembler': 'fastAssembler',
+            'splitter': 'splitter', 'merger': 'merger'
+        };
+        const SHAPE_ICONS  = { point: '●', line: '─', triangle: '▲', square: '■', pentagon: '⬠', hexagon: '⬡' };
+        const SHAPE_NAMES_JP = { point: '点', line: '線', triangle: '三角形', square: '四角形', pentagon: '五角形', hexagon: '六角形' };
+
+        const TIER_CONFIGS = [
+            {
+                name: "1-1: 線のテクノロジー解放",
+                desc: "「点」を合計100個納品して、直線の生産能力をアンロックします。手持ちの在庫（上限20）からいつでも分割納品可能です！",
+                unlocked: ["point"],
+                reqs: { point: 100 }
+            },
+            {
+                name: "1-2: 三角形の幾何学解放",
+                desc: "点と線をそれぞれ合計200個ずつ納品し、多角形合成システム（三角形）をアンロックします。",
+                unlocked: ["point", "line"],
+                reqs: { point: 200, line: 200 }
+            },
+            {
+                name: "1-3: 四角形の安定構造解放",
+                desc: "三角形を合計5個納品し、四角形の自動加工をアンロックします。倉庫拡張（四角形が6個必要）も利用可能になります。",
+                unlocked: ["point", "line", "triangle"],
+                reqs: { triangle: 5 }
+            },
+            {
+                name: "1-4: 五角形の複合合成解放",
+                desc: "四角形を合計5個納品し、五角形の加工テクノロジーをアンロックします。",
+                unlocked: ["point", "line", "triangle", "square"],
+                reqs: { square: 5 }
+            },
+            {
+                name: "1-5: 六角形の結晶構造解放",
+                desc: "五角形を合計5個納品し、最終テクノロジーである六角形の加工をアンロックします。",
+                unlocked: ["point", "line", "triangle", "square", "pentagon"],
+                reqs: { pentagon: 5 }
+            },
+            {
+                name: "1-Complete: ティア1完全制覇",
+                desc: "六角形を合計5個納品して、ティア1のすべての製品ラインを完成させましょう！",
+                unlocked: ["point", "line", "triangle", "square", "pentagon", "hexagon"],
+                reqs: { hexagon: 5 }
+            },
+            {
+                name: "2-1: 点の自動化設備解放",
+                desc: "点と四角形を納品し、毎秒0.2の「点」を自動生産するラインをアンロックします。",
+                unlocked: ["point", "line", "triangle", "square", "pentagon", "hexagon"],
+                reqs: { point: 100, square: 10 }
+            },
+            {
+                name: "2-2: 線の自動化設備解放",
+                desc: "線と五角形を納品し、毎秒0.2の「線」を自動生産するラインをアンロックします。",
+                unlocked: ["point", "line", "triangle", "square", "pentagon", "hexagon", "autoPoint"],
+                reqs: { line: 100, pentagon: 10 }
+            },
+            {
+                name: "2-Complete: ティア2制覇！",
+                desc: "お見事！全図形テクノロジーと自動生産ラインが解放されました！続けてティア3に挑戦しましょう。高速化設備と分岐・合流機の解放が待っています！",
+                unlocked: ["point", "line", "triangle", "square", "pentagon", "hexagon", "autoPoint", "autoLine"],
+                reqs: {}
+            },
+            {
+                name: "3-1: 高速ベルトの解放",
+                desc: "六角形50個・五角形30個を納品し、通常の2倍速で動く高速ベルトをアンロックします。グリッド自動化ラインをフル活用して大量生産しましょう！",
+                unlocked: ["point", "line", "triangle", "square", "pentagon", "hexagon", "autoPoint", "autoLine"],
+                reqs: { hexagon: 50, pentagon: 30 }
+            },
+            {
+                name: "3-2: 高速インサーターの解放",
+                desc: "六角形50個・三角形50個を納品し、2マス先から掴める高速インサーターをアンロックします。",
+                unlocked: ["point", "line", "triangle", "square", "pentagon", "hexagon", "autoPoint", "autoLine", "fastBelt"],
+                reqs: { hexagon: 50, triangle: 50 }
+            },
+            {
+                name: "3-3: 高速組立機の解放",
+                desc: "六角形100個・四角形50個を納品し、製造速度2倍の高速組立機をアンロックします。",
+                unlocked: ["point", "line", "triangle", "square", "pentagon", "hexagon", "autoPoint", "autoLine", "fastBelt", "fastInserter"],
+                reqs: { hexagon: 100, square: 50 }
+            },
+            {
+                name: "3-4: 分岐機＆合流機の解放",
+                desc: "五角形・六角形を各30個納品し、ラインを2方向に分岐させる分岐機と2ラインを1本に合流させる合流機をアンロックします。",
+                unlocked: ["point", "line", "triangle", "square", "pentagon", "hexagon", "autoPoint", "autoLine", "fastBelt", "fastInserter", "fastAssembler"],
+                reqs: { pentagon: 30, hexagon: 30 }
+            },
+            {
+                name: "T3-Complete: ティア3完全制覇！",
+                desc: "すべての高速化設備と分岐・合流機が解放されました！究極の自動化工場を構築してください！",
+                unlocked: ["point", "line", "triangle", "square", "pentagon", "hexagon", "autoPoint", "autoLine", "fastBelt", "fastInserter", "fastAssembler", "splitter", "merger"],
+                reqs: {}
+            }
+        ];
+
+        // 工場自動化システム用の個別定数・変数群
+        const COLS = 16;
+        const ROWS = 10;
+        const TICK_MS = 400;
+        const TOTAL_SECTORS = 30;
+
+        // 辺の数に比例した生産時間: 三角3s, 四角4s, 五角5s, 六角6s
+        const RECIPES = [
+            { id: 'triangle',     name: '▲',  label: '三角形',
+              ingredients: [{ kind: 'raw', count: 3 }, { kind: 'line', count: 3 }],
+              output: 'triangle',     ticks: Math.round(3000/TICK_MS) },
+            { id: 'square',       name: '■',  label: '四角形',
+              ingredients: [{ kind: 'raw', count: 4 }, { kind: 'line', count: 4 }],
+              output: 'square',       ticks: Math.round(4000/TICK_MS) },
+            { id: 'pentagon',     name: '⬠',  label: '五角形',
+              ingredients: [{ kind: 'raw', count: 5 }, { kind: 'line', count: 5 }],
+              output: 'pentagon',     ticks: Math.round(5000/TICK_MS) },
+            { id: 'hexagon',      name: '⬡',  label: '六角形',
+              ingredients: [{ kind: 'raw', count: 6 }, { kind: 'line', count: 6 }],
+              output: 'hexagon',      ticks: Math.round(6000/TICK_MS) },
+            { id: 'belt',         name: '🟫', label: 'ベルト(部品)',
+              ingredients: [{ kind: 'square', count: 1 }, { kind: 'triangle', count: 1 }],
+              output: 'belt',         ticks: Math.round(4000/TICK_MS),  unlocksAt: 8 },
+            { id: 'inserter',     name: '🦾', label: 'インサーター(部品)',
+              ingredients: [{ kind: 'square', count: 1 }, { kind: 'triangle', count: 2 }],
+              output: 'inserter',     ticks: Math.round(6000/TICK_MS),  unlocksAt: 8 },
+            { id: 'assembler',    name: '🟣', label: '組立機(部品)',
+              ingredients: [{ kind: 'square', count: 3 }, { kind: 'triangle', count: 2 }, { kind: 'pentagon', count: 1 }],
+              output: 'assembler',    ticks: Math.round(10000/TICK_MS), unlocksAt: 8 },
+            { id: 'storageSource',name: '📦', label: '材料ストレージ(部品)',
+              ingredients: [{ kind: 'square', count: 2 }],
+              output: 'storageSource',ticks: Math.round(4000/TICK_MS),  unlocksAt: 8 },
+            { id: 'storageSink',  name: '📤', label: '完成品ストレージ(部品)',
+              ingredients: [{ kind: 'square', count: 2 }],
+              output: 'storageSink',  ticks: Math.round(4000/TICK_MS),  unlocksAt: 8 },
+        ];
+
+        function isRecipeAvailable(recipe) {
+            return recipe.unlocksAt === undefined || currentTierIndex >= recipe.unlocksAt;
+        }
+
+        const gridEl = document.getElementById('grid');
+        const toolbarEl = document.getElementById('toolbar');
+        const itemLayerEl = document.getElementById('item-layer');
+        const btnPrevSector = document.getElementById('btn-prev-sector');
+        const btnNextSector = document.getElementById('btn-next-sector');
+        const sectorDisplay = document.getElementById('sector-display');
+
+        const sectors = [];
+        let currentSectorId = 0;
+        let itemIdCounter = 0;
+
+        let startX = 0;
+        let startY = 0;
+        let startCellX = null;
+        let startCellY = null;
+        let currentTool = 'erase';
+
+        // 入力検知用変数 (Canvasジェスチャー用)
+        let isDrawing = false;
+        let startPoint = { x: 0, y: 0 };
+        let anchorPoint = { x: 0, y: 0 };
+        let lastVector = null;
+        let strokePoints = [];
+        let rawCorners = [];
+        let currentPrediction = "";
+        let pauseTimer = null; 
+        let lastMovePos = { x: 0, y: 0 }; 
+        
+        const MIN_DIST = 15; 
+        let effects = []; 
+
+        // タイトルクリックハンドラー
+        function handleTitleClick() {
+            titleClickCount++;
+            if (titleClickTimer) clearTimeout(titleClickTimer);
+            
+            titleClickTimer = setTimeout(() => {
+                titleClickCount = 0;
+            }, 1500);
+
+            if (titleClickCount >= 5) {
+                titleClickCount = 0;
+                clearTimeout(titleClickTimer);
+                isDebugMode = !isDebugMode;
+                
+                const titleEl = document.getElementById('game-title');
+                if (isDebugMode) {
+                    titleEl.innerHTML = 'Shape Gesture Factory <span style="font-size:16px; color:#ff3366; vertical-align:middle;">[DEBUG]</span>';
+                    setFeedback("🔧 デバッグモード ON: 在庫なしでティアを解放できます");
+                } else {
+                    titleEl.innerHTML = 'Shape Gesture Factory';
+                    setFeedback("🔧 デバッグモード OFF");
+                }
+                updateUI();
+                updateTierUI();
+            }
+        }
+
+        // タブ切り替えロジック
+        function switchTab(tabName) {
+            // ティア2-2（Index 7）クリアのALL CLEAR!（Index 8以上）に到達するまでは自動化ラインへの切り替えをブロック
+            if (tabName === 'automation' && currentTierIndex < 8) {
+                setFeedback("🔒 自動化ラインはティア3（ALL CLEAR!）に到達すると解放されます！");
+                return;
+            }
+
+            const factoryContent = document.getElementById('content-factory');
+            const automationContent = document.getElementById('content-automation');
+            const storageContent = document.getElementById('content-storage');
+            const tierContent = document.getElementById('content-tier');
+            
+            const factoryBtn = document.getElementById('tab-factory');
+            const automationBtn = document.getElementById('tab-automation');
+            const storageBtn = document.getElementById('tab-storage');
+            const tierBtn = document.getElementById('tab-tier');
+
+            factoryContent.style.display = 'none';
+            automationContent.style.display = 'none';
+            storageContent.style.display = 'none';
+            tierContent.style.display = 'none';
+            
+            factoryBtn.classList.remove('active');
+            automationBtn.classList.remove('active');
+            storageBtn.classList.remove('active');
+            tierBtn.classList.remove('active');
+
+            if (tabName === 'factory') {
+                factoryContent.style.display = 'flex';
+                factoryBtn.classList.add('active');
+            } else if (tabName === 'automation') {
+                automationContent.style.display = 'flex';
+                automationBtn.classList.add('active');
+                renderAll();
+            } else if (tabName === 'storage') {
+                storageContent.style.display = 'grid';
+                storageBtn.classList.add('active');
+                updateUI();
+            } else if (tabName === 'tier') {
+                tierContent.style.display = 'flex'; 
+                tierBtn.classList.add('active');
+                updateTierUI();
+            }
+        }
+
+        // 自動化ツールバーイベント
+        toolbarEl.addEventListener('click', (e) => {
+            if (e.target.tagName !== 'BUTTON') return;
+            currentTool = e.target.dataset.tool;
+            [...toolbarEl.querySelectorAll('button')].forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+        });
+
+        // セクターUI更新
+        function updateSectorUI() {
+            sectorDisplay.textContent = `SECTOR ${String(currentSectorId).padStart(2, '0')}`;
+            btnPrevSector.disabled = (currentSectorId === 0);
+            btnNextSector.disabled = (currentSectorId === TOTAL_SECTORS - 1);
+            
+            itemLayerEl.innerHTML = '';
+            renderAll();
+        }
+
+        btnPrevSector.addEventListener('click', () => {
+            if (currentSectorId > 0) {
+                currentSectorId--;
+                updateSectorUI();
+            }
+        });
+
+        btnNextSector.addEventListener('click', () => {
+            if (currentSectorId < TOTAL_SECTORS - 1) {
+                currentSectorId++;
+                updateSectorUI();
+            }
+        });
+
+        // 工場用グリッド生成
+        function createGrid() {
+            for (let s = 0; s < TOTAL_SECTORS; s++) {
+                sectors[s] = [];
+                for (let y = 0; y < ROWS; y++) {
+                    sectors[s][y] = [];
+                    for (let x = 0; x < COLS; x++) {
+                        sectors[s][y][x] = {
+                            type: 'empty', 
+                            dir: null,     
+                            items: [],     
+                            work: null,    
+                            el: null,
+                            x, y
+                        };
+                    }
+                }
+            }
+
+            gridEl.innerHTML = '';
+            for (let y = 0; y < ROWS; y++) {
+                for (let x = 0; x < COLS; x++) {
+                    const div = document.createElement('div');
+                    div.className = 'cell';
+                    div.dataset.x = x;
+                    div.dataset.y = y;
+                    
+                    div.addEventListener('pointerdown', onCellPointerDown);
+                    div.addEventListener('pointerup', onCellPointerUp);
+                    
+                    gridEl.appendChild(div);
+                    sectors[currentSectorId][y][x].el = div;
+                }
+            }
+        }
+
+        function onCellPointerDown(e) {
+            e.preventDefault();
+            startX = e.clientX;
+            startY = e.clientY;
+            startCellX = parseInt(e.currentTarget.dataset.x, 10);
+            startCellY = parseInt(e.currentTarget.dataset.y, 10);
+            e.currentTarget.setPointerCapture(e.pointerId);
+        }
+
+        function onCellPointerUp(e) {
+            e.preventDefault();
+            if (startCellX === null || startCellY === null) return;
+
+            const x = startCellX;
+            const y = startCellY;
+            
+            const diffX = e.clientX - startX;
+            const diffY = e.clientY - startY;
+            const distance = Math.sqrt(diffX * diffX + diffY * diffY);
+
+            const cell = sectors[currentSectorId][y][x];
+
+            if ((cell.type === 'assembler' || cell.type === 'fast-assembler') && distance <= 8 && (currentTool === 'assembler' || currentTool === 'fast-assembler')) {
+                let nextRecipeIdx = (cell.work.recipeIdx + 1) % RECIPES.length;
+                for (let t = 0; t < RECIPES.length; t++) {
+                    if (isRecipeAvailable(RECIPES[nextRecipeIdx])) break;
+                    nextRecipeIdx = (nextRecipeIdx + 1) % RECIPES.length;
+                }
+                cell.work.recipeIdx = nextRecipeIdx;
+                cell.work.progress = 0;
+                startCellX = null;
+                startCellY = null;
+                renderCell(cell);
+                return;
+            }
+
+            let finalDir = 'right';
+
+            if (distance > 8) {
+                if (Math.abs(diffX) > Math.abs(diffY)) {
+                    finalDir = diffX > 0 ? 'right' : 'left';
+                } else {
+                    finalDir = diffY > 0 ? 'down' : 'up';
+                }
+            }
+
+            // セル上のパーツを在庫へ返却するヘルパー
+            const returnCellPart = () => {
+                const partKey = CELL_TYPE_TO_PART_KEY[cell.type];
+                if (partKey) {
+                    parts[partKey]++;
+                    updatePartsDisplay();
+                }
+            };
+
+            // 材料ストレージのタップ → 出力種類を切り替え（上書きブロックより前に処理、消しゴム時はスキップ）
+            if (cell.type === 'storage-source' && distance <= 8 && currentTool !== 'erase') {
+                const allKinds = ['raw', 'line', 'triangle', 'square', 'pentagon', 'hexagon'];
+                const unlockMap = { raw: 'point', line: 'line', triangle: 'triangle', square: 'square', pentagon: 'pentagon', hexagon: 'hexagon' };
+                const available = allKinds.filter(k => isUnlocked(unlockMap[k]));
+                if (available.length > 0) {
+                    if (!cell.work) cell.work = { kind: 'raw' };
+                    const idx = available.indexOf(cell.work.kind);
+                    cell.work.kind = available[(idx + 1) % available.length];
+                    renderCell(cell);
+                    setFeedback(`📦 材料ストレージ: ${SHAPE_NAMES_JP[cell.work.kind === 'raw' ? 'point' : cell.work.kind] || cell.work.kind} に切り替え`);
+                }
+                startCellX = null; startCellY = null; return;
+            }
+
+            // 空でないセルへの上書きをブロック（消しゴムで先に消す必要あり）
+            if (currentTool !== 'erase' && cell.type !== 'empty') {
+                setFeedback('⚠️ 先に消しゴムで消してから配置してください');
+                startCellX = null;
+                startCellY = null;
+                return;
+            }
+
+            if (currentTool === 'erase') {
+                returnCellPart();
+                cell.type = 'empty';
+                cell.dir = null;
+                cell.items = [];
+                cell.work = null;
+            } else if (Object.keys(CELL_TYPE_TO_PART_KEY).includes(currentTool)) {
+                const partKey = CELL_TYPE_TO_PART_KEY[currentTool];
+                // 未解放チェック（T3設備）
+                const t3UnlockMap = { 'fast-belt': 'fastBelt', 'fast-inserter': 'fastInserter', 'fast-assembler': 'fastAssembler', 'splitter': 'splitter', 'merger': 'merger' };
+                const unlockKey = t3UnlockMap[currentTool];
+                if (unlockKey && !isUnlocked(unlockKey)) {
+                    setFeedback(`🔒 ${PART_NAMES[partKey]} はまだ解放されていません！`);
+                    startCellX = null; startCellY = null; return;
+                }
+                // 部品インベントリを消費
+                if (parts[partKey] <= 0) {
+                    setFeedback(`⚠️ ${PART_NAMES[partKey]} が足りません！🔧 工場タブのクラフトモードで作ってください`);
+                    startCellX = null; startCellY = null; return;
+                }
+                parts[partKey]--;
+                updatePartsDisplay();
+
+                if (currentTool === 'belt' || currentTool === 'fast-belt' || currentTool === 'inserter' || currentTool === 'fast-inserter') {
+                    cell.type = currentTool; cell.dir = finalDir; cell.work = null;
+                } else if (currentTool === 'assembler' || currentTool === 'fast-assembler') {
+                    cell.type = currentTool; cell.dir = 'right';
+                    cell.work = { recipeIdx: 0, stored: {}, producing: false, progressTick: 0 };
+                } else if (currentTool === 'splitter' || currentTool === 'merger') {
+                    cell.type = currentTool; cell.dir = finalDir; cell.work = { toggle: false };
+                } else if (currentTool === 'storage-source') {
+                    cell.type = 'storage-source'; cell.dir = null; cell.work = { kind: 'raw' };
+                } else if (currentTool === 'storage-sink') {
+                    cell.type = 'storage-sink'; cell.dir = null; cell.work = null;
+                }
+            }
+
+            startCellX = null;
+            startCellY = null;
+
+            renderCell(cell);
+            updateUI();
+        }
+
+        function renderCell(cell) {
+            const el = cell.el;
+            if (!el) return; 
+            
+            el.className = 'cell';
+            el.innerHTML = '';
+
+            if (cell.type === 'fast-belt') {
+                el.classList.add('building', 'fast-belt');
+                if (cell.dir) el.classList.add('dir-' + cell.dir);
+
+            } else if (cell.type === 'fast-inserter') {
+                el.classList.add('building', 'inserter', 'fast-inserter');
+                if (cell.dir) el.classList.add('dir-' + cell.dir);
+                const hub = document.createElement('div');
+                hub.className = 'inserter-hub';
+                el.appendChild(hub);
+                const arm = document.createElement('div');
+                arm.className = 'inserter-arm';
+                el.appendChild(arm);
+                if (cell.work && cell.work.state === 'grab') el.classList.add('swing-grab');
+                else if (cell.work && cell.work.state === 'drop') el.classList.add('swing-drop');
+
+            } else if (cell.type === 'fast-assembler') {
+                el.classList.add('building', 'assembler', 'fast-assembler');
+                const recipe = RECIPES[cell.work.recipeIdx];
+                if (cell.work.producing) el.classList.add('producing');
+                const nameDiv = document.createElement('div');
+                nameDiv.style.cssText = 'font-size:11px;color:#a0b0ff;font-weight:bold;';
+                nameDiv.textContent = `FA:${recipe.name}`;
+                el.appendChild(nameDiv);
+                const stockDiv = document.createElement('div');
+                stockDiv.style.cssText = 'font-size:8px;color:#aaa;margin-top:1px;line-height:1.3;';
+                const storedFA = cell.work.stored || {};
+                stockDiv.textContent = recipe.ingredients.map(ing => {
+                    const icons = { raw:'●', line:'─', triangle:'▲', square:'■', pentagon:'⬠', hexagon:'⬡' };
+                    return `${icons[ing.kind]||'?'}${storedFA[ing.kind]||0}/${ing.count}`;
+                }).join(' ');
+                el.appendChild(stockDiv);
+                if (cell.work.producing) {
+                    const effectiveTicks = Math.max(1, Math.ceil(recipe.ticks / 2));
+                    const barWrap = document.createElement('div');
+                    barWrap.className = 'assembler-bar-wrap';
+                    const barFill = document.createElement('div');
+                    barFill.className = 'assembler-bar-fill';
+                    barFill.style.width = Math.max(2, Math.round(cell.work.progressTick / effectiveTicks * 100)) + '%';
+                    barWrap.appendChild(barFill);
+                    el.appendChild(barWrap);
+                }
+
+            } else if (cell.type === 'splitter') {
+                el.classList.add('building', 'splitter');
+                if (cell.dir) el.classList.add('dir-' + cell.dir);
+                el.innerHTML = `<span style="font-size:13px;color:#e07700;text-shadow:0 0 8px #e07700;">🔀</span>`;
+
+            } else if (cell.type === 'merger') {
+                el.classList.add('building', 'merger');
+                if (cell.dir) el.classList.add('dir-' + cell.dir);
+                el.innerHTML = `<span style="font-size:13px;color:#a000e0;text-shadow:0 0 8px #a000e0;">🔁</span>`;
+
+            } else if (cell.type === 'belt') {
+                el.classList.add('building', 'belt');
+                if (cell.dir) el.classList.add('dir-' + cell.dir);
+
+            } else if (cell.type === 'storage-source') {
+                el.classList.add('building', 'storage-src');
+                const srcKind = (cell.work && cell.work.kind) ? cell.work.kind : 'raw';
+                const srcColors = { raw: '#00ffcc', line: '#00a2ff', triangle: '#ffca28', square: '#ff3366', pentagon: '#af40ff', hexagon: '#ff7700' };
+                const srcIcons  = { raw: '●', line: '─', triangle: '▲', square: '■', pentagon: '⬠', hexagon: '⬡' };
+                const sc = srcColors[srcKind] || '#00ffcc';
+                el.innerHTML = `<span style="font-size:14px;color:${sc};text-shadow:0 0 8px ${sc};">${srcIcons[srcKind] || '?'}</span>`;
+
+            } else if (cell.type === 'storage-sink') {
+                el.classList.add('building', 'storage-snk');
+                el.innerHTML = '<span style="font-size:13px;color:#00c850;text-shadow:0 0 8px #00c850;">▣</span>';
+
+            } else if (cell.type === 'inserter') {
+                el.classList.add('building', 'inserter');
+                if (cell.dir) el.classList.add('dir-' + cell.dir);
+                
+                const hub = document.createElement('div');
+                hub.className = 'inserter-hub';
+                el.appendChild(hub);
+
+                const arm = document.createElement('div');
+                arm.className = 'inserter-arm';
+                el.appendChild(arm);
+                
+                if (cell.work && cell.work.state === 'grab') {
+                    el.classList.add('swing-grab');
+                } else if (cell.work && cell.work.state === 'drop') {
+                    el.classList.add('swing-drop');
+                }
+
+            } else if (cell.type === 'assembler') {
+                el.classList.add('building', 'assembler');
+                const recipe = RECIPES[cell.work.recipeIdx];
+
+                if (cell.work.producing) el.classList.add('producing');
+
+                const nameDiv = document.createElement('div');
+                nameDiv.style.cssText = 'font-size:11px;color:#d4a0ff;font-weight:bold;';
+                nameDiv.textContent = `A:${recipe.name}`;
+                el.appendChild(nameDiv);
+
+                const stockDiv = document.createElement('div');
+                stockDiv.style.cssText = 'font-size:8px;color:#aaa;margin-top:1px;line-height:1.3;';
+                const stored = cell.work.stored || {};
+                stockDiv.textContent = recipe.ingredients.map(ing => {
+                    const icons = { raw:'●', line:'─', triangle:'▲', square:'■', pentagon:'⬠', hexagon:'⬡' };
+                    return `${icons[ing.kind]||'?'}${stored[ing.kind]||0}/${ing.count}`;
+                }).join(' ');
+                el.appendChild(stockDiv);
+
+                if (cell.work.producing) {
+                    const barWrap = document.createElement('div');
+                    barWrap.className = 'assembler-bar-wrap';
+                    const barFill = document.createElement('div');
+                    barFill.className = 'assembler-bar-fill';
+                    barFill.style.width = Math.max(2, Math.round(cell.work.progressTick / recipe.ticks * 100)) + '%';
+                    barWrap.appendChild(barFill);
+                    el.appendChild(barWrap);
+                }
+            }
+        }
+
+        function getItemSymbol(kind) {
+            if (kind === 'raw') return '●';
+            if (kind === 'line') return '─';
+            if (kind === 'triangle') return '▲';
+            if (kind === 'square') return '■';
+            if (kind === 'pentagon') return '⬠';
+            if (kind === 'hexagon') return '⬡';
+            if (kind === 'belt') return '🟫';
+            if (kind === 'inserter') return '🦾';
+            if (kind === 'assembler') return '🟣';
+            if (kind === 'storageSource') return '📦';
+            if (kind === 'storageSink') return '📤';
+            return '?';
+        }
+
+        function updateItemLayer() {
+            const activeIds = new Set();
+            const currentGrid = sectors[currentSectorId];
+
+            for (let y = 0; y < ROWS; y++) {
+                for (let x = 0; x < COLS; x++) {
+                    const cell = currentGrid[y][x];
+                    
+                    if (cell.items.length > 0) {
+                        const item = cell.items[0];
+                        activeIds.add(String(item.id));
+                        
+                        let dom = document.getElementById('smooth-item-' + item.id);
+                        if (!dom) {
+                          dom = document.createElement('div');
+                          dom.id = 'smooth-item-' + item.id;
+                          dom.className = 'smooth-item kind-' + item.kind;
+                          dom.style.left = (cell.x * 33) + 'px';
+                          dom.style.top = (cell.y * 33) + 'px';
+                          const orb = document.createElement('div');
+                          orb.className = 'item-orb';
+                          const partOrbIcons = {
+                              belt:'▶', inserter:'⇒', assembler:'⚙',
+                              fastBelt:'⚡▶', fastInserter:'⚡⇒', fastAssembler:'⚡⚙',
+                              storageSource:'📦', storageSink:'📤',
+                              splitter:'🔀', merger:'🔁'
+                          };
+                          if (partOrbIcons[item.kind]) orb.textContent = partOrbIcons[item.kind];
+                          dom.appendChild(orb);
+                          itemLayerEl.appendChild(dom);
+                        }
+                        
+                        dom.className = 'smooth-item kind-' + item.kind;
+                        
+                        if ((cell.type === 'inserter' || cell.type === 'fast-inserter') && cell.work && cell.work.state !== 'idle') {
+                            const cx = cell.x * 33;
+                            const cy = cell.y * 33;
+                            
+                            if (cell.dir === 'right') {
+                                dom.style.left = (cell.work.state === 'grab' ? cx - 24 : cx + 24) + 'px';
+                                dom.style.top = cy + 'px';
+                            } else if (cell.dir === 'left') {
+                                dom.style.left = (cell.work.state === 'grab' ? cx + 24 : cx - 24) + 'px';
+                                dom.style.top = cy + 'px';
+                            } else if (cell.dir === 'down') {
+                                dom.style.left = cx + 'px';
+                                dom.style.top = (cell.work.state === 'grab' ? cy - 24 : cy + 24) + 'px';
+                            } else if (cell.dir === 'up') {
+                                dom.style.left = cx + 'px';
+                                dom.style.top = (cell.work.state === 'grab' ? cy + 24 : cy - 24) + 'px';
+                            }
+                            dom.style.transform = cell.work.state === 'grab' ? 'scale(0.8)' : 'scale(1)';
+                        } else {
+                            dom.style.left = (cell.x * 33) + 'px';
+                            dom.style.top = (cell.y * 33) + 'px';
+                            dom.style.transform = 'scale(1)';
+                        }
+                    }
+                }
+            }
+
+            const divs = itemLayerEl.querySelectorAll('.smooth-item');
+            divs.forEach(d => {
+                const id = d.id.replace('smooth-item-', '');
+                if (!activeIds.has(id)) {
+                    d.style.opacity = '0';
+                    setTimeout(() => d.remove(), 200);
+                }
+            });
+        }
+
+        function renderAll() {
+            const currentGrid = sectors[currentSectorId];
+            const cellsDOM = gridEl.querySelectorAll('.cell');
+            let idx = 0;
+            for (let y = 0; y < ROWS; y++) {
+                for (let x = 0; x < COLS; x++) {
+                    for (let s = 0; s < TOTAL_SECTORS; s++) {
+                        sectors[s][y][x].el = null;
+                    }
+                    currentGrid[y][x].el = cellsDOM[idx];
+                    renderCell(currentGrid[y][x]);
+                    idx++;
+                }
+            }
+            updateItemLayer();
+        }
+
+        function getNeighborInGrid(currentGrid, cell, dir) {
+            if (dir !== 'right' && dir !== 'left' && dir !== 'up' && dir !== 'down') return null;
+
+            let nx = cell.x;
+            let ny = cell.y;
+            if (dir === 'right') nx++;
+            if (dir === 'left') nx--;
+            if (dir === 'up') ny--;
+            if (dir === 'down') ny++;
+            if (nx < 0 || nx >= COLS || ny < 0 || ny >= ROWS) return null;
+            return currentGrid[ny][nx];
+        }
+
+        function getOppositeDir(dir) {
+            if (dir === 'right') return 'left';
+            if (dir === 'left') return 'right';
+            if (dir === 'up') return 'down';
+            if (dir === 'down') return 'up';
+            return null;
+        }
+
+        function rotateClockwise(dir) {
+            if (dir === 'right') return 'down';
+            if (dir === 'down') return 'left';
+            if (dir === 'left') return 'up';
+            if (dir === 'up') return 'right';
+            return null;
+        }
+
+        // ベルト系のアイテム移動先として有効かチェック
+        function canBeltPushTo(fromDir, toCell) {
+            if (!toCell || toCell.items.length > 0) return false;
+            const t = toCell.type;
+            if (t === 'belt' || t === 'fast-belt') return true;
+            // 分岐機: 入力はdir方向から（fromDir === toCell.dir）
+            if (t === 'splitter') return fromDir === toCell.dir;
+            // 合流機: opposite(dir)方向とrotateClockwise(opposite(dir))方向から入力
+            if (t === 'merger') {
+                const oppDir = getOppositeDir(toCell.dir);
+                return fromDir === toCell.dir || fromDir === rotateClockwise(oppDir);
+            }
+            return false;
+        }
+
+        // ベルト移動パス（types に含まれるセルタイプを1ティック分移動）
+        function doBeltPass(currentGrid, reserved, types) {
+            const moves = [];
+            for (let y = ROWS - 1; y >= 0; y--) {
+                for (let x = COLS - 1; x >= 0; x--) {
+                    const cell = currentGrid[y][x];
+                    if (!types.includes(cell.type) || cell.items.length === 0 || !cell.dir) continue;
+
+                    if (cell.type === 'splitter') {
+                        if (!cell.work) cell.work = { toggle: false };
+                        const out1 = getNeighborInGrid(currentGrid, cell, cell.dir);
+                        const out2 = getNeighborInGrid(currentGrid, cell, rotateClockwise(cell.dir));
+                        const pref = cell.work.toggle ? out2 : out1;
+                        const prefDir = cell.work.toggle ? rotateClockwise(cell.dir) : cell.dir;
+                        const fall = cell.work.toggle ? out1 : out2;
+                        const fallDir = cell.work.toggle ? cell.dir : rotateClockwise(cell.dir);
+                        let target = null, targetDir = null;
+                        if (pref && canBeltPushTo(prefDir, pref) && !reserved[pref.y][pref.x]) {
+                            target = pref; targetDir = prefDir;
+                        } else if (fall && canBeltPushTo(fallDir, fall) && !reserved[fall.y][fall.x]) {
+                            target = fall; targetDir = fallDir;
+                        }
+                        if (target) {
+                            moves.push({ from: cell, to: target, item: cell.items[0], splitterToggle: cell });
+                            reserved[target.y][target.x] = true;
+                        }
+                    } else {
+                        const next = getNeighborInGrid(currentGrid, cell, cell.dir);
+                        if (next && canBeltPushTo(cell.dir, next) && !reserved[next.y][next.x]) {
+                            moves.push({ from: cell, to: next, item: cell.items[0] });
+                            reserved[next.y][next.x] = true;
+                        }
+                    }
+                }
+            }
+            moves.forEach(m => {
+                m.from.items.shift();
+                m.to.items.push(m.item);
+                if (m.splitterToggle) m.splitterToggle.work.toggle = !m.splitterToggle.work.toggle;
+            });
+        }
+
+        function advanceTier() {
+            currentTierIndex++;
+            submittedResources = { point: 0, line: 0, triangle: 0, square: 0, pentagon: 0, hexagon: 0 };
+            setFeedback('🎉 新しいティアが開始されました！');
+            saveGame();
+            updateUI();
+            updateTierUI();
+        }
+
+        // 1ティック自動化処理
+        function tick() {
+            // ティア3（Index 8: ALL CLEAR!）未満の時はバックグラウンドでのグリッドアイテム進行処理・更新自体を停止させておく
+            if (currentTierIndex < 8) return;
+
+            for (let s = 0; s < TOTAL_SECTORS; s++) {
+                const currentGrid = sectors[s];
+                const reserved = Array.from({ length: ROWS }, () => Array(COLS).fill(false));
+
+                // 1. ベルト（通常）・高速ベルト・分岐機・合流機の移動
+                doBeltPass(currentGrid, reserved, ['belt', 'merger']);
+                doBeltPass(currentGrid, reserved, ['fast-belt']); // 高速ベルト1回目
+                doBeltPass(currentGrid, reserved, ['fast-belt']); // 高速ベルト2回目（2倍速）
+                doBeltPass(currentGrid, reserved, ['splitter']);
+
+                // 2. インサーター・高速インサーター (倉庫連携の最重要ロジック)
+                for (let y = 0; y < ROWS; y++) {
+                    for (let x = 0; x < COLS; x++) {
+                        const cell = currentGrid[y][x];
+                        if (cell.type === 'inserter' || cell.type === 'fast-inserter') {
+                            if (!cell.work) cell.work = { state: 'idle' };
+
+                            const fromDir = getOppositeDir(cell.dir);
+                            // 高速インサーターは2マス先から掴む
+                            const isFastInserter = cell.type === 'fast-inserter';
+                            let from = getNeighborInGrid(currentGrid, cell, fromDir);
+                            if (isFastInserter && from) from = getNeighborInGrid(currentGrid, from, fromDir);
+                            const to = getNeighborInGrid(currentGrid, cell, cell.dir);
+                            
+                            if (!from || !to) {
+                                cell.work.state = 'idle';
+                                continue;
+                            }
+
+                            let itemToMove = null;
+                            let shouldShiftFrom = false;
+                            let isFromSource = false;
+                            let sourceType = "";
+
+                            // 搬出元の在庫確認・アイテム生成
+                            if (from.type === 'storage-source') {
+                                // 設定された種類の在庫を確認して引き抜く
+                                const outputKind = (from.work && from.work.kind) ? from.work.kind : 'raw';
+                                const resKey = outputKind === 'raw' ? 'point' : outputKind;
+                                if (resources[resKey] !== undefined && Math.floor(resources[resKey]) >= 1) {
+                                    itemToMove = { id: ++itemIdCounter, kind: outputKind };
+                                    isFromSource = true;
+                                    sourceType = resKey;
+                                }
+                            } else if (from.type === 'belt' && from.items.length > 0) {
+                                itemToMove = { ...from.items[0] };
+                                shouldShiftFrom = true;
+                            } else if ((from.type === 'assembler' || from.type === 'fast-assembler') && from.items.length > 0 && from.items[0].kind !== 'raw' && from.items[0].kind !== 'line') {
+                                itemToMove = { ...from.items[0] };
+                                shouldShiftFrom = true;
+                            }
+
+                            // 搬入先のキャパシティ確認（倉庫上限との連動）
+                            let canDrop = false;
+                            if (itemToMove && !reserved[to?.y]?.[to?.x]) {
+                                if ((to.type === 'belt' || to.type === 'fast-belt') && to.items.length === 0) {
+                                    canDrop = true;
+                                } else if ((to.type === 'assembler' || to.type === 'fast-assembler') && !to.work.producing) {
+                                    const r = RECIPES[to.work.recipeIdx];
+                                    const stored = to.work.stored || {};
+                                    for (const ing of r.ingredients) {
+                                        if (itemToMove.kind === ing.kind && (stored[ing.kind] || 0) < ing.count) {
+                                            canDrop = true; break;
+                                        }
+                                    }
+                                } else if (to.type === 'storage-sink' && itemToMove.kind !== 'raw' && itemToMove.kind !== 'line') {
+                                    const kind = itemToMove.kind;
+                                    if (parts[kind] !== undefined) {
+                                        canDrop = true; // 部品類は容量制限なし
+                                    } else if (resources[kind] !== undefined && Math.floor(resources[kind]) < maxStorage[kind]) {
+                                        canDrop = true;
+                                    }
+                                }
+                            }
+
+                            // 移動及び倉庫増減の実行
+                            if (canDrop) {
+                                if (isFromSource) {
+                                    // 点源・線源から取り出したので、共通倉庫の在庫を1減少
+                                    resources[sourceType] -= 1;
+                                }
+                                if (shouldShiftFrom) {
+                                    from.items.shift();
+                                }
+                                
+                                if (to.type === 'assembler' || to.type === 'fast-assembler') {
+                                    if (!to.work.stored) to.work.stored = {};
+                                    to.work.stored[itemToMove.kind] = (to.work.stored[itemToMove.kind] || 0) + 1;
+                                } else if (to.type === 'storage-sink') {
+                                    if (parts[itemToMove.kind] !== undefined) {
+                                        parts[itemToMove.kind]++;
+                                        updatePartsDisplay();
+                                    } else {
+                                        addResource(itemToMove.kind, 1);
+                                    }
+                                } else {
+                                    to.items.push(itemToMove);
+                                }
+                                reserved[to.y][to.x] = true;
+                                cell.work.state = cell.work.state === 'grab' ? 'drop' : 'grab';
+                            } else {
+                                cell.work.state = 'idle';
+                            }
+                        }
+                    }
+                }
+
+                // 3. 組立機・高速組立機（バッファ充填→生産開始→完成品出力）
+                for (let y = 0; y < ROWS; y++) {
+                    for (let x = 0; x < COLS; x++) {
+                        const cell = currentGrid[y][x];
+                        if (cell.type === 'assembler' || cell.type === 'fast-assembler') {
+                            const r = RECIPES[cell.work.recipeIdx];
+                            const effectiveTicks = cell.type === 'fast-assembler' ? Math.max(1, Math.ceil(r.ticks / 2)) : r.ticks;
+
+                            if (cell.items.length > 0) continue; // 出力バッファ占有中、待機
+
+                            if (cell.work.producing) {
+                                cell.work.progressTick++;
+                                if (cell.work.progressTick >= effectiveTicks) {
+                                    cell.work.producing = false;
+                                    cell.work.progressTick = 0;
+                                    cell.items.push({ id: ++itemIdCounter, kind: r.output });
+                                }
+                            } else {
+                                const stored = cell.work.stored || {};
+                                const allReady = r.ingredients.every(ing => (stored[ing.kind] || 0) >= ing.count);
+                                if (allReady) {
+                                    if (!cell.work.stored) cell.work.stored = {};
+                                    r.ingredients.forEach(ing => { cell.work.stored[ing.kind] -= ing.count; });
+                                    cell.work.producing = true;
+                                    cell.work.progressTick = 0;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // 4. 完成品ストレージ（前段のインサータ処理側で直接加算回収するため、ここでは残渣クリアのみ）
+                for (let y = 0; y < ROWS; y++) {
+                    for (let x = 0; x < COLS; x++) {
+                        const cell = currentGrid[y][x];
+                        if (cell.type === 'storage-sink') {
+                            if (cell.items.length > 0) {
+                                cell.items.shift();
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (document.getElementById('content-automation').style.display !== 'none') {
+                renderAll();
+                updateUI();
+            }
+        }
+
+        // 初期設定
+        function init() {
+            canvas.width = 800;
+            canvas.height = 450;
+            
+            createGrid();
+            loadGame(); // 自動セーブデータの復元
+            updateSectorUI();
+            updateUI();
+            updateTierUI();
+            
+            // マウスイベント
+            canvas.addEventListener('mousedown', (e) => { e.preventDefault(); const pos = getMousePos(e); startDraw(pos.x, pos.y); });
+            canvas.addEventListener('mousemove', (e) => { e.preventDefault(); const pos = getMousePos(e); moveDraw(pos.x, pos.y); });
+            canvas.addEventListener('mouseup', (e) => { e.preventDefault(); const pos = getMousePos(e); endDraw(pos.x, pos.y); });
+
+            // タッチイベント
+            canvas.addEventListener('touchstart', (e) => { e.preventDefault(); const pos = getMousePos(e); startDraw(pos.x, pos.y); }, {passive: false});
+            canvas.addEventListener('touchmove', (e) => { e.preventDefault(); const pos = getMousePos(e); moveDraw(pos.x, pos.y); }, {passive: false});
+            canvas.addEventListener('touchend', (e) => { e.preventDefault(); if(strokePoints.length > 0) { const pos = strokePoints[strokePoints.length - 1]; endDraw(pos.x, pos.y); } }, {passive: false});
+
+            // 自動生産ループ（毎秒実行）
+            setInterval(() => {
+                let updated = false;
+                if (isUnlocked('autoPoint')) {
+                    if (addResource('point', autoProductionRates.point)) updated = true;
+                }
+                if (isUnlocked('autoLine')) {
+                    if (addResource('line', autoProductionRates.line)) updated = true;
+                }
+                if (updated) {
+                    updateUI();
+                    updateTierUI();
+                }
+            }, 1000);
+
+            // 工場側の1ティックタイマー駆動
+            setInterval(tick, TICK_MS);
+
+            // 自動セーブタイマー（3秒ごとに実行）
+            setInterval(saveGame, 3000);
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        // 座標計算
+        function getMousePos(e) {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return {
+                x: (clientX - rect.left) * (canvas.width / rect.width),
+                y: (clientY - rect.top) * (canvas.height / rect.height)
+            };
+        }
+
+        // 描画開始
+        function startDraw(x, y) {
+            isDrawing = true;
+            startPoint = { x, y };
+            anchorPoint = { x, y };
+            lastMovePos = { x, y };
+            lastVector = null;
+            strokePoints = [{ x, y }, { x, y }]; 
+            rawCorners = [];
+            currentPrediction = "点";
+            if (pauseTimer) clearTimeout(pauseTimer);
+        }
+
+        // 描画中
+        function moveDraw(x, y) {
+            if (!isDrawing) return;
+
+            let targetX = x;
+            let targetY = y;
+
+            let distToStart = Math.sqrt(Math.pow(x - startPoint.x, 2) + Math.pow(y - startPoint.y, 2));
+            let isSnapped = false;
+
+            if (distToStart < 40 && (rawCorners.length > 0 || strokePoints.length > 2)) {
+                targetX = startPoint.x;
+                targetY = startPoint.y;
+                isSnapped = true;
+            }
+
+            if (strokePoints.length >= 2) {
+                strokePoints[strokePoints.length - 1] = { x: targetX, y: targetY };
+            }
+
+            let moveDelta = Math.sqrt(Math.pow(x - lastMovePos.x, 2) + Math.pow(y - lastMovePos.y, 2));
+            lastMovePos = { x, y };
+
+            if (pauseTimer && moveDelta > 3) {
+                clearTimeout(pauseTimer);
+                pauseTimer = null;
+            }
+
+            if (!pauseTimer) {
+                let lastPoint = rawCorners.length > 0 ? rawCorners[rawCorners.length - 1] : startPoint;
+                let distFromLast = Math.sqrt(Math.pow(targetX - lastPoint.x, 2) + Math.pow(targetY - lastPoint.y, 2));
+
+                if (!isSnapped && distFromLast > 40) {
+                    pauseTimer = setTimeout(() => {
+                        rawCorners.push({ x: targetX, y: targetY });
+                        strokePoints.push({ x: targetX, y: targetY });
+                        updatePrediction();
+                    }, 70);
+                }
+            }
+
+            updatePrediction();
+        }
+
+        function getCleanedCorners() {
+            return rawCorners; 
+        }
+
+        function isUnlocked(type) {
+            const idx = Math.min(currentTierIndex, TIER_CONFIGS.length - 1);
+            return TIER_CONFIGS[idx].unlocked.includes(type);
+        }
+
+        // リアルタイム形状予測
+        function updatePrediction() {
+            let corners = getCleanedCorners();
+            let lastP = strokePoints[strokePoints.length - 1];
+
+            let dispDist = Math.sqrt(Math.pow(lastP.x - startPoint.x, 2) + Math.pow(lastP.y - startPoint.y, 2));
+            let isClosed = (lastP.x === startPoint.x && lastP.y === startPoint.y) || (dispDist < 40 && strokePoints.length > 2);
+
+            let totalLength = 0;
+            if (strokePoints.length === 2) {
+                totalLength = Math.sqrt(Math.pow(strokePoints[1].x - strokePoints[0].x, 2) + Math.pow(strokePoints[1].y - strokePoints[0].y, 2));
+            } else {
+                totalLength = 100; 
+            }
+
+            if (strokePoints.length === 2 && totalLength < 35) {
+                currentPrediction = "点";
+            } else if (corners.length === 0 && !isClosed) {
+                currentPrediction = isUnlocked("line") ? "線" : "線 [未解放]";
+            } else if (isClosed) {
+                if (corners.length === 2) currentPrediction = isUnlocked("triangle") ? "📐 三角形" : "📐 三角形 [未解放]";
+                else if (corners.length === 3) currentPrediction = isUnlocked("square") ? "🧱 四角形" : "🧱 四角形 [未解放]";
+                else if (corners.length === 4) currentPrediction = isUnlocked("pentagon") ? "⬠ 五角形" : "⬠ 五角形 [未解放]";
+                else if (corners.length >= 5) currentPrediction = isUnlocked("hexagon") ? "⬢ 六角形" : "⬢ 六角形 [未解放]";
+                else currentPrediction = "分析中...";
+            } else {
+                currentPrediction = "多角形を描画中...";
+            }
+            feedbackEl.innerText = `予測検知: ${currentPrediction}`;
+        }
+
+        // 描画終了・確定処理
+        function endDraw(x, y) {
+            if (!isDrawing) return;
+            isDrawing = false;
+            if (pauseTimer) clearTimeout(pauseTimer);
+
+            let corners = getCleanedCorners();
+            let lastP = strokePoints[strokePoints.length - 1];
+            let dispDist = Math.sqrt(Math.pow(lastP.x - startPoint.x, 2) + Math.pow(lastP.y - startPoint.y, 2));
+            let isClosed = (lastP.x === startPoint.x && lastP.y === startPoint.y) || (dispDist < 50 && strokePoints.length > 2);
+
+            let totalLength = 0;
+            if (strokePoints.length === 2) {
+                totalLength = Math.sqrt(Math.pow(strokePoints[1].x - strokePoints[0].x, 2) + Math.pow(strokePoints[1].y - strokePoints[0].y, 2));
+            }
+
+            // ── クラフトモード時は材料ボタンへ誘導（ジェスチャー廃止） ──
+            if (currentMode === 'craft' && currentCraftTarget) {
+                setFeedback('🔧 クラフトモード：パネルの材料ボタンをスワイプ↑ or タップして投入！');
+                return;
+            }
+            // ───────────────────────────────────────────────
+
+            if (strokePoints.length === 2 && totalLength < 35) {
+                if (addResource('point', productionRates.point)) {
+                    addEffect({ type: 'point', x: startPoint.x, y: startPoint.y });
+                    setFeedback(`「点」を ${productionRates.point.toFixed(1)} つ生産しました`);
+                } else {
+                    setFeedback(`「点」の倉庫が上限(${maxStorage.point})です！ティア画面から納品してください。`);
+                }
+                updateUI();
+                return;
+            }
+
+            if (corners.length === 0 && !isClosed) {
+                if (!isUnlocked("line")) {
+                    setFeedback("技術ロック：まだ「線」の加工技術が解放されていません！");
+                    return;
+                }
+                if (addResource('line', productionRates.line)) {
+                    addEffect({ type: 'line', x1: startPoint.x, y1: startPoint.y, x2: lastP.x, y2: lastP.y });
+                    setFeedback(`「線」を ${productionRates.line.toFixed(1)} つ生産しました`);
+                } else {
+                    setFeedback(`「線」の倉庫が上限(${maxStorage.line})です！ティア画面から納品してください。`);
+                }
+                updateUI();
+                return;
+            }
+
+            if (isClosed) {
+                if (corners.length === 2) {
+                    if (!isUnlocked("triangle")) {
+                        setFeedback("技術ロック：まだ「三角形」の合成技術が解放されていません！");
+                        return;
+                    }
+                    if (isDebugMode || (Math.floor(resources.point) >= 3 && Math.floor(resources.line) >= 3)) {
+                        if (addResource('triangle', 1)) {
+                            if (!isDebugMode) { resources.point -= 3; resources.line -= 3; }
+                            addEffect({ type: 'triangle', points: [startPoint, corners[0], corners[1]] });
+                            setFeedback(isDebugMode ? "🔧[DEBUG] 「三角形」を合成" : "「三角形」を合成しました (点-3, 線-3)");
+                        } else {
+                            setFeedback("「三角形」の倉庫が上限です！ティア画面から納品してください。");
+                        }
+                    } else {
+                        setFeedback("素材が不足しています (必要: 点3, 線3)");
+                    }
+                    updateUI();
+                    return;
+                }
+                else if (corners.length === 3) {
+                    if (!isUnlocked("square")) {
+                        setFeedback("技術ロック：まだ「四角形」の合成技術が解放されていません！");
+                        return;
+                    }
+                    if (isDebugMode || (Math.floor(resources.point) >= 4 && Math.floor(resources.line) >= 4)) {
+                        if (addResource('square', 1)) {
+                            if (!isDebugMode) { resources.point -= 4; resources.line -= 4; }
+                            addEffect({ type: 'square', points: [startPoint, corners[0], corners[1], corners[2]] });
+                            setFeedback(isDebugMode ? "🔧[DEBUG] 「四角形」を合成" : "「四角形」を合成しました (点-4, 線-4)");
+                        } else {
+                            setFeedback("「四角形」の倉庫が上限です！ティア画面から納品してください。");
+                        }
+                    } else {
+                        setFeedback("素材が不足しています (必要: 点4, 線4)");
+                    }
+                    updateUI();
+                    return;
+                }
+                else if (corners.length === 4) {
+                    if (!isUnlocked("pentagon")) {
+                        setFeedback("技術ロック：まだ「五角形」の合成技術が解放されていません！");
+                        return;
+                    }
+                    if (isDebugMode || (Math.floor(resources.point) >= 5 && Math.floor(resources.line) >= 5)) {
+                        if (addResource('pentagon', 1)) {
+                            if (!isDebugMode) { resources.point -= 5; resources.line -= 5; }
+                            addEffect({ type: 'pentagon', points: [startPoint, ...corners] });
+                            setFeedback(isDebugMode ? "🔧[DEBUG] 「五角形」を合成" : "「五角形」を合成しました (点-5, 線-5)");
+                        } else {
+                            setFeedback("「五角形」の倉庫が上限です！ティア画面から納品してください。");
+                        }
+                    } else {
+                        setFeedback("素材が不足しています (必要: 点5, 線5)");
+                    }
+                    updateUI();
+                    return;
+                }
+                else if (corners.length >= 5) {
+                    if (!isUnlocked("hexagon")) {
+                        setFeedback("技術ロック：まだ「六角形」の合成技術が解放されていません！");
+                        return;
+                    }
+                    if (isDebugMode || (Math.floor(resources.point) >= 6 && Math.floor(resources.line) >= 6)) {
+                        if (addResource('hexagon', 1)) {
+                            if (!isDebugMode) { resources.point -= 6; resources.line -= 6; }
+                            addEffect({ type: 'hexagon', points: [startPoint, ...corners] });
+                            setFeedback(isDebugMode ? "🔧[DEBUG] 「六角形」を合成" : "「六角形」を合成しました (点-6, 線-6)");
+                        } else {
+                            setFeedback("「六角形」の倉庫が上限です！ティア画面から納品してください. ");
+                        }
+                    } else {
+                        setFeedback("素材が不足しています (必要: 点6, 線6)");
+                    }
+                    updateUI();
+                    return;
+                }
+            }
+
+            setFeedback("ジェスチャーが不鮮明です。もう一度お試しください。");
+        }
+
+        // リソース追加（上限補正機能付き）
+        function addResource(type, amount) {
+            if (Math.floor(resources[type]) >= maxStorage[type]) {
+                return false;
+            }
+            if (resources[type] + amount >= maxStorage[type]) {
+                resources[type] = maxStorage[type];
+                triggerMiniFlash(type);
+                return true;
+            } else {
+                resources[type] += amount;
+                triggerMiniFlash(type);
+                return true;
+            }
+        }
+
+        function triggerMiniFlash(type) {
+            const el = document.getElementById(`mini-${type}`);
+            if (!el) return;
+            el.classList.remove(`flash-${type}`);
+            void el.offsetWidth; 
+            el.classList.add(`flash-${type}`);
+        }
+
+        // 倉庫拡張
+        function upgradeStorage(type) {
+            if (!isUnlocked(type)) return;
+            if (Math.floor(resources.square) >= 6) {
+                resources.square -= 6;
+                maxStorage[type] += 10;
+                setFeedback(`📦 ストレージ拡張成功！最大容量が +10 されました`);
+                updateUI();
+            }
+        }
+        
+        // 手動生産量アップグレード
+        function upgradeProduction(type) {
+            if (!isUnlocked(type)) return;
+            if (type === 'point') {
+                if (Math.floor(resources.triangle) >= 10) {
+                    resources.triangle -= 10;
+                    productionRates.point += 0.1;
+                    setFeedback(`⚡ 点の手動生産量が +0.1 されました (現在: ${productionRates.point.toFixed(1)})`);
+                    updateUI();
+                }
+            } else if (type === 'line') {
+                if (Math.floor(resources.triangle) >= 15) {
+                    resources.triangle -= 15;
+                    productionRates.line += 0.1;
+                    setFeedback(`⚡ 線の手動生産量が +0.1 されました (現在: ${productionRates.line.toFixed(1)})`);
+                    updateUI();
+                }
+            }
+        }
+
+        // 自動生産量アップグレード
+        function upgradeAutoProduction(type) {
+            if (type === 'point') {
+                if (isUnlocked('autoPoint') && Math.floor(resources.triangle) >= 5 && Math.floor(resources.square) >= 5) {
+                    resources.triangle -= 5;
+                    resources.square -= 5;
+                    autoProductionRates.point += 0.2;
+                    setFeedback(`🤖 点の自動生産量が +0.2 されました (現在: ${autoProductionRates.point.toFixed(1)}/s)`);
+                    updateUI();
+                }
+            } else if (type === 'line') {
+                if (isUnlocked('autoLine') && Math.floor(resources.pentagon) >= 5 && Math.floor(resources.hexagon) >= 5) {
+                    resources.pentagon -= 5;
+                    resources.hexagon -= 5;
+                    autoProductionRates.line += 0.2;
+                    setFeedback(`🤖 線の自動生産量が +0.2 されました (現在: ${autoProductionRates.line.toFixed(1)}/s)`);
+                    updateUI();
+                }
+            }
+        }
+
+        // 納品処理
+        function submitResource(type) {
+            if (currentTierIndex >= TIER_CONFIGS.length - 1) return;
+            
+            const config = TIER_CONFIGS[currentTierIndex];
+            if (!config.reqs[type]) return;
+
+            const needed = config.reqs[type] - submittedResources[type];
+            if (needed <= 0) return;
+
+            if (isDebugMode) {
+                submittedResources[type] += needed;
+                setFeedback(`🔧 [DEBUG] 「${type === 'point' ? '点' : type === 'line' ? '線' : '図形'}」の要求分 ${needed} 個を強制達成しました！`);
+                checkTierProgress();
+                updateUI();
+                updateTierUI();
+                return;
+            }
+
+            const submitAmount = Math.min(Math.floor(resources[type]), needed);
+
+            if (submitAmount > 0) {
+                resources[type] -= submitAmount;
+                submittedResources[type] += submitAmount;
+                setFeedback(`📦 「${type === 'point' ? '点' : type === 'line' ? '線' : '図形'}」を ${submitAmount} 個納品しました！`);
+                
+                checkTierProgress();
+                updateUI();
+                updateTierUI();
+            }
+        }
+
+        function checkTierProgress() {
+            const config = TIER_CONFIGS[currentTierIndex];
+            let allMet = true;
+
+            for (let key in config.reqs) {
+                if (submittedResources[key] < config.reqs[key]) {
+                    allMet = false;
+                    break;
+                }
+            }
+
+            if (allMet) {
+                currentTierIndex++;
+                submittedResources = { point: 0, line: 0, triangle: 0, square: 0, pentagon: 0, hexagon: 0 };
+                setFeedback(`🎉 ティア進行！新しい技術・図形が加工可能になりました！`);
+            }
+        }
+
+        // ティアUI更新
+        function updateTierUI() {
+            if (currentTierIndex >= TIER_CONFIGS.length) return;
+            const config = TIER_CONFIGS[currentTierIndex];
+
+            const nameEl = document.getElementById('tier-name');
+            const descEl = document.getElementById('tier-desc');
+            const headerTitleEl = document.getElementById('tier-header-title');
+            
+            if (nameEl) nameEl.innerText = config.name;
+            if (descEl) descEl.innerText = config.desc;
+            
+            if (headerTitleEl) {
+                if (config.name.startsWith("1-")) {
+                    headerTitleEl.innerText = "TIER 1";
+                } else if (config.name.startsWith("2-Complete")) {
+                    headerTitleEl.innerText = "TIER 2 COMPLETE";
+                } else if (config.name.startsWith("2-")) {
+                    headerTitleEl.innerText = "TIER 2";
+                } else if (config.name.startsWith("3-")) {
+                    headerTitleEl.innerText = "TIER 3";
+                } else if (config.name.startsWith("T3-Complete")) {
+                    headerTitleEl.innerText = "TIER 3 COMPLETE";
+                } else {
+                    headerTitleEl.innerText = "COMPLETE";
+                }
+            }
+
+            const reqsContainer = document.getElementById('tier-reqs');
+            if (!reqsContainer) return;
+            
+            reqsContainer.innerHTML = '';
+
+            const namesJP = { point: '点', line: '線', triangle: '三角形', square: '四角形', pentagon: '五角形', hexagon: '六角形' };
+
+            if (Object.keys(config.reqs).length === 0) {
+                if (currentTierIndex >= TIER_CONFIGS.length - 1) {
+                    reqsContainer.innerHTML = '<div style="color:var(--accent-point);text-align:center;font-weight:bold;margin-top:10px;">✨ ALL CLEAR ✨</div>';
+                } else {
+                    reqsContainer.innerHTML = `<div style="text-align:center;margin-top:10px;">
+                        <div style="color:var(--accent-point);font-weight:bold;font-size:15px;margin-bottom:12px;">✨ このティアをクリア！ ✨</div>
+                        <button class="submit-action-btn" onclick="advanceTier()" style="font-size:14px;padding:10px 24px;">次のティアへ進む →</button>
+                    </div>`;
+                }
+                return;
+            }
+
+            for (let key in config.reqs) {
+                const target = config.reqs[key];
+                const submitted = submittedResources[key];
+                const isMet = submitted >= target;
+
+                const row = document.createElement('div');
+                row.className = 'req-row';
+
+                const infoDiv = document.createElement('div');
+                infoDiv.className = `req-info ${isMet ? 'met' : ''}`;
+                infoDiv.innerHTML = `<span>${namesJP[key]} の累積納品目標</span><span class="req-progress">${submitted} / ${target} (手持ち: ${Math.floor(resources[key])})</span>`;
+                
+                const btn = document.createElement('button');
+                btn.className = 'submit-action-btn';
+                btn.innerText = isMet ? '✓ 完了' : `手持ちを納品`;
+                btn.disabled = isMet || (!isDebugMode && Math.floor(resources[key]) === 0);
+                
+                btn.onclick = (function(k) {
+                    return function() { submitResource(k); };
+                })(key);
+
+                row.appendChild(infoDiv);
+                row.appendChild(btn);
+                reqsContainer.appendChild(row);
+            }
+        }
+
+        function setFeedback(msg) {
+            if (feedbackEl) feedbackEl.innerText = msg;
+        }
+
+        // UI表示更新
+        function updateUI() {
+            const types = ['point', 'line', 'triangle', 'square', 'pentagon', 'hexagon'];
+            const icons = { point: '⚀', line: '⚁', triangle: '⚂', square: '⚃', pentagon: '⚄', hexagon: '⚅' };
+            
+            // 自動化ラインタブの解放制御 (ティア2-2(Index:7)を突破してALL CLEAR!(Index:8)以上に到達すると有効化)
+            const automationBtn = document.getElementById('tab-automation');
+            if (automationBtn) {
+                if (currentTierIndex >= 8) {
+                    automationBtn.disabled = false;
+                    automationBtn.style.opacity = "1";
+                    automationBtn.style.cursor = "pointer";
+                    automationBtn.innerHTML = "🏭 自動化ライン (Grid)";
+                } else {
+                    automationBtn.disabled = true;
+                    automationBtn.style.opacity = "0.4";
+                    automationBtn.style.cursor = "not-allowed";
+                    automationBtn.innerHTML = "🔒 自動化ライン (要T3)";
+                }
+            }
+
+            // クラフトモード切替スイッチの表示制御
+            const modeSwitch = document.getElementById('factory-mode-switch');
+            if (modeSwitch) {
+                modeSwitch.style.display = currentTierIndex >= 8 ? 'flex' : 'none';
+            }
+
+            // 部品インベントリ表示の更新
+            updatePartsDisplay();
+
+            types.forEach(type => {
+                const unlocked = isUnlocked(type);
+                const card = document.getElementById(`card-${type}`);
+                const miniEl = document.getElementById(`mini-${type}`);
+                
+                if (card) {
+                    if (unlocked) {
+                        card.classList.remove('locked');
+                        card.querySelector('.resource-name').innerHTML = type === 'point' ? `点 (Points) <span style="font-size:10px;color:var(--accent-point);">[手動:+${productionRates.point.toFixed(1)}${isUnlocked('autoPoint') ? ` 自動:+${autoProductionRates.point.toFixed(1)}/s` : ''}]</span>` : 
+                            type === 'line' ? `線 (Lines) <span style="font-size:10px;color:var(--accent-line);">[手動:+${productionRates.line.toFixed(1)}${isUnlocked('autoLine') ? ` 自動:+${autoProductionRates.line.toFixed(1)}/s` : ''}]</span>` :
+                            type === 'triangle' ? '三角形 (Triangles)' :
+                            type === 'square' ? '四角形 (Squares)' :
+                            type === 'pentagon' ? '五角形 (Pentagons)' : '六角形 (Hexagons)';
+                    } else {
+                        card.classList.add('locked');
+                    }
+                }
+
+                if (miniEl) {
+                    if (unlocked) {
+                        miniEl.classList.remove('locked-mini');
+                        miniEl.innerText = `${icons[type]} ${Math.floor(resources[type])}`;
+                    } else {
+                        miniEl.classList.add('locked-mini');
+                    }
+                }
+
+                const valEl = document.getElementById(`${type}-val`);
+                if (valEl) {
+                    valEl.innerText = `${Math.floor(resources[type])} / ${maxStorage[type]}`;
+                    if (Math.floor(resources[type]) >= maxStorage[type]) {
+                        valEl.classList.add('full');
+                    } else {
+                        valEl.classList.remove('full');
+                    }
+                }
+
+                const btn = document.getElementById(`up-${type}`);
+                if (btn) {
+                    btn.disabled = (!unlocked || Math.floor(resources.square) < 6);
+                }
+            });
+            
+            const prodPointBtn = document.getElementById('prod-point');
+            if (prodPointBtn) {
+                prodPointBtn.disabled = (!isUnlocked('point') || Math.floor(resources.triangle) < 10);
+            }
+            const prodLineBtn = document.getElementById('prod-line');
+            if (prodLineBtn) {
+                prodLineBtn.disabled = (!isUnlocked('line') || Math.floor(resources.triangle) < 15);
+            }
+
+            const autoProdPointBtn = document.getElementById('auto-prod-point');
+            if (autoProdPointBtn) {
+                autoProdPointBtn.disabled = (!isUnlocked('autoPoint') || Math.floor(resources.triangle) < 5 || Math.floor(resources.square) < 5);
+            }
+            const autoProdLineBtn = document.getElementById('auto-prod-line');
+            if (autoProdLineBtn) {
+                autoProdLineBtn.disabled = (!isUnlocked('autoLine') || Math.floor(resources.pentagon) < 5 || Math.floor(resources.hexagon) < 5);
+            }
+        }
+
+        // ── クラフトモード関数群 ──────────────────────────────
+
+        function setFactoryMode(mode) {
+            currentMode = mode;
+            document.getElementById('btn-mode-factory').classList.toggle('active', mode === 'factory');
+            document.getElementById('btn-mode-craft').classList.toggle('active', mode === 'craft');
+            document.getElementById('craft-panel').style.display = mode === 'craft' ? 'block' : 'none';
+            if (mode === 'craft') {
+                selectCraftTarget(currentCraftTarget);
+                setFeedback('🔧 クラフトモード：下の材料ボタンをスワイプ↑ or タップして投入！');
+            } else {
+                setFeedback('ラインを引くか、ジェスチャーをどうぞ');
+            }
+        }
+
+        function selectCraftTarget(partType) {
+            currentCraftTarget = partType;
+
+            // ボタンのselected更新
+            document.querySelectorAll('.craft-part-btn').forEach((btn, i) => {
+                const keys = Object.keys(CRAFT_RECIPES);
+                btn.classList.toggle('selected', keys[i] === partType);
+            });
+
+            // スロット初期化
+            const recipe = CRAFT_RECIPES[partType];
+            craftSlots = [];
+            recipe.ingredients.forEach(({ type, count }) => {
+                for (let i = 0; i < count; i++) {
+                    craftSlots.push({ type, filled: false });
+                }
+            });
+
+            renderCraftSlots();
+        }
+
+        function renderCraftSlots() {
+            const area = document.getElementById('craft-slots-area');
+            if (!area) return;
+            area.innerHTML = '';
+
+            const nextIdx = craftSlots.findIndex(s => !s.filled);
+
+            craftSlots.forEach((slot, idx) => {
+                const div = document.createElement('div');
+                const isFilled   = slot.filled;
+                const isNext     = idx === nextIdx;
+                div.className = 'craft-slot' + (isFilled ? ' filled' : isNext ? ' next-needed' : '');
+                div.textContent  = SHAPE_ICONS[slot.type];
+                div.style.opacity = isFilled ? '1' : isNext ? '1' : '0.35';
+                area.appendChild(div);
+            });
+
+            // ヒント更新
+            const hint = document.getElementById('craft-hint');
+            if (hint) {
+                if (nextIdx === -1) {
+                    hint.textContent = '✅ 完成！';
+                } else {
+                    const remaining = craftSlots.filter(s => !s.filled).length;
+                    hint.textContent = `残り ${remaining} スロット　↓ 材料をスワイプ↑ or タップ`;
+                }
+            }
+
+            // 部品カウント更新
+            updatePartsDisplay();
+
+            // 材料ボタン更新
+            renderCraftMaterials();
+        }
+
+        function renderCraftMaterials() {
+            const area = document.getElementById('craft-materials');
+            if (!area) return;
+            area.innerHTML = '';
+            if (!currentCraftTarget) return;
+
+            // 未充填スロットから必要な材料をカウント
+            const needed = {};
+            craftSlots.filter(s => !s.filled).forEach(s => {
+                needed[s.type] = (needed[s.type] || 0) + 1;
+            });
+
+            if (Object.keys(needed).length === 0) return; // 全スロット完了
+
+            Object.entries(needed).forEach(([type, count]) => {
+                const have = Math.floor(resources[type]);
+                const btn = document.createElement('button');
+                btn.disabled = !isDebugMode && have < 1;
+
+                btn.innerHTML =
+                    `<span class="cmat-icon">${SHAPE_ICONS[type]}</span>` +
+                    `<span class="cmat-label">${SHAPE_NAMES_JP[type]}</span>` +
+                    `<span class="cmat-need">必要 ×${count}</span>` +
+                    `<span class="cmat-have" style="color:${(isDebugMode || have >= 1) ? '#00ffcc' : '#ff3366'}">` +
+                    `在庫: ${have}</span>`;
+                btn.className = 'craft-material-btn';
+
+                // スワイプ↑ OR タップ で1個投入
+                let pyStart = null;
+                btn.addEventListener('pointerdown', (e) => {
+                    e.preventDefault();
+                    btn.setPointerCapture(e.pointerId);
+                    pyStart = e.clientY;
+                }, { passive: false });
+                btn.addEventListener('pointerup', (e) => {
+                    if (pyStart === null) return;
+                    const dy = pyStart - e.clientY;
+                    const dx = Math.abs(e.clientX - (btn.getBoundingClientRect().left + btn.offsetWidth / 2));
+                    pyStart = null;
+                    // スワイプ上方向 OR タップ判定
+                    if (dy > 15 || (Math.abs(dy) <= 15 && dx <= btn.offsetWidth)) {
+                        tryFillCraftSlot(type);
+                    }
+                }, { passive: false });
+
+                area.appendChild(btn);
+            });
+        }
+
+        function tryFillCraftSlot(shapeType) {
+            if (!currentCraftTarget || craftSlots.length === 0) return;
+
+            // 対応する未充填スロットを探す
+            const slotIdx = craftSlots.findIndex(s => !s.filled && s.type === shapeType);
+            if (slotIdx === -1) {
+                setFeedback(`${SHAPE_ICONS[shapeType]} は今必要ありません`);
+                return;
+            }
+
+            // 在庫チェック（デバッグモード時はスキップ）
+            if (!isDebugMode && Math.floor(resources[shapeType]) < 1) {
+                setFeedback(`在庫が足りません（${SHAPE_ICONS[shapeType]} が必要）`);
+                return;
+            }
+
+            // 投入（デバッグモード時は在庫消費なし）
+            if (!isDebugMode) resources[shapeType] -= 1;
+            craftSlots[slotIdx].filled = true;
+
+            const remaining = craftSlots.filter(s => !s.filled).length;
+
+            if (remaining === 0) {
+                // 完成！
+                parts[currentCraftTarget]++;
+                const panel = document.getElementById('craft-panel');
+                if (panel) {
+                    panel.classList.add('craft-complete-flash');
+                    setTimeout(() => panel.classList.remove('craft-complete-flash'), 500);
+                }
+                setFeedback(`✅ ${PART_NAMES[currentCraftTarget]} ×1 完成！（手持ち: ${parts[currentCraftTarget]}）`);
+                // 少し間を置いてスロットリセット
+                setTimeout(() => {
+                    selectCraftTarget(currentCraftTarget);
+                }, 400);
+            } else {
+                setFeedback(`投入！残り ${remaining} スロット`);
+                renderCraftSlots();
+            }
+
+            updateUI();
+        }
+
+        function updatePartsDisplay() {
+            const allParts = ['belt', 'inserter', 'assembler', 'storageSource', 'storageSink', 'fastBelt', 'fastInserter', 'fastAssembler', 'splitter', 'merger'];
+            allParts.forEach(p => {
+                const countEl = document.getElementById(`parts-${p}-count`);
+                if (countEl) countEl.textContent = `×${parts[p]}`;
+                const dispEl = document.getElementById(`disp-parts-${p}`);
+                if (dispEl) {
+                    dispEl.textContent = parts[p];
+                    dispEl.className = 'part-num' + (parts[p] === 0 ? ' zero' : '');
+                }
+            });
+
+            // 解放状態に応じてT3部品UI要素の表示切替
+            const t3Unlocks = ['fastBelt', 'fastInserter', 'fastAssembler', 'splitter', 'merger'];
+            t3Unlocks.forEach(key => {
+                const unlocked = isUnlocked(key);
+                document.querySelectorAll(`[data-unlock="${key}"]`).forEach(el => {
+                    el.style.display = unlocked ? '' : 'none';
+                });
+            });
+        }
+
+        // ── セーブ＆ロードシステム ──────────────────────────
+
+        function saveGame() {
+            try {
+                const saveData = {
+                    resources,
+                    maxStorage,
+                    productionRates,
+                    autoProductionRates,
+                    currentTierIndex,
+                    submittedResources,
+                    parts,
+                    sectors: sectors.map(sector => 
+                        sector.map(row => 
+                            row.map(cell => ({
+                                type: cell.type,
+                                dir: cell.dir,
+                                items: cell.items,
+                                work: cell.work,
+                                x: cell.x,
+                                y: cell.y
+                            }))
+                        )
+                    )
+                };
+                localStorage.setItem('shape_gesture_factory_v2_save', JSON.stringify(saveData));
+            } catch (e) {
+                console.error("セーブデータの保存に失敗しました", e);
+            }
+        }
+
+        function loadGame() {
+            try {
+                const raw = localStorage.getItem('shape_gesture_factory_v2_save');
+                if (!raw) return;
+                const data = JSON.parse(raw);
+                
+                if (data.resources) resources = data.resources;
+                if (data.maxStorage) maxStorage = data.maxStorage;
+                if (data.productionRates) productionRates = data.productionRates;
+                if (data.autoProductionRates) autoProductionRates = data.autoProductionRates;
+                if (data.currentTierIndex !== undefined) currentTierIndex = data.currentTierIndex;
+                if (data.submittedResources) submittedResources = data.submittedResources;
+                if (data.parts) parts = data.parts;
+                
+                if (data.sectors) {
+                    for (let s = 0; s < TOTAL_SECTORS; s++) {
+                        if (!data.sectors[s]) continue;
+                        for (let y = 0; y < ROWS; y++) {
+                            if (!data.sectors[s][y]) continue;
+                            for (let x = 0; x < COLS; x++) {
+                                const savedCell = data.sectors[s][y][x];
+                                if (!savedCell) continue;
+                                // マイグレーション: storage-source-line → storage-source with kind:'line'
+                                if (savedCell.type === 'storage-source-line') {
+                                    savedCell.type = 'storage-source';
+                                    savedCell.work = { kind: 'line' };
+                                }
+                                // マイグレーション: storage-source の work が null → { kind:'raw' }
+                                if (savedCell.type === 'storage-source' && !savedCell.work) {
+                                    savedCell.work = { kind: 'raw' };
+                                }
+                                // マイグレーション: 組立機の storedDots/storedLines → stored{}
+                                if ((savedCell.type === 'assembler' || savedCell.type === 'fast-assembler') && savedCell.work && savedCell.work.storedDots !== undefined) {
+                                    const r = RECIPES[savedCell.work.recipeIdx || 0];
+                                    savedCell.work.stored = {};
+                                    if (r) {
+                                        r.ingredients.forEach(ing => { savedCell.work.stored[ing.kind] = 0; });
+                                        savedCell.work.stored['raw']  = savedCell.work.storedDots  || 0;
+                                        savedCell.work.stored['line'] = savedCell.work.storedLines || 0;
+                                    }
+                                    delete savedCell.work.storedDots;
+                                    delete savedCell.work.storedLines;
+                                }
+                                sectors[s][y][x].type = savedCell.type;
+                                sectors[s][y][x].dir = savedCell.dir;
+                                sectors[s][y][x].items = savedCell.items || [];
+                                sectors[s][y][x].work = savedCell.work;
+                            }
+                        }
+                    }
+                }
+            } catch (e) {
+                console.error("セーブデータの読み込みに失敗しました", e);
+            }
+        }
+
+        // ──────────────────────────────────────────────────────
+
+        function addEffect(eff) {
+            eff.life = 1.0;
+            effects.push(eff);
+        }
+
+        // メインループ (Canvas用)
+        function gameLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.strokeStyle = COLORS.grid;
+            ctx.lineWidth = 1;
+            for (let x = 0; x < canvas.width; x += 40) {
+                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+            }
+            for (let y = 0; y < canvas.height; y += 40) {
+                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+            }
+
+            for (let i = effects.length - 1; i >= 0; i--) {
+                let eff = effects[i];
+                eff.life -= 0.025;
+                if (eff.life <= 0) {
+                    effects.splice(i, 1);
+                    continue;
+                }
+
+                ctx.save();
+                ctx.globalAlpha = eff.life;
+                if (eff.type === 'point') {
+                    ctx.beginPath();
+                    ctx.arc(eff.x, eff.y, 8 + (1.0 - eff.life) * 30, 0, Math.PI * 2);
+                    ctx.strokeStyle = COLORS.point;
+                    ctx.lineWidth = 4;
+                    ctx.stroke();
+                } else if (eff.type === 'line') {
+                    ctx.beginPath();
+                    ctx.moveTo(eff.x1, eff.y1);
+                    ctx.lineTo(eff.x2, eff.y2);
+                    ctx.strokeStyle = COLORS.line;
+                    ctx.lineWidth = 6 * eff.life;
+                    ctx.stroke();
+                } else if (eff.type === 'triangle' || eff.type === 'square' || eff.type === 'pentagon' || eff.type === 'hexagon') {
+                    ctx.beginPath();
+                    ctx.moveTo(eff.points[0].x, eff.points[0].y);
+                    for(let j=1; j<eff.points.length; j++) ctx.lineTo(eff.points[j].x, eff.points[j].y);
+                    ctx.closePath();
+                    if (eff.type === 'triangle') ctx.fillStyle = 'rgba(255, 202, 40, 0.25)';
+                    else if (eff.type === 'square') ctx.fillStyle = 'rgba(255, 51, 102, 0.25)';
+                    else if (eff.type === 'pentagon') ctx.fillStyle = 'rgba(175, 64, 255, 0.25)';
+                    else if (eff.type === 'hexagon') ctx.fillStyle = 'rgba(255, 119, 0, 0.25)';
+                    ctx.fill();
+                    ctx.strokeStyle = COLORS[eff.type];
+                    ctx.lineWidth = 5;
+                    ctx.stroke();
+                }
+                ctx.restore();
+            }
+
+            if (isDrawing && strokePoints.length > 0) {
+                ctx.beginPath();
+                ctx.moveTo(strokePoints[0].x, strokePoints[0].y);
+                for (let i = 1; i < strokePoints.length; i++) {
+                    ctx.lineTo(strokePoints[i].x, strokePoints[i].y);
+                }
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+                ctx.lineWidth = 3;
+                ctx.setLineDash([4, 4]);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                let corners = getCleanedCorners();
+                corners.forEach(c => {
+                    ctx.beginPath();
+                    ctx.arc(c.x, c.y, 6, 0, Math.PI * 2);
+                    ctx.fillStyle = '#ffffff';
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = '#ffffff';
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                });
+            }
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
