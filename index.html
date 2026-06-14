@@ -596,11 +596,16 @@
             transform-origin: bottom center;
             bottom: 50%;
             left: calc(50% - 1.5px);
-            transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.38s ease-in-out;
             z-index: 2;
             border-radius: 2px 2px 0 0;
         }
-        /* SOURCE方向へ掴みに行く → DEST方向へ180度回転して離す */
+        /* idle: アームはdest方向（出力側）を指す */
+        .inserter.dir-right .inserter-arm { transform: rotate(90deg); }
+        .inserter.dir-left  .inserter-arm { transform: rotate(270deg); }
+        .inserter.dir-down  .inserter-arm { transform: rotate(180deg); }
+        .inserter.dir-up    .inserter-arm { transform: rotate(0deg); }
+        /* grab: source側（180度スイング）→ drop: dest側に戻る */
         .inserter.dir-right.swing-grab .inserter-arm { transform: rotate(-90deg); }
         .inserter.dir-right.swing-drop .inserter-arm { transform: rotate(90deg); }
         .inserter.dir-down.swing-grab  .inserter-arm { transform: rotate(0deg); }
@@ -609,6 +614,37 @@
         .inserter.dir-left.swing-drop  .inserter-arm { transform: rotate(270deg); }
         .inserter.dir-up.swing-grab    .inserter-arm { transform: rotate(180deg); }
         .inserter.dir-up.swing-drop    .inserter-arm { transform: rotate(360deg); }
+
+        /* ── インサーター 方向インジケーター ── */
+        .inserter-out {
+            position: absolute;
+            font-size: 9px;
+            line-height: 1;
+            z-index: 6;
+            pointer-events: none;
+        }
+        .inserter-in {
+            position: absolute;
+            width: 5px; height: 5px;
+            border-radius: 50%;
+            background: rgba(160,160,160,0.6);
+            z-index: 6;
+            pointer-events: none;
+        }
+        /* 出力矢印の位置（dir方向の端） */
+        .inserter.dir-right .inserter-out { right: 1px;   top: 50%; transform: translateY(-50%); }
+        .inserter.dir-left  .inserter-out { left: 1px;    top: 50%; transform: translateY(-50%); }
+        .inserter.dir-down  .inserter-out { bottom: 1px;  left: 50%; transform: translateX(-50%); }
+        .inserter.dir-up    .inserter-out { top: 1px;     left: 50%; transform: translateX(-50%); }
+        /* 入力ドットの位置（逆方向の端） */
+        .inserter.dir-right .inserter-in { left: 1px;    top: 50%; transform: translateY(-50%); }
+        .inserter.dir-left  .inserter-in { right: 1px;   top: 50%; transform: translateY(-50%); }
+        .inserter.dir-down  .inserter-in { top: 1px;     left: 50%; transform: translateX(-50%); }
+        .inserter.dir-up    .inserter-in { bottom: 1px;  left: 50%; transform: translateX(-50%); }
+        /* 各種インサーターの矢印色 */
+        .inserter:not(.fast-inserter):not(.long-inserter) .inserter-out { color: #fbbf24; text-shadow: 0 0 5px rgba(251,191,36,0.9); }
+        .fast-inserter  .inserter-out { color: #40ff80; text-shadow: 0 0 5px rgba(64,255,128,0.9); }
+        .long-inserter  .inserter-out { color: #ff8040; text-shadow: 0 0 5px rgba(255,128,64,0.9); }
 
         /* ── 組立機（パルス発光 + プログレスバー） ── */
         .assembler {
@@ -1569,15 +1605,17 @@
                     setFeedback(`🔒 ${PART_NAMES[partKey]} はまだ解放されていません！`);
                     startCellX = null; startCellY = null; return;
                 }
-                // 部品インベントリを消費
-                if (parts[partKey] <= 0) {
-                    setFeedback(`⚠️ ${PART_NAMES[partKey]} が足りません！🔧 工場タブのクラフトモードで作ってください`);
-                    startCellX = null; startCellY = null; return;
+                // 部品インベントリを消費（デバッグモード時はスキップ）
+                if (!isDebugMode) {
+                    if (parts[partKey] <= 0) {
+                        setFeedback(`⚠️ ${PART_NAMES[partKey]} が足りません！🔧 工場タブのクラフトモードで作ってください`);
+                        startCellX = null; startCellY = null; return;
+                    }
+                    parts[partKey]--;
+                    updatePartsDisplay();
                 }
-                parts[partKey]--;
-                updatePartsDisplay();
 
-                if (currentTool === 'belt' || currentTool === 'fast-belt' || currentTool === 'inserter' || currentTool === 'fast-inserter') {
+                if (currentTool === 'belt' || currentTool === 'fast-belt' || currentTool === 'inserter' || currentTool === 'fast-inserter' || currentTool === 'long-inserter') {
                     cell.type = currentTool; cell.dir = finalDir; cell.work = null;
                 } else if (currentTool === 'assembler' || currentTool === 'fast-assembler') {
                     cell.type = currentTool; cell.dir = 'right';
@@ -1596,6 +1634,18 @@
 
             renderCell(cell);
             updateUI();
+        }
+
+        function addInserterIndicators(el, dir, isLong) {
+            const arrowChars = { right: '▶', left: '◀', down: '▼', up: '▲' };
+            const outEl = document.createElement('div');
+            outEl.className = 'inserter-out';
+            outEl.textContent = isLong ? (arrowChars[dir] || '▶') + (arrowChars[dir] || '▶') : (arrowChars[dir] || '▶');
+            if (isLong) outEl.style.fontSize = '7px';
+            el.appendChild(outEl);
+            const inEl = document.createElement('div');
+            inEl.className = 'inserter-in';
+            el.appendChild(inEl);
         }
 
         function renderCell(cell) {
@@ -1618,6 +1668,7 @@
                 const arm = document.createElement('div');
                 arm.className = 'inserter-arm';
                 el.appendChild(arm);
+                addInserterIndicators(el, cell.dir, true);
                 if (cell.work && cell.work.state === 'grab') el.classList.add('swing-grab');
                 else if (cell.work && cell.work.state === 'drop') el.classList.add('swing-drop');
 
@@ -1630,6 +1681,7 @@
                 const arm = document.createElement('div');
                 arm.className = 'inserter-arm';
                 el.appendChild(arm);
+                addInserterIndicators(el, cell.dir, false);
                 if (cell.work && cell.work.state === 'grab') el.classList.add('swing-grab');
                 else if (cell.work && cell.work.state === 'drop') el.classList.add('swing-drop');
 
@@ -1689,7 +1741,7 @@
             } else if (cell.type === 'inserter') {
                 el.classList.add('building', 'inserter');
                 if (cell.dir) el.classList.add('dir-' + cell.dir);
-                
+
                 const hub = document.createElement('div');
                 hub.className = 'inserter-hub';
                 el.appendChild(hub);
@@ -1697,7 +1749,8 @@
                 const arm = document.createElement('div');
                 arm.className = 'inserter-arm';
                 el.appendChild(arm);
-                
+                addInserterIndicators(el, cell.dir, false);
+
                 if (cell.work && cell.work.state === 'grab') {
                     el.classList.add('swing-grab');
                 } else if (cell.work && cell.work.state === 'drop') {
@@ -1752,6 +1805,38 @@
             return '?';
         }
 
+        function makeItemDom(item, cx, cy) {
+            const dom = document.createElement('div');
+            dom.id = 'smooth-item-' + item.id;
+            dom.className = 'smooth-item kind-' + item.kind;
+            dom.style.left = cx + 'px';
+            dom.style.top  = cy + 'px';
+            const orb = document.createElement('div');
+            orb.className = 'item-orb';
+            const partOrbIcons = {
+                belt:'▶', inserter:'⇒', assembler:'⚙',
+                fastBelt:'⚡▶', fastInserter:'⚡⇒', fastAssembler:'⚡⚙',
+                storageSource:'📦', storageSink:'📤',
+                splitter:'🔀', merger:'🔁', longInserter:'⟹'
+            };
+            if (partOrbIcons[item.kind]) orb.textContent = partOrbIcons[item.kind];
+            dom.appendChild(orb);
+            itemLayerEl.appendChild(dom);
+            return dom;
+        }
+
+        function positionInserterItem(dom, cell, state) {
+            const cx = cell.x * 33;
+            const cy = cell.y * 33;
+            const offset = cell.type === 'long-inserter' ? 32 : 24;
+            const isGrab = state === 'grab';
+            if (cell.dir === 'right') { dom.style.left = (cx + (isGrab ? -offset : offset)) + 'px'; dom.style.top = cy + 'px'; }
+            else if (cell.dir === 'left')  { dom.style.left = (cx + (isGrab ?  offset : -offset)) + 'px'; dom.style.top = cy + 'px'; }
+            else if (cell.dir === 'down')  { dom.style.left = cx + 'px'; dom.style.top = (cy + (isGrab ? -offset : offset)) + 'px'; }
+            else if (cell.dir === 'up')    { dom.style.left = cx + 'px'; dom.style.top = (cy + (isGrab ?  offset : -offset)) + 'px'; }
+            dom.style.transform = isGrab ? 'scale(0.8)' : 'scale(1)';
+        }
+
         function updateItemLayer() {
             const activeIds = new Set();
             const currentGrid = sectors[currentSectorId];
@@ -1759,57 +1844,34 @@
             for (let y = 0; y < ROWS; y++) {
                 for (let x = 0; x < COLS; x++) {
                     const cell = currentGrid[y][x];
-                    
+
+                    // ベルト/組立機などのセル上アイテム
                     if (cell.items.length > 0) {
                         const item = cell.items[0];
                         activeIds.add(String(item.id));
-                        
                         let dom = document.getElementById('smooth-item-' + item.id);
-                        if (!dom) {
-                          dom = document.createElement('div');
-                          dom.id = 'smooth-item-' + item.id;
-                          dom.className = 'smooth-item kind-' + item.kind;
-                          dom.style.left = (cell.x * 33) + 'px';
-                          dom.style.top = (cell.y * 33) + 'px';
-                          const orb = document.createElement('div');
-                          orb.className = 'item-orb';
-                          const partOrbIcons = {
-                              belt:'▶', inserter:'⇒', assembler:'⚙',
-                              fastBelt:'⚡▶', fastInserter:'⚡⇒', fastAssembler:'⚡⚙',
-                              storageSource:'📦', storageSink:'📤',
-                              splitter:'🔀', merger:'🔁',
-                              longInserter:'⟹'
-                          };
-                          if (partOrbIcons[item.kind]) orb.textContent = partOrbIcons[item.kind];
-                          dom.appendChild(orb);
-                          itemLayerEl.appendChild(dom);
-                        }
-                        
+                        if (!dom) dom = makeItemDom(item, cell.x * 33, cell.y * 33);
                         dom.className = 'smooth-item kind-' + item.kind;
-                        
-                        if ((cell.type === 'inserter' || cell.type === 'fast-inserter') && cell.work && cell.work.state !== 'idle') {
-                            const cx = cell.x * 33;
-                            const cy = cell.y * 33;
-                            
-                            if (cell.dir === 'right') {
-                                dom.style.left = (cell.work.state === 'grab' ? cx - 24 : cx + 24) + 'px';
-                                dom.style.top = cy + 'px';
-                            } else if (cell.dir === 'left') {
-                                dom.style.left = (cell.work.state === 'grab' ? cx + 24 : cx - 24) + 'px';
-                                dom.style.top = cy + 'px';
-                            } else if (cell.dir === 'down') {
-                                dom.style.left = cx + 'px';
-                                dom.style.top = (cell.work.state === 'grab' ? cy - 24 : cy + 24) + 'px';
-                            } else if (cell.dir === 'up') {
-                                dom.style.left = cx + 'px';
-                                dom.style.top = (cell.work.state === 'grab' ? cy + 24 : cy - 24) + 'px';
-                            }
-                            dom.style.transform = cell.work.state === 'grab' ? 'scale(0.8)' : 'scale(1)';
+
+                        const isInserterCell = cell.type === 'inserter' || cell.type === 'fast-inserter' || cell.type === 'long-inserter';
+                        if (isInserterCell && cell.work && cell.work.state !== 'idle') {
+                            positionInserterItem(dom, cell, cell.work.state);
                         } else {
                             dom.style.left = (cell.x * 33) + 'px';
-                            dom.style.top = (cell.y * 33) + 'px';
+                            dom.style.top  = (cell.y * 33) + 'px';
                             dom.style.transform = 'scale(1)';
                         }
+                    }
+
+                    // 3フェーズインサーターが保持中のアイテム
+                    const isPhased = cell.type === 'inserter' || cell.type === 'long-inserter';
+                    if (isPhased && cell.work && cell.work.heldItem) {
+                        const item = cell.work.heldItem;
+                        activeIds.add(String(item.id));
+                        let dom = document.getElementById('smooth-item-' + item.id);
+                        if (!dom) dom = makeItemDom(item, cell.x * 33, cell.y * 33);
+                        dom.className = 'smooth-item kind-' + item.kind;
+                        positionInserterItem(dom, cell, cell.work.state);
                     }
                 }
             }
@@ -1885,82 +1947,125 @@
             return false;
         }
 
-        // インサーター移動パス（types に含まれるセルタイプを1ティック分処理）
-        function doInserterPass(currentGrid, reserved, types) {
+        // 搬入先にアイテムを置く（インサーター共通）
+        function inserterDrop(itemToMove, to) {
+            if (to.type === 'assembler' || to.type === 'fast-assembler') {
+                if (!to.work.stored) to.work.stored = {};
+                to.work.stored[itemToMove.kind] = (to.work.stored[itemToMove.kind] || 0) + 1;
+            } else if (to.type === 'storage-sink') {
+                if (parts[itemToMove.kind] !== undefined) {
+                    parts[itemToMove.kind]++;
+                    updatePartsDisplay();
+                } else {
+                    addResource(itemToMove.kind, 1);
+                }
+            } else {
+                to.items.push(itemToMove);
+            }
+        }
+
+        // 搬入先に置けるか判定
+        function inserterCanDrop(itemToMove, to, reserved) {
+            if (!itemToMove || !to || reserved[to.y]?.[to.x]) return false;
+            if ((to.type === 'belt' || to.type === 'fast-belt') && to.items.length === 0) return true;
+            if ((to.type === 'assembler' || to.type === 'fast-assembler') && !to.work.producing) {
+                const r = RECIPES[to.work.recipeIdx];
+                const stored = to.work.stored || {};
+                for (const ing of r.ingredients)
+                    if (itemToMove.kind === ing.kind && (stored[ing.kind] || 0) < ing.count) return true;
+                return false;
+            }
+            if (to.type === 'storage-sink' && itemToMove.kind !== 'raw' && itemToMove.kind !== 'line') {
+                const kind = itemToMove.kind;
+                if (parts[kind] !== undefined) return true;
+                if (resources[kind] !== undefined && Math.floor(resources[kind]) < maxStorage[kind]) return true;
+            }
+            return false;
+        }
+
+        // 搬出元からアイテムを取得（インサーター共通）
+        function inserterPickup(from) {
+            if (from.type === 'storage-source') {
+                const outputKind = (from.work && from.work.kind) ? from.work.kind : 'raw';
+                const resKey = outputKind === 'raw' ? 'point' : outputKind;
+                if (resources[resKey] !== undefined && Math.floor(resources[resKey]) >= 1)
+                    return { item: { id: ++itemIdCounter, kind: outputKind }, isSource: true, sourceKey: resKey };
+            } else if (from.type === 'belt' || from.type === 'fast-belt') {
+                if (from.items.length > 0) return { item: { ...from.items[0] }, shiftFrom: true };
+            } else if (from.type === 'assembler' || from.type === 'fast-assembler') {
+                if (from.items.length > 0 && from.items[0].kind !== 'raw' && from.items[0].kind !== 'line')
+                    return { item: { ...from.items[0] }, shiftFrom: true };
+            }
+            return null;
+        }
+
+        // インサーター移動パス
+        // phased=true  → 3フェーズ（grab→hold→drop）通常/ロング用
+        // phased=false → 即時（高速インサーター用）
+        function doInserterPass(currentGrid, reserved, types, phased) {
             for (let y = 0; y < ROWS; y++) {
                 for (let x = 0; x < COLS; x++) {
                     const cell = currentGrid[y][x];
                     if (!types.includes(cell.type)) continue;
-                    if (!cell.work) cell.work = { state: 'idle' };
+                    if (!cell.work) cell.work = { state: 'idle', phase: 0, heldItem: null };
+                    if (cell.work.phase === undefined) { cell.work.phase = 0; cell.work.heldItem = null; }
 
-                    const fromDir = getOppositeDir(cell.dir);
                     const isLong = cell.type === 'long-inserter';
+                    const fromDir = getOppositeDir(cell.dir);
                     let from = getNeighborInGrid(currentGrid, cell, fromDir);
                     if (isLong && from) from = getNeighborInGrid(currentGrid, from, fromDir);
-                    const to = getNeighborInGrid(currentGrid, cell, cell.dir);
+                    let to = getNeighborInGrid(currentGrid, cell, cell.dir);
+                    if (isLong && to) to = getNeighborInGrid(currentGrid, to, cell.dir);
 
-                    if (!from || !to) { cell.work.state = 'idle'; continue; }
-
-                    let itemToMove = null, shouldShiftFrom = false, isFromSource = false, sourceType = '';
-
-                    if (from.type === 'storage-source') {
-                        const outputKind = (from.work && from.work.kind) ? from.work.kind : 'raw';
-                        const resKey = outputKind === 'raw' ? 'point' : outputKind;
-                        if (resources[resKey] !== undefined && Math.floor(resources[resKey]) >= 1) {
-                            itemToMove = { id: ++itemIdCounter, kind: outputKind };
-                            isFromSource = true;
-                            sourceType = resKey;
-                        }
-                    } else if (from.type === 'belt' || from.type === 'fast-belt') {
-                        if (from.items.length > 0) { itemToMove = { ...from.items[0] }; shouldShiftFrom = true; }
-                    } else if (from.type === 'assembler' || from.type === 'fast-assembler') {
-                        if (from.items.length > 0 && from.items[0].kind !== 'raw' && from.items[0].kind !== 'line') {
-                            itemToMove = { ...from.items[0] }; shouldShiftFrom = true;
-                        }
+                    if (!from || !to) {
+                        cell.work.state = 'idle'; cell.work.phase = 0; cell.work.heldItem = null; continue;
                     }
 
-                    let canDrop = false;
-                    if (itemToMove && !reserved[to?.y]?.[to?.x]) {
-                        if ((to.type === 'belt' || to.type === 'fast-belt') && to.items.length === 0) {
-                            canDrop = true;
-                        } else if ((to.type === 'assembler' || to.type === 'fast-assembler') && !to.work.producing) {
-                            const r = RECIPES[to.work.recipeIdx];
-                            const stored = to.work.stored || {};
-                            for (const ing of r.ingredients) {
-                                if (itemToMove.kind === ing.kind && (stored[ing.kind] || 0) < ing.count) {
-                                    canDrop = true; break;
-                                }
-                            }
-                        } else if (to.type === 'storage-sink' && itemToMove.kind !== 'raw' && itemToMove.kind !== 'line') {
-                            const kind = itemToMove.kind;
-                            if (parts[kind] !== undefined) {
-                                canDrop = true;
-                            } else if (resources[kind] !== undefined && Math.floor(resources[kind]) < maxStorage[kind]) {
-                                canDrop = true;
-                            }
-                        }
-                    }
-
-                    if (canDrop) {
-                        if (isFromSource) resources[sourceType] -= 1;
-                        if (shouldShiftFrom) from.items.shift();
-                        if (to.type === 'assembler' || to.type === 'fast-assembler') {
-                            if (!to.work.stored) to.work.stored = {};
-                            to.work.stored[itemToMove.kind] = (to.work.stored[itemToMove.kind] || 0) + 1;
-                        } else if (to.type === 'storage-sink') {
-                            if (parts[itemToMove.kind] !== undefined) {
-                                parts[itemToMove.kind]++;
-                                updatePartsDisplay();
-                            } else {
-                                addResource(itemToMove.kind, 1);
-                            }
+                    if (!phased) {
+                        // 高速インサーター：即時グラブ＆ドロップ
+                        const picked = inserterPickup(from);
+                        if (picked && inserterCanDrop(picked.item, to, reserved)) {
+                            if (picked.isSource) resources[picked.sourceKey] -= 1;
+                            if (picked.shiftFrom) from.items.shift();
+                            inserterDrop(picked.item, to);
+                            reserved[to.y][to.x] = true;
+                            cell.work.state = cell.work.state === 'grab' ? 'drop' : 'grab';
                         } else {
-                            to.items.push(itemToMove);
+                            cell.work.state = 'idle';
                         }
-                        reserved[to.y][to.x] = true;
-                        cell.work.state = cell.work.state === 'grab' ? 'drop' : 'grab';
                     } else {
-                        cell.work.state = 'idle';
+                        // 通常/ロング：3フェーズ
+                        const phase = cell.work.phase || 0;
+
+                        if (phase === 0) {
+                            // フェーズ0：ソースからグラブ
+                            const picked = inserterPickup(from);
+                            if (picked) {
+                                if (picked.isSource) resources[picked.sourceKey] -= 1;
+                                if (picked.shiftFrom) from.items.shift();
+                                cell.work.heldItem = picked.item;
+                                cell.work.state = 'grab';
+                                cell.work.phase = 1;
+                            } else {
+                                cell.work.state = 'idle';
+                                cell.work.phase = 0;
+                            }
+                        } else if (phase === 1) {
+                            // フェーズ1：ソース側で保持（アームがグラブ位置に停留）
+                            cell.work.state = 'grab';
+                            cell.work.phase = 2;
+                        } else if (phase === 2) {
+                            // フェーズ2：デスト側にドロップ
+                            const held = cell.work.heldItem;
+                            if (held && inserterCanDrop(held, to, reserved)) {
+                                inserterDrop(held, to);
+                                reserved[to.y][to.x] = true;
+                                cell.work.heldItem = null;
+                                cell.work.state = 'drop';
+                                cell.work.phase = 0;
+                            }
+                            // ドロップ失敗なら phase=2 のまま次tickに再試行
+                        }
                     }
                 }
             }
@@ -2033,9 +2138,9 @@
                 doBeltPass(currentGrid, reserved, ['splitter']);
 
                 // 2. インサーター・高速インサーター・ロングアーム
-                doInserterPass(currentGrid, reserved, ['inserter', 'long-inserter']);
-                doInserterPass(currentGrid, reserved, ['fast-inserter']); // 1回目
-                doInserterPass(currentGrid, reserved, ['fast-inserter']); // 2回目（2倍速）
+                doInserterPass(currentGrid, reserved, ['inserter', 'long-inserter'], true);  // 3フェーズ
+                doInserterPass(currentGrid, reserved, ['fast-inserter'], false); // 即時1回目
+                doInserterPass(currentGrid, reserved, ['fast-inserter'], false); // 即時2回目（2倍速）
 
                 // 3. 組立機・高速組立機（バッファ充填→生産開始→完成品出力）
                 for (let y = 0; y < ROWS; y++) {
@@ -2843,7 +2948,7 @@
             });
 
             // 解放状態に応じてT3部品UI要素の表示切替
-            const t3Unlocks = ['fastBelt', 'fastInserter', 'fastAssembler', 'splitter', 'merger'];
+            const t3Unlocks = ['fastBelt', 'fastInserter', 'fastAssembler', 'splitter', 'merger', 'longInserter'];
             t3Unlocks.forEach(key => {
                 const unlocked = isUnlocked(key);
                 document.querySelectorAll(`[data-unlock="${key}"]`).forEach(el => {
