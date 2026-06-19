@@ -8,6 +8,23 @@
     <link rel="apple-touch-icon" href="/Gesture-Factory/icon-192.png">
     <title>GESTURE&amp;FACTORY</title>
     <style>
+        @keyframes omega-glow {
+            from { text-shadow: 0 0 6px #ffd700, 0 0 14px #ff8800; opacity: 0.85; }
+            to   { text-shadow: 0 0 14px #ffd700, 0 0 30px #ffaa00, 0 0 50px #ff6600; opacity: 1; }
+        }
+        @keyframes star-fall {
+            0%   { transform: translateY(-10px) scale(0.5); opacity: 1; }
+            100% { transform: translateY(100vh) scale(1); opacity: 0; }
+        }
+        .genesis-star {
+            position: fixed;
+            pointer-events: none;
+            color: #ffd700;
+            font-size: 16px;
+            animation: star-fall linear forwards;
+            z-index: 10000;
+        }
+
         :root {
             --bg-color: #121216;
             --panel-color: #1a1a24;
@@ -1912,6 +1929,7 @@
         let dysonCleared   = false;
         let genesisUnlocked = false;
         let genesisChallenging = false;
+        let genesisEverCleared = false;
 
         // トロフィーシステム
         const TROPHIES = [
@@ -5111,10 +5129,33 @@
         function checkGenesisClear() {
             if (!isGenesisComplete()) return;
             genesisChallenging = false;
+            genesisEverCleared = true;
             unlockTrophy('genesis_clear');
             if (reincarnationCount === 0) unlockTrophy('genesis_no_reinc');
+            applyGenesisTheme();
             saveGame();
             showGenesisClearScreen();
+        }
+
+        function applyGenesisTheme() {
+            const root = document.documentElement;
+            root.style.setProperty('--bg-color',    '#0d0a00');
+            root.style.setProperty('--panel-color', '#1a1500');
+            root.style.setProperty('--canvas-color','#1e1800');
+            root.style.setProperty('--accent-point','#ffd700');
+            root.style.setProperty('--accent-line', '#ffaa00');
+            root.style.setProperty('--accent-tri',  '#ff6600');
+            root.style.setProperty('--accent-squ',  '#ff3300');
+            root.style.setProperty('--accent-pen',  '#cc2200');
+            root.style.setProperty('--accent-hex',  '#ff8800');
+            const titleEl = document.getElementById('game-title');
+            if (titleEl && !titleEl.querySelector('.omega-badge')) {
+                const badge = document.createElement('span');
+                badge.className = 'omega-badge';
+                badge.textContent = ' Ω';
+                badge.style.cssText = 'font-size:18px;color:#ffd700;text-shadow:0 0 8px #ffd700,0 0 18px #ff8800;animation:omega-glow 2s ease-in-out infinite alternate;vertical-align:middle;';
+                titleEl.appendChild(badge);
+            }
         }
 
         function showDysonClearScreen() {
@@ -5145,13 +5186,30 @@
             const overlay = document.createElement('div');
             overlay.style.cssText = `position:fixed;inset:0;background:rgba(0,0,0,0.97);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;`;
             overlay.innerHTML = `
-                <p style="font-size:11px;letter-spacing:0.3em;color:#ff6644;margin:0;">PROJECT: GENESIS OMEGA</p>
-                <p style="font-size:32px;font-weight:bold;color:#fff;margin:0;">${t('genesis_complete_label')}</p>
-                <p style="color:#888;font-size:13px;max-width:340px;text-align:center;line-height:1.8;">${t('genesis_complete_desc', reincarnationCount, monolithMultiplier.toFixed(2))}</p>
-                <button onclick="reincarnate();this.parentElement.remove();" style="padding:12px 28px;background:#1a0000;border:1px solid #ff4444;color:#ff8888;border-radius:8px;font-size:14px;cursor:pointer;">もう一度、すべてを超える</button>
-                <button onclick="this.parentElement.remove();" style="padding:8px 20px;background:transparent;border:1px solid #444;color:#666;border-radius:8px;font-size:13px;cursor:pointer;">${t('close')}</button>
+                <p style="font-size:11px;letter-spacing:0.3em;color:#ffd700;margin:0;text-shadow:0 0 10px #ffd700;">PROJECT: GENESIS OMEGA</p>
+                <p style="font-size:32px;font-weight:bold;color:#fff;margin:0;text-shadow:0 0 20px #ffd700;">${t('genesis_complete_label')}</p>
+                <p style="color:#aaa;font-size:13px;max-width:340px;text-align:center;line-height:1.8;">${t('genesis_complete_desc', reincarnationCount, monolithMultiplier.toFixed(2))}</p>
+                <button onclick="reincarnate();document.querySelectorAll('.genesis-star').forEach(s=>s.remove());this.parentElement.remove();" style="padding:12px 28px;background:#1a1000;border:1px solid #ffd700;color:#ffd700;border-radius:8px;font-size:14px;cursor:pointer;">もう一度、すべてを超える</button>
+                <button onclick="document.querySelectorAll('.genesis-star').forEach(s=>s.remove());this.parentElement.remove();" style="padding:8px 20px;background:transparent;border:1px solid #444;color:#666;border-radius:8px;font-size:13px;cursor:pointer;">${t('close')}</button>
             `;
             document.body.appendChild(overlay);
+            // 星パーティクル
+            const symbols = ['★','✦','✧','◆','Ω'];
+            let count = 0;
+            const burst = setInterval(() => {
+                if (count++ > 60) { clearInterval(burst); return; }
+                const star = document.createElement('div');
+                star.className = 'genesis-star';
+                star.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+                star.style.left = Math.random() * 100 + 'vw';
+                star.style.top = '-20px';
+                const dur = 2 + Math.random() * 3;
+                star.style.animationDuration = dur + 's';
+                star.style.fontSize = (12 + Math.random() * 14) + 'px';
+                star.style.color = ['#ffd700','#ffaa00','#fff','#ff8800'][Math.floor(Math.random()*4)];
+                document.body.appendChild(star);
+                setTimeout(() => star.remove(), dur * 1000);
+            }, 80);
         }
 
         function startGenesisChallenge() {
@@ -5208,6 +5266,7 @@
                     dysonCleared,
                     genesisUnlocked,
                     genesisChallenging,
+                    genesisEverCleared,
                     trophies,
                     lifetimeProduced,
                     placedObjects,
@@ -5251,6 +5310,8 @@
                 if (data.dysonCleared      !== undefined) dysonCleared      = data.dysonCleared;
                 if (data.genesisUnlocked   !== undefined) genesisUnlocked   = data.genesisUnlocked;
                 if (data.genesisChallenging !== undefined) genesisChallenging = data.genesisChallenging;
+                if (data.genesisEverCleared !== undefined) genesisEverCleared = data.genesisEverCleared;
+                if (genesisEverCleared) applyGenesisTheme();
                 if (data.trophies) Object.assign(trophies, data.trophies);
                 if (data.lifetimeProduced) Object.assign(lifetimeProduced, data.lifetimeProduced);
                 if (data.placedObjects) Object.assign(placedObjects, data.placedObjects);
