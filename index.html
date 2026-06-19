@@ -1621,6 +1621,30 @@
                 instr_poly: '多角形作成', instr_poly_desc: '：ドラッグして線を引いて<b>一瞬止める(約0.07秒)</b>と、そこが直線でロックされて「角」になります。最後に<b>始点の近くへ持ってくると磁石のようにピタッとくっつく</b>ので、そこで指を離すと合成されます。',
                 instr_shapes: '（🔺三角形:角2 / 🟥四角形:角3 / ⬠五角形:角4 / ⬢六角形:角5以上）',
                 instr_shapes_note: '※要各解放',
+                // Dyson / Genesis
+                dyson_title: 'ダイソンスフィア 建築計画',
+                dyson_true_path: '真の完全制覇への道',
+                dyson_built: '建築完了 — 転生 or Genesis Omega へ',
+                dyson_deliver: '全素材・全部品を storageSink へ納品せよ',
+                monolith_mul: (m, n) => `モノリス倍率: ×${m}　転生回数: ${n}`,
+                dyson_challenge_btn: 'Genesis Omega に挑戦',
+                dyson_reincarnate_btn: '転生する',
+                genesis_forfeit_btn: '断念して転生する…',
+                genesis_forfeit_confirm: 'Genesis Omegaを断念して転生しますか？\n進捗はリセットされます。',
+                dyson_clear_title: 'ダイソンスフィア 建築完了',
+                dyson_clear_title_n: (n) => `ダイソンスフィア 建築完了\n転生 ${n} 回目`,
+                dyson_clear_hint_first: 'が解放された。',
+                dyson_clear_hint_first_pre: '遠くで何かが反応した気がした。<br>だがまだ——何かが足りない。<br><span style="color:#ff6644;font-weight:bold;">Project: Genesis Omega</span> ',
+                dyson_clear_hint_reinc: (n, m) => `モノリスが力を増す。<br>転生後の生産倍率: <span style="color:#ffd700;font-weight:bold;">×${m}</span>`,
+                genesis_challenge_btn: 'Project: Genesis Omega に挑戦する',
+                reincarnate_btn: (m) => `転生してやり直す（×${m}倍）`,
+                continue_btn: 'このまま続ける',
+                genesis_complete_label: '完全制覇',
+                genesis_complete_desc: (n, m) => `転生 ${n} 回。モノリス倍率 ×${m}。<br>この宇宙に、あなたが建てたものがある。`,
+                close: '閉じる',
+                dyson_sink_locked: '🔒 ダイソンスフィア納品口はT4解放後に使用できます',
+                debug_dyson_clear: 'ダイソンスフィア即クリア',
+                debug_genesis_clear: 'Genesis Omega即クリア',
             },
             en: {
                 settings_title: 'Settings', sfx: '🔊 Sound Effects', bgm: '🎵 BGM',
@@ -1675,6 +1699,30 @@
                 instr_poly: 'Draw polygon', instr_poly_desc: ': Drag and <b>pause briefly (~0.07s)</b> to lock each corner. Bring the end <b>near the start — it snaps closed</b> automatically.',
                 instr_shapes: '(🔺Triangle:2 / 🟥Square:3 / ⬠Pentagon:4 / ⬢Hexagon:5+)',
                 instr_shapes_note: '*Each requires unlock',
+                // Dyson / Genesis
+                dyson_title: 'Dyson Sphere Construction',
+                dyson_true_path: 'The Road to True Complete Mastery',
+                dyson_built: 'Built — Reincarnate or take on Genesis Omega',
+                dyson_deliver: 'Deliver all materials & parts to storageSink',
+                monolith_mul: (m, n) => `Monolith multiplier: ×${m}　Reincarnations: ${n}`,
+                dyson_challenge_btn: 'Challenge Genesis Omega',
+                dyson_reincarnate_btn: 'Reincarnate',
+                genesis_forfeit_btn: 'Forfeit and reincarnate…',
+                genesis_forfeit_confirm: 'Forfeit Genesis Omega and reincarnate?\nProgress will be reset.',
+                dyson_clear_title: 'Dyson Sphere Complete',
+                dyson_clear_title_n: (n) => `Dyson Sphere Complete\nRun #${n}`,
+                dyson_clear_hint_first: 'has been unlocked.',
+                dyson_clear_hint_first_pre: 'Something responded from far away.<br>But still — something is missing.<br><span style="color:#ff6644;font-weight:bold;">Project: Genesis Omega</span> ',
+                dyson_clear_hint_reinc: (n, m) => `The Monolith grows stronger.<br>Post-reincarnation multiplier: <span style="color:#ffd700;font-weight:bold;">×${m}</span>`,
+                genesis_challenge_btn: 'Challenge Project: Genesis Omega',
+                reincarnate_btn: (m) => `Reincarnate & restart (×${m})`,
+                continue_btn: 'Continue',
+                genesis_complete_label: 'COMPLETE MASTERY',
+                genesis_complete_desc: (n, m) => `${n} reincarnation(s). Monolith ×${m}.<br>In this universe, what you built remains.`,
+                close: 'Close',
+                dyson_sink_locked: '🔒 Dyson Sphere output unlocks after Tier 4',
+                debug_dyson_clear: 'Instant Dyson Clear',
+                debug_genesis_clear: 'Instant Genesis Clear',
             }
         };
 
@@ -2517,7 +2565,7 @@
                 cell.work = null;
             } else if (currentTool === 'dyson-sink') {
                 if (!isUnlocked('factory')) {
-                    setFeedback('🔒 ダイソンスフィア納品口はT4解放後に使用できます');
+                    setFeedback(t('dyson_sink_locked'));
                     startCellX = null; startCellY = null; return;
                 }
                 cell.type = 'dyson-sink'; cell.dir = null; cell.items = []; cell.work = {};
@@ -3932,7 +3980,7 @@
                 'fast-inserter':'高速インサーター','fast-assembler':'高速組立機',
                 'cross-belt':'交差ベルト','fast-cross-belt':'高速交差','double-belt':'デュアルベルト','curve-belt':'カーブベルト',
                 'splitter':'分岐機','merger':'合流機','long-inserter':'ロングアーム','factory':'部品工場',
-                'dyson-sink':'DS納品口'
+                'dyson-sink':currentLang==='en'?'DS Output':'DS納品口'
             };
             document.querySelectorAll('#toolbar button[data-tool]').forEach(btn => {
                 const tool = btn.dataset.tool;
@@ -4632,24 +4680,32 @@
             const prog = genesisChallenging ? genesisProgress : dysonProgress;
             const title = genesisChallenging
                 ? `<span style="color:#ff6644;font-weight:bold;letter-spacing:0.08em;">PROJECT: GENESIS OMEGA</span>`
-                : `<span style="color:#ffd700;font-weight:bold;">ダイソンスフィア 建築計画</span>`;
+                : `<span style="color:#ffd700;font-weight:bold;">${t('dyson_title')}</span>`;
             const subtitle = genesisChallenging
-                ? `<span style="font-size:11px;color:#888;">真の完全制覇への道</span>`
+                ? `<span style="font-size:11px;color:#888;">${t('dyson_true_path')}</span>`
                 : dysonCleared
-                    ? `<span style="font-size:11px;color:#4af;">建築完了 — 転生 or Genesis Omega へ</span>`
-                    : `<span style="font-size:11px;color:#888;">全素材・全部品を storageSink へ納品せよ</span>`;
+                    ? `<span style="font-size:11px;color:#4af;">${t('dyson_built')}</span>`
+                    : `<span style="font-size:11px;color:#888;">${t('dyson_deliver')}</span>`;
 
             const monolithLine = reincarnationCount > 0
-                ? `<div style="font-size:11px;color:#aaa;margin:6px 0 10px;">モノリス倍率: <span style="color:#ffd700;font-weight:bold;">×${monolithMultiplier.toFixed(2)}</span>　転生回数: <span style="color:#88bbff;">${reincarnationCount}</span></div>`
+                ? `<div style="font-size:11px;color:#aaa;margin:6px 0 10px;">${t('monolith_mul', monolithMultiplier.toFixed(2), reincarnationCount)}</div>`
                 : '';
 
-            const NAMES = {
+            const NAMES_JP = {
                 point:'点', line:'線', triangle:'三角形', square:'四角形', pentagon:'五角形', hexagon:'六角形',
                 belt:'ベルト', inserter:'インサーター', assembler:'組立機',
                 storageSource:'材料ST', storageSink:'完成品ST',
                 fastBelt:'高速ベルト', fastInserter:'高速インサーター', fastAssembler:'高速組立機',
                 splitter:'分岐機', merger:'合流機', longInserter:'ロングアーム', factory:'部品工場'
             };
+            const NAMES_EN = {
+                point:'Point', line:'Line', triangle:'Triangle', square:'Square', pentagon:'Pentagon', hexagon:'Hexagon',
+                belt:'Belt', inserter:'Inserter', assembler:'Assembler',
+                storageSource:'Supply ST', storageSink:'Output ST',
+                fastBelt:'Fast Belt', fastInserter:'Fast Ins.', fastAssembler:'Fast Asm.',
+                splitter:'Splitter', merger:'Merger', longInserter:'Long Arm', factory:'Part Factory'
+            };
+            const NAMES = currentLang === 'en' ? NAMES_EN : NAMES_JP;
 
             const rows = Object.keys(reqs).map(k => {
                 const cur = Math.min(prog[k] || 0, reqs[k]);
@@ -4684,11 +4740,11 @@
                 ${monolithLine}
                 ${rows}
                 ${!genesisChallenging && dysonCleared ? `<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
-                    <button onclick="startGenesisChallenge();updateDysonUI();" style="padding:6px 14px;background:#1a0a00;border:1px solid #ff6644;color:#ff9966;border-radius:6px;font-size:12px;cursor:pointer;">Genesis Omega に挑戦</button>
-                    <button onclick="showDysonClearScreen();" style="padding:6px 14px;background:#0a1020;border:1px solid #4488ff;color:#88bbff;border-radius:6px;font-size:12px;cursor:pointer;">転生する</button>
+                    <button onclick="startGenesisChallenge();updateDysonUI();" style="padding:6px 14px;background:#1a0a00;border:1px solid #ff6644;color:#ff9966;border-radius:6px;font-size:12px;cursor:pointer;">${t('dyson_challenge_btn')}</button>
+                    <button onclick="showDysonClearScreen();" style="padding:6px 14px;background:#0a1020;border:1px solid #4488ff;color:#88bbff;border-radius:6px;font-size:12px;cursor:pointer;">${t('dyson_reincarnate_btn')}</button>
                 </div>` : ''}
                 ${genesisChallenging ? `<div style="margin-top:10px;">
-                    <button onclick="if(confirm('Genesis Omegaを断念して転生しますか？\\n進捗はリセットされます。')) { genesisChallenging=false; showDysonClearScreen(); }" style="padding:6px 14px;background:#0a0a1a;border:1px solid #556;color:#889;border-radius:6px;font-size:11px;cursor:pointer;">断念して転生する…</button>
+                    <button onclick="if(confirm(t('genesis_forfeit_confirm'))) { genesisChallenging=false; showDysonClearScreen(); }" style="padding:6px 14px;background:#0a0a1a;border:1px solid #556;color:#889;border-radius:6px;font-size:11px;cursor:pointer;">${t('genesis_forfeit_btn')}</button>
                 </div>` : ''}
                 ${debugButtons}
             `;
@@ -5065,21 +5121,22 @@
             const overlay = document.createElement('div');
             overlay.id = 'dyson-clear-overlay';
             overlay.style.cssText = `position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;`;
+            const _mul = (Math.pow(1.5, reincarnationCount+1)).toFixed(2);
             const title = reincarnationCount === 0
-                ? `<p style="font-size:28px;font-weight:bold;color:#ffd700;margin:0;">ダイソンスフィア 建築完了</p>`
-                : `<p style="font-size:28px;font-weight:bold;color:#ffd700;margin:0;">ダイソンスフィア 建築完了<br><span style="font-size:16px;color:#aaa;">転生 ${reincarnationCount} 回目</span></p>`;
+                ? `<p style="font-size:28px;font-weight:bold;color:#ffd700;margin:0;">${t('dyson_clear_title')}</p>`
+                : `<p style="font-size:28px;font-weight:bold;color:#ffd700;margin:0;">${t('dyson_clear_title')}<br><span style="font-size:16px;color:#aaa;">${currentLang==='en'?'Run #'+reincarnationCount:'転生 '+reincarnationCount+' 回目'}</span></p>`;
             const hint = reincarnationCount === 0
-                ? `<p style="color:#888;font-size:13px;max-width:320px;text-align:center;line-height:1.7;">遠くで何かが反応した気がした。<br>だがまだ——何かが足りない。<br><span style="color:#ff6644;font-weight:bold;">Project: Genesis Omega</span> が解放された。</p>`
-                : `<p style="color:#888;font-size:13px;max-width:320px;text-align:center;line-height:1.7;">モノリスが力を増す。<br>転生後の生産倍率: <span style="color:#ffd700;font-weight:bold;">×${(Math.pow(1.5, reincarnationCount+1)).toFixed(2)}</span></p>`;
+                ? `<p style="color:#888;font-size:13px;max-width:320px;text-align:center;line-height:1.7;">${t('dyson_clear_hint_first_pre')}${t('dyson_clear_hint_first')}</p>`
+                : `<p style="color:#888;font-size:13px;max-width:320px;text-align:center;line-height:1.7;">${t('dyson_clear_hint_reinc', reincarnationCount, _mul)}</p>`;
             const genesisBtn = genesisUnlocked
-                ? `<button onclick="startGenesisChallenge();document.getElementById('dyson-clear-overlay').remove();" style="padding:10px 24px;background:#1a0a00;border:1px solid #ff6644;color:#ff9966;border-radius:8px;font-size:14px;cursor:pointer;">Project: Genesis Omega に挑戦する</button>`
+                ? `<button onclick="startGenesisChallenge();document.getElementById('dyson-clear-overlay').remove();" style="padding:10px 24px;background:#1a0a00;border:1px solid #ff6644;color:#ff9966;border-radius:8px;font-size:14px;cursor:pointer;">${t('genesis_challenge_btn')}</button>`
                 : '';
             overlay.innerHTML = `
                 ${title}
                 ${hint}
                 ${genesisBtn}
-                <button onclick="reincarnate();document.getElementById('dyson-clear-overlay').remove();" style="padding:10px 24px;background:#0a1a2a;border:1px solid #4488ff;color:#88bbff;border-radius:8px;font-size:14px;cursor:pointer;">転生してやり直す（×${(Math.pow(1.5, reincarnationCount+1)).toFixed(2)}倍）</button>
-                <button onclick="document.getElementById('dyson-clear-overlay').remove();" style="padding:8px 20px;background:transparent;border:1px solid #444;color:#888;border-radius:8px;font-size:13px;cursor:pointer;">このまま続ける</button>
+                <button onclick="reincarnate();document.getElementById('dyson-clear-overlay').remove();" style="padding:10px 24px;background:#0a1a2a;border:1px solid #4488ff;color:#88bbff;border-radius:8px;font-size:14px;cursor:pointer;">${t('reincarnate_btn', _mul)}</button>
+                <button onclick="document.getElementById('dyson-clear-overlay').remove();" style="padding:8px 20px;background:transparent;border:1px solid #444;color:#888;border-radius:8px;font-size:13px;cursor:pointer;">${t('continue_btn')}</button>
             `;
             document.body.appendChild(overlay);
         }
@@ -5089,10 +5146,10 @@
             overlay.style.cssText = `position:fixed;inset:0;background:rgba(0,0,0,0.97);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;`;
             overlay.innerHTML = `
                 <p style="font-size:11px;letter-spacing:0.3em;color:#ff6644;margin:0;">PROJECT: GENESIS OMEGA</p>
-                <p style="font-size:32px;font-weight:bold;color:#fff;margin:0;">完全制覇</p>
-                <p style="color:#888;font-size:13px;max-width:340px;text-align:center;line-height:1.8;">転生 ${reincarnationCount} 回。モノリス倍率 ×${monolithMultiplier.toFixed(2)}。<br>この宇宙に、あなたが建てたものがある。</p>
+                <p style="font-size:32px;font-weight:bold;color:#fff;margin:0;">${t('genesis_complete_label')}</p>
+                <p style="color:#888;font-size:13px;max-width:340px;text-align:center;line-height:1.8;">${t('genesis_complete_desc', reincarnationCount, monolithMultiplier.toFixed(2))}</p>
                 <button onclick="reincarnate();this.parentElement.remove();" style="padding:12px 28px;background:#1a0000;border:1px solid #ff4444;color:#ff8888;border-radius:8px;font-size:14px;cursor:pointer;">もう一度、すべてを超える</button>
-                <button onclick="this.parentElement.remove();" style="padding:8px 20px;background:transparent;border:1px solid #444;color:#666;border-radius:8px;font-size:13px;cursor:pointer;">閉じる</button>
+                <button onclick="this.parentElement.remove();" style="padding:8px 20px;background:transparent;border:1px solid #444;color:#666;border-radius:8px;font-size:13px;cursor:pointer;">${t('close')}</button>
             `;
             document.body.appendChild(overlay);
         }
