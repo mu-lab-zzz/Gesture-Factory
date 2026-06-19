@@ -1266,6 +1266,40 @@
             </div>
             <hr style="border:none; border-top:1px solid #333355; margin:0 0 20px;">
             <button onclick="confirmReset()" style="width:100%; padding:11px; background:#3d1515; border:1.5px solid #7a2020; border-radius:10px; color:#f88; font-size:14px; font-weight:bold; cursor:pointer; letter-spacing:1px;">データをリセット</button>
+            <hr style="border:none; border-top:1px solid #333355; margin:0 0 20px;">
+            <details style="color:#ccc;">
+                <summary style="cursor:pointer; font-size:15px; font-weight:bold; padding:4px 0; list-style:none; display:flex; align-items:center; gap:6px;">
+                    <span>❓ 操作ヘルプ</span>
+                </summary>
+                <div style="margin-top:14px; display:flex; flex-direction:column; gap:16px; font-size:13px; line-height:1.7; color:#bbb;">
+                    <div>
+                        <div style="color:#00ffcc; font-weight:bold; margin-bottom:4px;">✦ ジェスチャーで図形を作る</div>
+                        <div>・<b>タップ</b>：点を生産 (+1)</div>
+                        <div>・<b>まっすぐ引いて離す</b>：線を生産 (+1)　※要解放</div>
+                        <div>・<b>ドラッグ中に一瞬止める</b>（約0.07秒）と角が確定。始点に近づけて離すと多角形を合成。</div>
+                        <div style="margin-top:4px; color:#aaa;">　▲三角:角2 ／ 🟥四角:角3 ／ 🟣五角:角4 ／ 🔵六角:角5以上</div>
+                    </div>
+                    <div>
+                        <div style="color:#00a2ff; font-weight:bold; margin-bottom:4px;">✦ 工場ラインを組む</div>
+                        <div>集めた図形を素材にクラフト画面でパーツを作り、工場タブに配置します。</div>
+                        <div style="margin-top:6px; display:flex; flex-direction:column; gap:4px;">
+                            <div>🟫 <b>ベルト</b>：アイテムを隣のセルへ運ぶ。矢印の向きに流れる。</div>
+                            <div>🦾 <b>インサーター</b>：隣のセルからアイテムを掴んで渡す。</div>
+                            <div>🟣 <b>組立機</b>：材料が揃うと自動でレシピを実行する。</div>
+                            <div>📦 <b>材料ストレージ</b>：図形素材を供給し続ける入口。</div>
+                            <div>📤 <b>完成品ストレージ</b>：完成品を受け取る出口。</div>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="color:#ffca28; font-weight:bold; margin-bottom:4px;">✦ 基本的な工場の流れ</div>
+                        <div style="color:#aaa;">材料ストレージ → ベルト → インサーター → 組立機 → インサーター → 完成品ストレージ</div>
+                    </div>
+                    <div>
+                        <div style="color:#af40ff; font-weight:bold; margin-bottom:4px;">✦ ティアを上げる</div>
+                        <div>ティアタブで必要な図形を納品すると新しいパーツやレシピが解放されます。</div>
+                    </div>
+                </div>
+            </details>
             <button onclick="closeSettings()" style="width:100%; margin-top:12px; padding:11px; background:none; border:1.5px solid #444; border-radius:10px; color:#aaa; font-size:14px; cursor:pointer;">閉じる</button>
         </div>
     </div>
