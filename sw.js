@@ -1,5 +1,12 @@
-const CACHE = 'gf-v1';
-const ASSETS = ['/', '/index.html', '/icon-192.png', '/icon-512.png', '/Thousandth_Rotation.mp3'];
+const CACHE = 'gf-v2';
+const BASE = '/Gesture-Factory';
+const ASSETS = [
+  BASE + '/',
+  BASE + '/index.html',
+  BASE + '/icon-192.png',
+  BASE + '/icon-512.png',
+  BASE + '/Thousandth_Rotation.mp3'
+];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));

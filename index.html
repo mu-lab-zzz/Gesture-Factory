@@ -5285,7 +5285,7 @@
                                     delete savedCell.work.storedDots;
                                     delete savedCell.work.storedLines;
                                 }
-                                sectors[s][y][x].type = savedCell.type;
+                                sectors[s][y][x].type = savedCell.type || 'empty';
                                 sectors[s][y][x].dir = savedCell.dir;
                                 sectors[s][y][x].items = savedCell.items || [];
                                 sectors[s][y][x].work = savedCell.work;
