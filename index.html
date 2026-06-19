@@ -1243,64 +1243,71 @@
     <div style="display:flex; align-items:center; padding:0 12px; width:100%; box-sizing:border-box;">
         <div style="width:36px; flex-shrink:0;"></div>
         <h1 id="game-title" onclick="handleTitleClick()" style="margin:0; flex:1; text-align:center;">GESTURE&FACTORY</h1>
-        <button id="settings-btn" onclick="openSettings()" title="設定" style="flex-shrink:0; background:none; border:1.5px solid #444; border-radius:8px; color:#aaa; font-size:20px; width:36px; height:36px; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0;">⚙</button>
+        <button id="settings-btn" onclick="openSettings()" data-i18n-title="settings_btn_title" title="設定" style="flex-shrink:0; background:none; border:1.5px solid #444; border-radius:8px; color:#aaa; font-size:20px; width:36px; height:36px; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0;">⚙</button>
     </div>
 
     <!-- 設定モーダル -->
     <div id="settings-modal" style="display:none; position:fixed; inset:0; z-index:8000; background:rgba(0,0,0,0.7); align-items:center; justify-content:center;">
         <div style="background:#1a1a2e; border:1.5px solid #333355; border-radius:16px; padding:28px 32px; min-width:280px; max-width:360px; width:90%;">
-            <h2 style="margin:0 0 20px; font-size:18px; color:#e2e2f0; text-align:center;">設定</h2>
+            <h2 style="margin:0 0 20px; font-size:18px; color:#e2e2f0; text-align:center;" data-i18n="settings_title">設定</h2>
             <div style="display:flex; flex-direction:column; gap:14px; margin-bottom:24px;">
                 <label style="display:flex; align-items:center; justify-content:space-between; color:#ccc; font-size:15px; cursor:pointer;">
-                    <span>🔊 効果音</span>
+                    <span data-i18n="sfx">🔊 効果音</span>
                     <div class="toggle-wrap" onclick="toggleSFX()">
                         <div id="sfx-toggle" class="toggle on"></div>
                     </div>
                 </label>
                 <label style="display:flex; align-items:center; justify-content:space-between; color:#ccc; font-size:15px; cursor:pointer;">
-                    <span>🎵 BGM</span>
+                    <span data-i18n="bgm">🎵 BGM</span>
                     <div class="toggle-wrap" onclick="toggleBGM()">
                         <div id="bgm-toggle" class="toggle on"></div>
                     </div>
                 </label>
+                <label style="display:flex; align-items:center; justify-content:space-between; color:#ccc; font-size:15px;">
+                    <span data-i18n="language">🌐 言語</span>
+                    <div style="display:flex; gap:6px;">
+                        <button id="lang-btn-jp" onclick="setLang('jp')" style="background:#1e1e3a; border:1.5px solid #444; border-radius:8px; color:#e2e2f0; font-size:13px; font-weight:bold; padding:4px 12px; cursor:pointer;">JP</button>
+                        <button id="lang-btn-en" onclick="setLang('en')" style="background:#1e1e3a; border:1.5px solid #444; border-radius:8px; color:#e2e2f0; font-size:13px; font-weight:bold; padding:4px 12px; cursor:pointer; opacity:0.45;">EN</button>
+                    </div>
+                </label>
             </div>
             <hr style="border:none; border-top:1px solid #333355; margin:0 0 20px;">
-            <button onclick="confirmReset()" style="width:100%; padding:11px; background:#3d1515; border:1.5px solid #7a2020; border-radius:10px; color:#f88; font-size:14px; font-weight:bold; cursor:pointer; letter-spacing:1px;">データをリセット</button>
+            <button onclick="confirmReset()" style="width:100%; padding:11px; background:#3d1515; border:1.5px solid #7a2020; border-radius:10px; color:#f88; font-size:14px; font-weight:bold; cursor:pointer; letter-spacing:1px;" data-i18n="reset_data">データをリセット</button>
             <hr style="border:none; border-top:1px solid #333355; margin:0 0 20px;">
             <details style="color:#ccc;">
                 <summary style="cursor:pointer; font-size:15px; font-weight:bold; padding:4px 0; list-style:none; display:flex; align-items:center; gap:6px;">
-                    <span>❓ 操作ヘルプ</span>
+                    <span data-i18n="help_summary">❓ 操作ヘルプ</span>
                 </summary>
                 <div style="margin-top:14px; display:flex; flex-direction:column; gap:16px; font-size:13px; line-height:1.7; color:#bbb;">
                     <div>
-                        <div style="color:#00ffcc; font-weight:bold; margin-bottom:4px;">✦ ジェスチャーで図形を作る</div>
-                        <div>・<b>タップ</b>：点を生産 (+1)</div>
-                        <div>・<b>まっすぐ引いて離す</b>：線を生産 (+1)　※要解放</div>
-                        <div>・<b>ドラッグ中に一瞬止める</b>（約0.07秒）と角が確定。始点に近づけて離すと多角形を合成。</div>
-                        <div style="margin-top:4px; color:#aaa;">　▲三角:角2 ／ 🟥四角:角3 ／ 🟣五角:角4 ／ 🔵六角:角5以上</div>
+                        <div style="color:#00ffcc; font-weight:bold; margin-bottom:4px;" data-i18n="help_gesture_title">✦ ジェスチャーで図形を作る</div>
+                        <div data-i18n="help_tap">・タップ：点を生産 (+1)</div>
+                        <div data-i18n="help_line">・まっすぐ引いて離す：線を生産 (+1)　※要解放</div>
+                        <div data-i18n="help_poly">・ドラッグ中に一瞬止める（約0.07秒）と角が確定。始点に近づけて離すと多角形を合成。</div>
+                        <div style="margin-top:4px; color:#aaa;" data-i18n="help_shapes">　▲三角:角2 ／ 🟥四角:角3 ／ 🟣五角:角4 ／ 🔵六角:角5以上</div>
                     </div>
                     <div>
-                        <div style="color:#00a2ff; font-weight:bold; margin-bottom:4px;">✦ 工場ラインを組む</div>
-                        <div>集めた図形を素材にクラフト画面でパーツを作り、工場タブに配置します。</div>
+                        <div style="color:#00a2ff; font-weight:bold; margin-bottom:4px;" data-i18n="help_factory_title">✦ 工場ラインを組む</div>
+                        <div data-i18n="help_factory_desc">集めた図形を素材にクラフト画面でパーツを作り、工場タブに配置します。</div>
                         <div style="margin-top:6px; display:flex; flex-direction:column; gap:4px;">
-                            <div>🟫 <b>ベルト</b>：アイテムを隣のセルへ運ぶ。矢印の向きに流れる。</div>
-                            <div>🦾 <b>インサーター</b>：隣のセルからアイテムを掴んで渡す。</div>
-                            <div>🟣 <b>組立機</b>：材料が揃うと自動でレシピを実行する。</div>
-                            <div>📦 <b>材料ストレージ</b>：図形素材を供給し続ける入口。</div>
-                            <div>📤 <b>完成品ストレージ</b>：完成品を受け取る出口。</div>
+                            <div data-i18n="help_belt_item">🟫 ベルト：アイテムを隣のセルへ運ぶ。矢印の向きに流れる。</div>
+                            <div data-i18n="help_inserter_item">🦾 インサーター：隣のセルからアイテムを掴んで渡す。</div>
+                            <div data-i18n="help_assembler_item">🟣 組立機：材料が揃うと自動でレシピを実行する。</div>
+                            <div data-i18n="help_storage_src">📦 材料ストレージ：図形素材を供給し続ける入口。</div>
+                            <div data-i18n="help_storage_sink">📤 完成品ストレージ：完成品を受け取る出口。</div>
                         </div>
                     </div>
                     <div>
-                        <div style="color:#ffca28; font-weight:bold; margin-bottom:4px;">✦ 基本的な工場の流れ</div>
-                        <div style="color:#aaa;">材料ストレージ → ベルト → インサーター → 組立機 → インサーター → 完成品ストレージ</div>
+                        <div style="color:#ffca28; font-weight:bold; margin-bottom:4px;" data-i18n="help_flow_title">✦ 基本的な工場の流れ</div>
+                        <div style="color:#aaa;" data-i18n="help_flow_desc">材料ストレージ → ベルト → インサーター → 組立機 → インサーター → 完成品ストレージ</div>
                     </div>
                     <div>
-                        <div style="color:#af40ff; font-weight:bold; margin-bottom:4px;">✦ ティアを上げる</div>
-                        <div>ティアタブで必要な図形を納品すると新しいパーツやレシピが解放されます。</div>
+                        <div style="color:#af40ff; font-weight:bold; margin-bottom:4px;" data-i18n="help_tier_title">✦ ティアを上げる</div>
+                        <div data-i18n="help_tier_desc">ティアタブで必要な図形を納品すると新しいパーツやレシピが解放されます。</div>
                     </div>
                 </div>
             </details>
-            <button onclick="closeSettings()" style="width:100%; margin-top:12px; padding:11px; background:none; border:1.5px solid #444; border-radius:10px; color:#aaa; font-size:14px; cursor:pointer;">閉じる</button>
+            <button onclick="closeSettings()" style="width:100%; margin-top:12px; padding:11px; background:none; border:1.5px solid #444; border-radius:10px; color:#aaa; font-size:14px; cursor:pointer;" data-i18n="close">閉じる</button>
         </div>
     </div>
 
@@ -1308,21 +1315,21 @@
     <div id="reset-modal" style="display:none; position:fixed; inset:0; z-index:8100; background:rgba(0,0,0,0.8); align-items:center; justify-content:center;">
         <div style="background:#1a1a2e; border:1.5px solid #7a2020; border-radius:16px; padding:28px 32px; min-width:260px; max-width:340px; width:90%; text-align:center;">
             <div style="font-size:36px; margin-bottom:12px;">⚠️</div>
-            <h2 style="margin:0 0 10px; font-size:17px; color:#f88;">データをリセットしますか？</h2>
-            <p style="color:#aaa; font-size:13px; margin:0 0 24px; line-height:1.6;">セーブデータ・進行状況がすべて削除されます。<br>この操作は取り消せません。</p>
+            <h2 style="margin:0 0 10px; font-size:17px; color:#f88;" data-i18n="reset_confirm_title">データをリセットしますか？</h2>
+            <p style="color:#aaa; font-size:13px; margin:0 0 24px; line-height:1.6;" data-i18n-html="reset_confirm_desc">セーブデータ・進行状況がすべて削除されます。<br>この操作は取り消せません。</p>
             <div style="display:flex; gap:12px;">
-                <button onclick="cancelReset()" style="flex:1; padding:11px; background:none; border:1.5px solid #444; border-radius:10px; color:#aaa; font-size:14px; cursor:pointer;">キャンセル</button>
-                <button onclick="executeReset()" style="flex:1; padding:11px; background:#7a2020; border:1.5px solid #aa3030; border-radius:10px; color:#fff; font-size:14px; font-weight:bold; cursor:pointer;">リセット実行</button>
+                <button onclick="cancelReset()" style="flex:1; padding:11px; background:none; border:1.5px solid #444; border-radius:10px; color:#aaa; font-size:14px; cursor:pointer;" data-i18n="cancel">キャンセル</button>
+                <button onclick="executeReset()" style="flex:1; padding:11px; background:#7a2020; border:1.5px solid #aa3030; border-radius:10px; color:#fff; font-size:14px; font-weight:bold; cursor:pointer;" data-i18n="execute_reset">リセット実行</button>
             </div>
         </div>
     </div>
 
     <div class="tab-container">
-        <button class="tab-btn active" id="tab-factory" onclick="switchTab('factory')">⚙️ 工房</button>
-        <button class="tab-btn" id="tab-automation" onclick="switchTab('automation')">🏭 工場</button>
-        <button class="tab-btn" id="tab-storage" onclick="switchTab('storage')">📦 倉庫</button>
-        <button class="tab-btn" id="tab-tier" onclick="switchTab('tier')">🏆 ティア</button>
-        <button class="tab-btn" id="tab-trophy" onclick="switchTab('trophy')">🎖 実績</button>
+        <button class="tab-btn active" id="tab-factory" onclick="switchTab('factory')" data-i18n="tab_factory">⚙️ 工房</button>
+        <button class="tab-btn" id="tab-automation" onclick="switchTab('automation')" data-i18n="tab_automation">🏭 工場</button>
+        <button class="tab-btn" id="tab-storage" onclick="switchTab('storage')" data-i18n="tab_storage">📦 倉庫</button>
+        <button class="tab-btn" id="tab-tier" onclick="switchTab('tier')" data-i18n="tab_tier">🏆 ティア</button>
+        <button class="tab-btn" id="tab-trophy" onclick="switchTab('trophy')" data-i18n="tab_trophy">🎖 実績</button>
     </div>
 
     <div class="mini-inventory">
@@ -1389,15 +1396,15 @@
     </div>
 
     <div id="content-trophy" style="display:none; width:100%; max-width:700px; padding:16px; box-sizing:border-box;">
-        <div style="font-size:13px; font-weight:bold; color:#aab; margin-bottom:12px; letter-spacing:0.05em;">🎖 実績</div>
+        <div style="font-size:13px; font-weight:bold; color:#aab; margin-bottom:12px; letter-spacing:0.05em;" data-i18n="trophy_header">🎖 実績</div>
         <div id="trophy-panel-content" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:8px;"></div>
     </div>
 
     <div id="content-factory">
 
         <div id="factory-mode-switch" class="mode-switch" style="display:none;">
-            <button class="mode-btn active" id="btn-mode-factory" onclick="setFactoryMode('factory')">⚙️ 製造モード</button>
-            <button class="mode-btn" id="btn-mode-craft" onclick="setFactoryMode('craft')">🔧 クラフトモード</button>
+            <button class="mode-btn active" id="btn-mode-factory" onclick="setFactoryMode('factory')" data-i18n="mode_factory">⚙️ 製造モード</button>
+            <button class="mode-btn" id="btn-mode-craft" onclick="setFactoryMode('craft')" data-i18n="mode_craft">🔧 クラフトモード</button>
         </div>
 
         <div id="craft-panel" style="display:none;">
@@ -1467,16 +1474,16 @@
         </div>
 
         <div class="canvas-container">
-            <div class="feedback" id="feedback-msg">ラインを引くか、ジェスチャーをどうぞ</div>
+            <div class="feedback" id="feedback-msg" data-i18n="feedback_default">ラインを引くか、ジェスチャーをどうぞ</div>
             <canvas id="gameCanvas"></canvas>
         </div>
 
-        <div class="instructions">
-            【操作方法】<br>
-            ・<span>タップ（クリック）</span>：点を生産 (+1)<br>
-            ・<span>まっすぐ引いて離す</span>：線を生産 (+1) <span style="color:#8a8a9a;">※要解放</span><br>
-            ・<span>多角形作成</span>：ドラッグして線を引いて<b>一瞬止める(約0.07秒)</b>と、そこが直線でロックされて「角」になります。最後に<b>始点の近くへ持ってくると磁石のようにピタッとくっつく</b>ので、そこで指を離すと合成されます。<br>
-            （🔺三角形:角2 / 🟥四角形:角3 / ⬠五角形:角4 / ⬢六角形:角5以上） <span style="color:#8a8a9a;">※要各解放</span>
+        <div class="instructions" id="instructions-block">
+            <span data-i18n="instr_title">【操作方法】</span><br>
+            ・<span data-i18n="instr_tap">タップ（クリック）</span><span data-i18n="instr_tap_desc">：点を生産 (+1)</span><br>
+            ・<span data-i18n="instr_line">まっすぐ引いて離す</span><span data-i18n="instr_line_desc">：線を生産 (+1)</span> <span style="color:#8a8a9a;" data-i18n="instr_line_note">※要解放</span><br>
+            ・<span data-i18n="instr_poly">多角形作成</span><span data-i18n-html="instr_poly_desc">：ドラッグして線を引いて<b>一瞬止める(約0.07秒)</b>と、そこが直線でロックされて「角」になります。最後に<b>始点の近くへ持ってくると磁石のようにピタッとくっつく</b>ので、そこで指を離すと合成されます。</span><br>
+            <span data-i18n="instr_shapes">（🔺三角形:角2 / 🟥四角形:角3 / ⬠五角形:角4 / ⬢六角形:角5以上）</span> <span style="color:#8a8a9a;" data-i18n="instr_shapes_note">※要各解放</span>
         </div>
     </div>
 
@@ -1548,14 +1555,259 @@
     <!-- レシピモーダル -->
     <div id="recipe-modal" style="display:none;">
         <div id="recipe-modal-inner">
-            <div id="recipe-modal-title">📖 組立機レシピ一覧</div>
-            <div id="recipe-modal-note">※ 手動クラフトのレシピとは異なります</div>
+            <div id="recipe-modal-title" data-i18n="recipe_modal_title">📖 組立機レシピ一覧</div>
+            <div id="recipe-modal-note" data-i18n="recipe_modal_note">※ 手動クラフトのレシピとは異なります</div>
             <div id="recipe-modal-list"></div>
         </div>
     </div>
 
     <script>
         const canvas = document.getElementById('gameCanvas');
+
+        // ===== i18n =====
+        let currentLang = localStorage.getItem('gf_lang') || 'jp';
+
+        const LANG = {
+            jp: {
+                settings_title: '設定', sfx: '🔊 効果音', bgm: '🎵 BGM',
+                language: '🌐 言語',
+                reset_data: 'データをリセット', close: '閉じる',
+                help_summary: '❓ 操作ヘルプ',
+                help_gesture_title: '✦ ジェスチャーで図形を作る',
+                help_tap: '・タップ：点を生産 (+1)',
+                help_line: '・まっすぐ引いて離す：線を生産 (+1)　※要解放',
+                help_poly: '・ドラッグ中に一瞬止める（約0.07秒）と角が確定。始点に近づけて離すと多角形を合成。',
+                help_shapes: '▲三角:角2 ／ 🟥四角:角3 ／ 🟣五角:角4 ／ 🔵六角:角5以上',
+                help_factory_title: '✦ 工場ラインを組む',
+                help_factory_desc: '集めた図形を素材にクラフト画面でパーツを作り、工場タブに配置します。',
+                help_belt_item: '🟫 ベルト：アイテムを隣のセルへ運ぶ。矢印の向きに流れる。',
+                help_inserter_item: '🦾 インサーター：隣のセルからアイテムを掴んで渡す。',
+                help_assembler_item: '🟣 組立機：材料が揃うと自動でレシピを実行する。',
+                help_storage_src: '📦 材料ストレージ：図形素材を供給し続ける入口。',
+                help_storage_sink: '📤 完成品ストレージ：完成品を受け取る出口。',
+                help_flow_title: '✦ 基本的な工場の流れ',
+                help_flow_desc: '材料ストレージ → ベルト → インサーター → 組立機 → インサーター → 完成品ストレージ',
+                help_tier_title: '✦ ティアを上げる',
+                help_tier_desc: 'ティアタブで必要な図形を納品すると新しいパーツやレシピが解放されます。',
+                reset_confirm_title: 'データをリセットしますか？',
+                reset_confirm_desc: 'セーブデータ・進行状況がすべて削除されます。<br>この操作は取り消せません。',
+                cancel: 'キャンセル', execute_reset: 'リセット実行',
+                tab_factory: '⚙️ 工房', tab_automation: '🏭 工場',
+                tab_storage: '📦 倉庫', tab_tier: '🏆 ティア', tab_trophy: '🎖 実績',
+                mode_factory: '⚙️ 製造モード', mode_craft: '🔧 クラフトモード',
+                feedback_default: 'ラインを引くか、ジェスチャーをどうぞ',
+                craft_hint_full: '✅ 完成！',
+                craft_hint_slots: (n) => `残り ${n} スロット　↓ 材料をスワイプ↑ or タップ`,
+                predict: (p) => `予測検知: ${p}`,
+                tool_erase: '🗑️\n消しゴム',
+                tool_storage_src: '📦\n材料ST', tool_storage_sink: '📤\n完成ST',
+                tool_belt: '🟫\nベルト', tool_inserter: '🦾\nインサーター',
+                tool_assembler: '🟣\n組立機', tool_fast_belt: '⚡🟫\n高速ベルト',
+                tool_fast_inserter: '⚡🦾\n高速インサーター', tool_fast_assembler: '⚡🟣\n高速組立機',
+                tool_splitter: '🔀\n分岐機', tool_merger: '🔁\n合流機',
+                tool_long_inserter: '⟹\nロングアーム', tool_double_belt: '〓\nデュアル',
+                tool_cross_belt: '✛\n交差ベルト', tool_fast_cross_belt: '⚡✛\n高速交差',
+                tool_factory: '🏭\n部品工場', tool_dyson_sink: '🌐\nDS納品口',
+                locked_label: '[未解放]',
+                submit_done: '✓ 完了',
+                trophy_header: '🎖 実績',
+                recipe_modal_title: '📖 組立機レシピ一覧',
+                recipe_modal_note: '※ 手動クラフトのレシピとは異なります',
+                settings_btn_title: '設定',
+                instr_title: '【操作方法】',
+                instr_tap: 'タップ（クリック）', instr_tap_desc: '：点を生産 (+1)',
+                instr_line: 'まっすぐ引いて離す', instr_line_desc: '：線を生産 (+1)',
+                instr_line_note: '※要解放',
+                instr_poly: '多角形作成', instr_poly_desc: '：ドラッグして線を引いて<b>一瞬止める(約0.07秒)</b>と、そこが直線でロックされて「角」になります。最後に<b>始点の近くへ持ってくると磁石のようにピタッとくっつく</b>ので、そこで指を離すと合成されます。',
+                instr_shapes: '（🔺三角形:角2 / 🟥四角形:角3 / ⬠五角形:角4 / ⬢六角形:角5以上）',
+                instr_shapes_note: '※要各解放',
+            },
+            en: {
+                settings_title: 'Settings', sfx: '🔊 Sound Effects', bgm: '🎵 BGM',
+                language: '🌐 Language',
+                reset_data: 'Reset Data', close: 'Close',
+                help_summary: '❓ Help',
+                help_gesture_title: '✦ Create Shapes with Gestures',
+                help_tap: '· Tap: Produce a Point (+1)',
+                help_line: '· Drag straight and release: Produce a Line (+1)  *Requires unlock',
+                help_poly: '· Pause briefly while dragging (~0.07s) to lock a corner. Bring the end near the start to snap and close the polygon.',
+                help_shapes: '▲Triangle:2 corners / 🟥Square:3 / 🟣Pentagon:4 / 🔵Hexagon:5+',
+                help_factory_title: '✦ Build a Factory Line',
+                help_factory_desc: 'Craft parts from shapes in Craft Mode, then place them in the Factory tab.',
+                help_belt_item: '🟫 Belt: Moves items to the next cell in the arrow direction.',
+                help_inserter_item: '🦾 Inserter: Grabs an item from one cell and hands it to another.',
+                help_assembler_item: '🟣 Assembler: Automatically executes a recipe when all materials arrive.',
+                help_storage_src: '📦 Supply Storage: Continuously feeds shape materials into the line.',
+                help_storage_sink: '📤 Output Storage: Collects finished products.',
+                help_flow_title: '✦ Basic Factory Flow',
+                help_flow_desc: 'Supply → Belt → Inserter → Assembler → Inserter → Output',
+                help_tier_title: '✦ Unlock Tiers',
+                help_tier_desc: 'Submit required shapes in the Tier tab to unlock new parts and recipes.',
+                reset_confirm_title: 'Reset all data?',
+                reset_confirm_desc: 'All save data and progress will be deleted.<br>This action cannot be undone.',
+                cancel: 'Cancel', execute_reset: 'Execute Reset',
+                tab_factory: '⚙️ Workshop', tab_automation: '🏭 Factory',
+                tab_storage: '📦 Storage', tab_tier: '🏆 Tiers', tab_trophy: '🎖 Trophies',
+                mode_factory: '⚙️ Craft Mode', mode_craft: '🔧 Factory Mode',
+                feedback_default: 'Draw a line or perform a gesture',
+                craft_hint_full: '✅ Complete!',
+                craft_hint_slots: (n) => `${n} slot(s) left — Swipe ↑ or tap to add`,
+                predict: (p) => `Prediction: ${p}`,
+                tool_erase: '🗑️\nErase',
+                tool_storage_src: '📦\nSupply', tool_storage_sink: '📤\nOutput',
+                tool_belt: '🟫\nBelt', tool_inserter: '🦾\nInserter',
+                tool_assembler: '🟣\nAssembler', tool_fast_belt: '⚡🟫\nFast Belt',
+                tool_fast_inserter: '⚡🦾\nFast Ins.', tool_fast_assembler: '⚡🟣\nFast Asm.',
+                tool_splitter: '🔀\nSplitter', tool_merger: '🔁\nMerger',
+                tool_long_inserter: '⟹\nLong Arm', tool_double_belt: '〓\nDual',
+                tool_cross_belt: '✛\nCross', tool_fast_cross_belt: '⚡✛\nFast Cross',
+                tool_factory: '🏭\nPart Factory', tool_dyson_sink: '🌐\nDS Output',
+                locked_label: '[Locked]',
+                submit_done: '✓ Done',
+                trophy_header: '🎖 Achievements',
+                recipe_modal_title: '📖 Assembler Recipe List',
+                recipe_modal_note: '※ Different from manual craft recipes',
+                settings_btn_title: 'Settings',
+                instr_title: '[How to Play]',
+                instr_tap: 'Tap (Click)', instr_tap_desc: ': Produce a Point (+1)',
+                instr_line: 'Drag straight and release', instr_line_desc: ': Produce a Line (+1)',
+                instr_line_note: '*Requires unlock',
+                instr_poly: 'Draw polygon', instr_poly_desc: ': Drag and <b>pause briefly (~0.07s)</b> to lock each corner. Bring the end <b>near the start — it snaps closed</b> automatically.',
+                instr_shapes: '(🔺Triangle:2 / 🟥Square:3 / ⬠Pentagon:4 / ⬢Hexagon:5+)',
+                instr_shapes_note: '*Each requires unlock',
+            }
+        };
+
+        const TIER_CONFIGS_EN = [
+            { name: "1-1: Unlock Line Technology",       desc: "Submit 100 Points to unlock straight-line production. You can submit partial amounts from your current stock!" },
+            { name: "1-2: Unlock Triangle Geometry",     desc: "Submit 200 Points and 200 Lines to unlock the polygon synthesis system (Triangle)." },
+            { name: "1-3: Unlock Square Structure",      desc: "Submit 5 Triangles to unlock Square processing. Storage expansion also becomes available." },
+            { name: "1-4: Unlock Pentagon Synthesis",    desc: "Submit 5 Squares to unlock Pentagon processing technology." },
+            { name: "1-5: Unlock Hexagon Crystals",      desc: "Submit 5 Pentagons to unlock Hexagon processing — the final shape technology." },
+            { name: "1-Complete: Tier 1 Mastered!",      desc: "Submit 5 Hexagons to complete all Tier 1 production lines!" },
+            { name: "2-1: Unlock Point Auto-Production", desc: "Submit Points and Squares to unlock a line that auto-produces 0.2 Points/sec." },
+            { name: "2-2: Unlock Line Auto-Production",  desc: "Submit Lines and Pentagons to unlock a line that auto-produces 0.2 Lines/sec." },
+            { name: "2-Complete: Tier 2 Complete!",      desc: "All shapes and auto-production lines unlocked! Take on Tier 3 next!" },
+            { name: "3-1: Unlock Fast Belt",             desc: "Submit 50 Hexagons and 30 Pentagons to unlock the Fast Belt (2× speed)." },
+            { name: "3-2: Unlock Fast Inserter",         desc: "Submit 50 Hexagons and 50 Triangles to unlock the Fast Inserter." },
+            { name: "3-3: Unlock Fast Assembler",        desc: "Submit 100 Hexagons and 50 Squares to unlock the Fast Assembler (2× production speed)." },
+            { name: "3-4: Unlock Splitter & Merger",     desc: "Submit 30 each of Pentagons and Hexagons to unlock the Splitter and Merger." },
+            { name: "3-5: Unlock Long-Arm Inserter",     desc: "Submit 50 Hexagons and 30 Squares to unlock the Long-Arm Inserter (2-cell reach)." },
+            { name: "T3-Complete: Tier 3 Mastered!",     desc: "All fast equipment, Splitter, Merger, and Long-Arm Inserter unlocked!" },
+            { name: "4-1: Unlock Part Factory",          desc: "Submit 100 Hexagons and 100 Pentagons to unlock the Part Factory." },
+            { name: "T4-Complete: Tier 4 Mastered!",     desc: "Part Factory unlocked! Mass-produce belts and inserters with your automated lines!" },
+        ];
+
+        const TROPHIES_EN = {
+            first_belt:      { name: 'First Step',          hint: 'Something moved. Do you remember that feeling?' },
+            first_assembler: { name: 'Factory Awakens',     hint: 'The machine started moving on its own.' },
+            t3_unlock:       { name: 'Talent for Speed',    hint: 'Speed is another kind of talent.' },
+            first_factory:   { name: 'Heart of the Factory',hint: 'Only those who can make this advance.' },
+            dyson_clear:     { name: 'Architect',           hint: 'For the first time, I dreamed of wrapping a star.' },
+            point_10k:       { name: 'Sea of Points',       hint: 'I stopped counting long ago.' },
+            line_5k:         { name: 'Trail of Lines',      hint: 'Everything is connected.' },
+            tri_2k:          { name: 'Mountain of Triangles',hint: 'The more corners, the wider the world.' },
+            sq_1k:           { name: 'Square Foundation',   hint: 'Stability means having four corners.' },
+            pent_300:        { name: 'Pentagon Balance',     hint: 'Few possess a fifth corner.' },
+            hex_100:         { name: 'Hexagon Summit',       hint: 'The rarest things are the most beautiful.' },
+            all_objects:     { name: 'Master of All Lines',  hint: 'The one who knows every machine is the true factory chief.' },
+            reincarnate_1:   { name: 'Monolith Heir',        hint: 'Die once, grow stronger. Is that the answer?' },
+            reincarnate_5:   { name: 'Loop Resident',        hint: "Which loop it is doesn't matter anymore." },
+            reincarnate_10:  { name: 'Cosmic Repeater',      hint: '...What are you searching for?' },
+            long_inserter:   { name: 'Long Reach',           hint: 'I reached a place I thought was too far.' },
+            splitter_place:  { name: 'Junction',             hint: 'A road does not need to be one lane.' },
+            full_storage:    { name: 'Full Warehouse',        hint: "It's about to overflow, yet the hands won't stop." },
+            dyson_no_reinc:  { name: '???',                   hint: 'Someone once said speed is not the only justice.' },
+            genesis_clear:   { name: '???',                   hint: 'Beyond submitting everything, I felt something more.' },
+            genesis_no_reinc:{ name: '???',                   hint: 'I never needed the Monolith.' },
+        };
+
+        const PART_NAMES_EN = {
+            belt: 'Belt', inserter: 'Inserter', assembler: 'Assembler',
+            storageSource: 'Supply Storage', storageSink: 'Output Storage',
+            fastBelt: 'Fast Belt', fastInserter: 'Fast Inserter', fastAssembler: 'Fast Assembler',
+            splitter: 'Splitter', merger: 'Merger', longInserter: 'Long-Arm Inserter',
+            factory: 'Part Factory', crossBelt: 'Cross Belt', fastCrossBelt: 'Fast Cross Belt',
+            doubleBelt: 'Dual Belt', curveBelt: 'Curve Belt',
+            fastCurveBelt: 'Fast Curve Belt', doubleCurveBelt: 'Dual Curve Belt'
+        };
+
+        const SHAPE_NAMES_EN = { point: 'Point', line: 'Line', triangle: 'Triangle', square: 'Square', pentagon: 'Pentagon', hexagon: 'Hexagon' };
+
+
+        function t(key, ...args) {
+            const val = LANG[currentLang]?.[key] ?? LANG.jp[key] ?? key;
+            return typeof val === 'function' ? val(...args) : val;
+        }
+
+        function getPartName(key) {
+            return currentLang === 'en' ? (PART_NAMES_EN[key] || key) : (PART_NAMES[key] || key);
+        }
+
+        function getShapeName(key) {
+            return currentLang === 'en' ? (SHAPE_NAMES_EN[key] || key) : (SHAPE_NAMES_JP[key] || key);
+        }
+
+        function getTierConfig(index) {
+            const base = TIER_CONFIGS[index];
+            if (!base) return null;
+            if (currentLang === 'en' && TIER_CONFIGS_EN[index]) {
+                return { ...base, name: TIER_CONFIGS_EN[index].name, desc: TIER_CONFIGS_EN[index].desc };
+            }
+            return base;
+        }
+
+        function getTrophyText(id) {
+            const base = TROPHIES.find(t => t.id === id);
+            if (!base) return { name: id, hint: '' };
+            if (currentLang === 'en' && TROPHIES_EN[id]) {
+                return { ...base, name: TROPHIES_EN[id].name, hint: TROPHIES_EN[id].hint };
+            }
+            return base;
+        }
+
+        function setLang(lang) {
+            currentLang = lang;
+            localStorage.setItem('gf_lang', lang);
+            applyLang();
+        }
+
+        function applyLang() {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                el.textContent = t(el.dataset.i18n);
+            });
+            document.querySelectorAll('[data-i18n-html]').forEach(el => {
+                el.innerHTML = t(el.dataset.i18nHtml);
+            });
+            document.querySelectorAll('[data-i18n-title]').forEach(el => {
+                el.title = t(el.dataset.i18nTitle);
+            });
+            const toolKeys = {
+                'erase': 'tool_erase', 'storage-source': 'tool_storage_src',
+                'storage-sink': 'tool_storage_sink', 'belt': 'tool_belt',
+                'inserter': 'tool_inserter', 'assembler': 'tool_assembler',
+                'fast-belt': 'tool_fast_belt', 'fast-inserter': 'tool_fast_inserter',
+                'fast-assembler': 'tool_fast_assembler', 'splitter': 'tool_splitter',
+                'merger': 'tool_merger', 'long-inserter': 'tool_long_inserter',
+                'double-belt': 'tool_double_belt', 'cross-belt': 'tool_cross_belt',
+                'fast-cross-belt': 'tool_fast_cross_belt', 'factory': 'tool_factory',
+                'dyson-sink': 'tool_dyson_sink'
+            };
+            document.querySelectorAll('#toolbar button, #erase-btn').forEach(btn => {
+                const tool = btn.dataset.tool;
+                if (tool && toolKeys[tool]) btn.innerHTML = t(toolKeys[tool]).replace('\n', '<br>');
+            });
+            if (feedbackEl && [LANG.jp.feedback_default, LANG.en.feedback_default].includes(feedbackEl.innerText)) {
+                feedbackEl.innerText = t('feedback_default');
+            }
+            const btnJp = document.getElementById('lang-btn-jp');
+            const btnEn = document.getElementById('lang-btn-en');
+            if (btnJp) { btnJp.style.opacity = currentLang === 'jp' ? '1' : '0.45'; btnJp.style.fontWeight = currentLang === 'jp' ? 'bold' : 'normal'; }
+            if (btnEn) { btnEn.style.opacity = currentLang === 'en' ? '1' : '0.45'; btnEn.style.fontWeight = currentLang === 'en' ? 'bold' : 'normal'; }
+            if (typeof updateTierUI === 'function') updateTierUI();
+            if (typeof renderTrophies === 'function') renderTrophies();
+            if (typeof updateStorageUI === 'function') updateStorageUI();
+        }
         let sfxEnabled = true;
         let bgmEnabled = true;
         const ctx = canvas.getContext('2d');
@@ -3910,20 +4162,21 @@
                 totalLength = 100; 
             }
 
+            const lk = t('locked_label');
             if (strokePoints.length === 2 && totalLength < 35) {
-                currentPrediction = "点";
+                currentPrediction = getShapeName('point');
             } else if (corners.length === 0 && !isClosed) {
-                currentPrediction = isUnlocked("line") ? "線" : "線 [未解放]";
+                currentPrediction = isUnlocked("line") ? getShapeName('line') : `${getShapeName('line')} ${lk}`;
             } else if (isClosed) {
-                if (corners.length === 2) currentPrediction = isUnlocked("triangle") ? "📐 三角形" : "📐 三角形 [未解放]";
-                else if (corners.length === 3) currentPrediction = isUnlocked("square") ? "🧱 四角形" : "🧱 四角形 [未解放]";
-                else if (corners.length === 4) currentPrediction = isUnlocked("pentagon") ? "⬠ 五角形" : "⬠ 五角形 [未解放]";
-                else if (corners.length >= 5) currentPrediction = isUnlocked("hexagon") ? "⬢ 六角形" : "⬢ 六角形 [未解放]";
-                else currentPrediction = "分析中...";
+                if (corners.length === 2) currentPrediction = isUnlocked("triangle") ? `📐 ${getShapeName('triangle')}` : `📐 ${getShapeName('triangle')} ${lk}`;
+                else if (corners.length === 3) currentPrediction = isUnlocked("square") ? `🧱 ${getShapeName('square')}` : `🧱 ${getShapeName('square')} ${lk}`;
+                else if (corners.length === 4) currentPrediction = isUnlocked("pentagon") ? `⬠ ${getShapeName('pentagon')}` : `⬠ ${getShapeName('pentagon')} ${lk}`;
+                else if (corners.length >= 5) currentPrediction = isUnlocked("hexagon") ? `⬢ ${getShapeName('hexagon')}` : `⬢ ${getShapeName('hexagon')} ${lk}`;
+                else currentPrediction = currentLang === 'en' ? 'analyzing...' : '分析中...';
             } else {
-                currentPrediction = "多角形を描画中...";
+                currentPrediction = currentLang === 'en' ? 'drawing polygon...' : '多角形を描画中...';
             }
-            feedbackEl.innerText = `予測検知: ${currentPrediction}`;
+            feedbackEl.innerText = t('predict', currentPrediction);
         }
 
         // 描画終了・確定処理
@@ -4197,9 +4450,6 @@
             const descEl = document.getElementById('tier-desc');
             const headerTitleEl = document.getElementById('tier-header-title');
             
-            if (nameEl) nameEl.innerText = config.name;
-            if (descEl) descEl.innerText = config.desc;
-            
             if (headerTitleEl) {
                 if (config.name.startsWith("1-")) {
                     headerTitleEl.innerText = "TIER 1";
@@ -4221,16 +4471,20 @@
             
             reqsContainer.innerHTML = '';
 
-            const namesJP = { point: '点', line: '線', triangle: '三角形', square: '四角形', pentagon: '五角形', hexagon: '六角形' };
             const kindMap = { point: 'raw', line: 'line', triangle: 'triangle', square: 'square', pentagon: 'pentagon', hexagon: 'hexagon' };
+            const cfg = getTierConfig(currentTierIndex) || config;
+            if (nameEl) nameEl.innerText = cfg.name;
+            if (descEl) descEl.innerText = cfg.desc;
 
             if (Object.keys(config.reqs).length === 0) {
                 if (currentTierIndex >= TIER_CONFIGS.length - 1) {
                     reqsContainer.innerHTML = '<div style="color:var(--accent-point);text-align:center;font-weight:bold;margin-top:10px;">✨ ALL CLEAR ✨</div>';
                 } else {
+                    const nextLabel = currentLang === 'en' ? 'Next Tier →' : '次のティアへ進む →';
+                    const clearMsg = currentLang === 'en' ? '✨ Tier Cleared! ✨' : '✨ このティアをクリア！ ✨';
                     reqsContainer.innerHTML = `<div style="text-align:center;margin-top:10px;">
-                        <div style="color:var(--accent-point);font-weight:bold;font-size:15px;margin-bottom:12px;">✨ このティアをクリア！ ✨</div>
-                        <button class="submit-action-btn" onclick="advanceTier()" style="font-size:14px;padding:10px 24px;">次のティアへ進む →</button>
+                        <div style="color:var(--accent-point);font-weight:bold;font-size:15px;margin-bottom:12px;">${clearMsg}</div>
+                        <button class="submit-action-btn" onclick="advanceTier()" style="font-size:14px;padding:10px 24px;">${nextLabel}</button>
                     </div>`;
                 }
                 return;
@@ -4247,11 +4501,14 @@
                 const infoDiv = document.createElement('div');
                 infoDiv.className = `req-info ${isMet ? 'met' : ''}`;
                 const gemIcon = `<span style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:4px;">${gemSVG(kindMap[key]||key, 20)}</span>`;
-                infoDiv.innerHTML = `<span>${gemIcon}${namesJP[key]} の累積納品目標</span><span class="req-progress">${submitted} / ${target} (手持ち: ${Math.floor(resources[key])})</span>`;
-                
+                const shapeLbl = getShapeName(key);
+                const goalLbl = currentLang === 'en' ? 'cumulative goal' : 'の累積納品目標';
+                const stockLbl = currentLang === 'en' ? 'In stock' : '手持ち';
+                infoDiv.innerHTML = `<span>${gemIcon}${shapeLbl} ${goalLbl}</span><span class="req-progress">${submitted} / ${target} (${stockLbl}: ${Math.floor(resources[key])})</span>`;
+
                 const btn = document.createElement('button');
                 btn.className = 'submit-action-btn';
-                btn.innerText = isMet ? '✓ 完了' : `手持ちを納品`;
+                btn.innerText = isMet ? t('submit_done') : t('submit_btn');
                 btn.disabled = isMet || (!isDebugMode && Math.floor(resources[key]) === 0);
                 
                 btn.onclick = (function(k) {
@@ -4306,11 +4563,12 @@
                 if (card) {
                     if (unlocked) {
                         card.classList.remove('locked');
-                        card.querySelector('.resource-name').innerHTML = type === 'point' ? `点 (Points) <span style="font-size:10px;color:var(--accent-point);">[手動:+${productionRates.point.toFixed(1)}${isUnlocked('autoPoint') ? ` 自動:+${autoProductionRates.point.toFixed(1)}/s` : ''}]</span>` : 
-                            type === 'line' ? `線 (Lines) <span style="font-size:10px;color:var(--accent-line);">[手動:+${productionRates.line.toFixed(1)}${isUnlocked('autoLine') ? ` 自動:+${autoProductionRates.line.toFixed(1)}/s` : ''}]</span>` :
-                            type === 'triangle' ? '三角形 (Triangles)' :
-                            type === 'square' ? '四角形 (Squares)' :
-                            type === 'pentagon' ? '五角形 (Pentagons)' : '六角形 (Hexagons)';
+                        const manualLbl = currentLang === 'en' ? 'Manual' : '手動';
+                        const autoLbl = currentLang === 'en' ? 'Auto' : '自動';
+                        const sn = getShapeName(type);
+                        card.querySelector('.resource-name').innerHTML = type === 'point' ? `${sn} <span style="font-size:10px;color:var(--accent-point);">[${manualLbl}:+${productionRates.point.toFixed(1)}${isUnlocked('autoPoint') ? ` ${autoLbl}:+${autoProductionRates.point.toFixed(1)}/s` : ''}]</span>` :
+                            type === 'line' ? `${sn} <span style="font-size:10px;color:var(--accent-line);">[${manualLbl}:+${productionRates.line.toFixed(1)}${isUnlocked('autoLine') ? ` ${autoLbl}:+${autoProductionRates.line.toFixed(1)}/s` : ''}]</span>` :
+                            sn;
                     } else {
                         card.classList.add('locked');
                     }
@@ -4720,12 +4978,14 @@
         function updateTrophyUI() {
             const el = document.getElementById('trophy-panel-content');
             if (!el) return;
-            el.innerHTML = TROPHIES.map(t => {
-                const got = trophies[t.id];
+            const acquiredLabel = currentLang === 'en' ? '✓ Acquired' : '✓ 取得済み';
+            el.innerHTML = TROPHIES.map(tr => {
+                const got = trophies[tr.id];
+                const txt = getTrophyText(tr.id);
                 return `<div style="background:${got ? '#0d1a0d' : '#0a0a12'};border:0.5px solid ${got ? '#2a5a2a' : '#222'};border-radius:8px;padding:8px 10px;">
-                    <div style="font-size:12px;font-weight:bold;color:${got ? '#7cfc7c' : '#445'};margin-bottom:3px;">${got && !t.secret ? t.name : '？？？'}</div>
-                    <div style="font-size:10px;color:${got ? '#aaa' : '#334'};line-height:1.4;">${t.hint}</div>
-                    ${got ? '<div style="font-size:9px;color:#4a8;margin-top:3px;">✓ 取得済み</div>' : ''}
+                    <div style="font-size:12px;font-weight:bold;color:${got ? '#7cfc7c' : '#445'};margin-bottom:3px;">${got && !tr.secret ? txt.name : '？？？'}</div>
+                    <div style="font-size:10px;color:${got ? '#aaa' : '#334'};line-height:1.4;">${txt.hint}</div>
+                    ${got ? `<div style="font-size:9px;color:#4a8;margin-top:3px;">${acquiredLabel}</div>` : ''}
                 </div>`;
             }).join('');
         }
@@ -4733,8 +4993,9 @@
         function unlockTrophy(id) {
             if (trophies[id]) return;
             trophies[id] = true;
-            const t = TROPHIES.find(t => t.id === id);
-            if (t) setFeedback(`🏆 トロフィー解除: 「${t.secret ? '？？？' : t.name}」— ${t.hint}`);
+            const tr = TROPHIES.find(t => t.id === id);
+            const txt = getTrophyText(id);
+            if (tr) setFeedback(`🏆 ${currentLang === 'en' ? 'Trophy unlocked' : 'トロフィー解除'}: 「${tr.secret ? '？？？' : txt.name}」— ${txt.hint}`);
             updateTrophyUI();
         }
 
