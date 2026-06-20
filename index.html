@@ -1584,7 +1584,7 @@
                         <div data-i18n="help_tap">・タップ：点を生産 (+1)</div>
                         <div data-i18n="help_line">・まっすぐ引いて離す：線を生産 (+1)　※要解放</div>
                         <div data-i18n="help_poly">・ドラッグ中に一瞬止める（約0.07秒）と角が確定。始点に近づけて離すと多角形を合成。</div>
-                        <div style="margin-top:4px; color:#aaa;" data-i18n="help_shapes">　▲三角:角2 ／ 🟥四角:角3 ／ 🟣五角:角4 ／ 🔵六角:角5以上</div>
+                        <div style="margin-top:4px; color:#aaa;" data-i18n-sym="help_shapes">　▲三角:角2 ／ 🟥四角:角3 ／ 🟣五角:角4 ／ 🔵六角:角5以上</div>
                     </div>
                     <div>
                         <div style="color:#00a2ff; font-weight:bold; margin-bottom:4px;" data-i18n="help_factory_title">✦ 工場ラインを組む</div>
@@ -1795,7 +1795,7 @@
             ・<span data-i18n="instr_tap">タップ（クリック）</span><span data-i18n="instr_tap_desc">：点を生産 (+1)</span><br>
             ・<span data-i18n="instr_line">まっすぐ引いて離す</span><span data-i18n="instr_line_desc">：線を生産 (+1)</span> <span style="color:#8a8a9a;" data-i18n="instr_line_note">※要解放</span><br>
             ・<span data-i18n="instr_poly">多角形作成</span><span data-i18n-html="instr_poly_desc">：ドラッグして線を引いて<b>一瞬止める(約0.07秒)</b>と、そこが直線でロックされて「角」になります。最後に<b>始点の近くへ持ってくると磁石のようにピタッとくっつく</b>ので、そこで指を離すと合成されます。</span><br>
-            <span data-i18n="instr_shapes">（🔺三角形:角2 / 🟥四角形:角3 / ⬠五角形:角4 / ⬢六角形:角5以上）</span> <span style="color:#8a8a9a;" data-i18n="instr_shapes_note">※要各解放</span>
+            <span data-i18n-sym="instr_shapes">（🔺三角形:角2 / 🟥四角形:角3 / ⬠五角形:角4 / ⬢六角形:角5以上）</span> <span style="color:#8a8a9a;" data-i18n="instr_shapes_note">※要各解放</span>
         </div>
     </div>
 
@@ -2179,6 +2179,9 @@
             });
             document.querySelectorAll('[data-i18n-html]').forEach(el => {
                 el.innerHTML = t(el.dataset.i18nHtml);
+            });
+            document.querySelectorAll('[data-i18n-sym]').forEach(el => {
+                el.innerHTML = replaceSymbols(t(el.dataset.i18nSym));
             });
             document.querySelectorAll('[data-i18n-title]').forEach(el => {
                 el.title = t(el.dataset.i18nTitle);
@@ -4366,16 +4369,14 @@
         }
 
         // 初期設定
-        // テキスト中の図形記号をgemSVGに変換するユーティリティ
+        // テキスト中の図形記号をgemSVGに変換するユーティリティ（uフラグで絵文字を正しく1文字扱い）
         function replaceSymbols(text, size = 14) {
             const gem = (kind) => `<span style="display:inline-flex;align-items:center;vertical-align:middle;">${gemSVG(kind, size)}</span>`;
             return String(text)
-                .replace(/●/g, gem('raw'))
-                .replace(/─/g, gem('line'))
-                .replace(/[▲△🔺]/g, gem('triangle'))
-                .replace(/[■□🟥]/g, gem('square'))
-                .replace(/[⬠🔵]/g, gem('pentagon'))
-                .replace(/[⬡⬢🟠]/g, gem('hexagon'));
+                .replace(/[▲△🔺]/gu, gem('triangle'))
+                .replace(/[■□🟥]/gu, gem('square'))
+                .replace(/⬠/gu, gem('pentagon'))
+                .replace(/[⬡⬢]/gu, gem('hexagon'));
         }
 
         function initIcons() {
@@ -4447,9 +4448,6 @@
                 if (btn) btn.innerHTML = replaceSymbols(btn.innerHTML, 13);
             });
 
-            // 操作説明文
-            const instr = document.querySelector('.instructions');
-            if (instr) instr.innerHTML = replaceSymbols(instr.innerHTML, 14);
         }
 
         function init() {
