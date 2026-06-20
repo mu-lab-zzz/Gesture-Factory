@@ -157,6 +157,17 @@
             opacity: 0.13;
         }
         /* ゲームUI要素がbefore疑似要素より前面になるよう確認用 */
+        /* カジノリールアニメーション */
+        .casino-reel { display:flex; flex-direction:column; }
+        .casino-reel.spinning { transition:none; }
+        .casino-reel-cell { width:88px; height:74px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+        #casino-slot-machine.fever { border-color:#ff88ff; box-shadow:0 0 40px #ff44ffaa; animation:casino-fever-pulse 0.8s ease-in-out infinite alternate; }
+        @keyframes casino-fever-pulse { from { box-shadow:0 0 20px #ff44ff88; } to { box-shadow:0 0 60px #ff88ffcc; } }
+        #casino-slot-machine.fever #casino-spin-btn { background:linear-gradient(135deg,#ff44ff,#ff88aa) !important; }
+        #casino-slot-machine.fever #casino-fever-badge { display:block !important; animation:casino-badge-pop 0.3s ease; }
+        @keyframes casino-badge-pop { from { transform:scale(0.5);opacity:0; } to { transform:scale(1);opacity:1; } }
+        #casino-slot-machine.fever #casino-tension-bar { background:linear-gradient(90deg,#ff44aa,#ff88ff,#fff) !important; box-shadow:0 0 8px #ff88ffaa; }
+
         #app, #header-bar, #tab-bar, #content-factory, #content-automation,
         #content-inventory, #content-dyson, #content-tier,
         #settings-modal, #ad-modal, #reset-modal {
@@ -1632,6 +1643,7 @@
         <button class="tab-btn" id="tab-storage" onclick="switchTab('storage')" data-i18n="tab_storage">📦 倉庫</button>
         <button class="tab-btn" id="tab-tier" onclick="switchTab('tier')" data-i18n="tab_tier">🏆 ティア</button>
         <button class="tab-btn" id="tab-trophy" onclick="switchTab('trophy')" data-i18n="tab_trophy">🎖 実績</button>
+        <button class="tab-btn" id="tab-casino" onclick="switchTab('casino')">🎰 カジノ</button>
     </div>
 
     <div class="mini-inventory">
@@ -1712,6 +1724,57 @@
     <div id="content-trophy" style="display:none; width:100%; max-width:700px; padding:16px; box-sizing:border-box;">
         <div style="font-size:13px; font-weight:bold; color:#aab; margin-bottom:12px; letter-spacing:0.05em;" data-i18n="trophy_header">🎖 実績</div>
         <div id="trophy-panel-content" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:8px;"></div>
+    </div>
+
+    <div id="content-casino" style="display:none; width:100%; max-width:400px; padding:16px; box-sizing:border-box;">
+        <!-- 免責バナー -->
+        <div style="background:#1a1a0a;border:1px solid #555522;border-radius:8px;padding:8px 12px;margin-bottom:14px;font-size:0.78rem;color:#aaa;text-align:center;line-height:1.5;">
+            🎰 ここで獲得したチップはゲーム本編には影響しません
+        </div>
+        <!-- チップ表示 -->
+        <div id="casino-chip-bar" style="display:flex;align-items:center;gap:10px;background:#1a1a2e;border:1px solid #333;border-radius:12px;padding:10px 20px;margin-bottom:16px;font-size:1rem;">
+            <span id="casino-chip-icon"></span>
+            <span>CHIPS</span>
+            <span id="casino-chip-count" style="color:#22cc55;font-size:1.4rem;font-weight:bold;margin-left:auto;">0</span>
+        </div>
+        <!-- スロット本体 -->
+        <div id="casino-slot-machine" style="background:linear-gradient(160deg,#1e1e3a,#12122a);border:2px solid #3a3a6a;border-radius:20px;padding:20px;box-shadow:0 0 30px #6060ff33;">
+            <div id="casino-fever-badge" style="display:none;background:linear-gradient(135deg,#ff44ff,#ff88aa);color:#fff;font-weight:bold;font-size:0.85rem;padding:4px 12px;border-radius:20px;letter-spacing:2px;text-align:center;margin-bottom:6px;">🔥 FEVER TIME! 🔥</div>
+            <div id="casino-tension-wrap" style="margin-bottom:12px;">
+                <div style="display:flex;justify-content:space-between;font-size:0.78rem;color:#aaa;margin-bottom:4px;">
+                    <span>TENSION</span><span id="casino-fever-label" style="color:#ff88ff;"></span>
+                </div>
+                <div style="height:12px;background:#0d0d1a;border-radius:6px;border:1px solid #2a2a4a;overflow:hidden;">
+                    <div id="casino-tension-bar" style="height:100%;width:0%;border-radius:6px;background:linear-gradient(90deg,#4444ff,#aa44ff,#ff44ff);transition:width 0.4s ease;"></div>
+                </div>
+            </div>
+            <div id="casino-result-msg" style="height:32px;display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:bold;margin-bottom:6px;"></div>
+            <div id="casino-reels-container" style="display:flex;gap:8px;justify-content:center;margin-bottom:14px;position:relative;">
+                <div id="casino-win-line" style="position:absolute;left:-26px;right:-26px;top:50%;transform:translateY(-50%);height:74px;pointer-events:none;display:flex;align-items:center;justify-content:space-between;z-index:2;">
+                    <div style="font-size:0.6rem;color:#ffd700cc;font-weight:bold;text-shadow:0 0 6px #ffd700;width:24px;text-align:center;line-height:1.3;">▶<br>WIN</div>
+                    <div style="font-size:0.6rem;color:#ffd700cc;font-weight:bold;text-shadow:0 0 6px #ffd700;width:24px;text-align:center;line-height:1.3;">WIN<br>◀</div>
+                </div>
+                <div id="casino-win-line-border" style="position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);height:74px;border-top:2px solid #ffd700aa;border-bottom:2px solid #ffd700aa;pointer-events:none;z-index:1;box-shadow:0 -2px 8px #ffd70044,0 2px 8px #ffd70044;"></div>
+                <div style="width:88px;height:222px;overflow:hidden;border-radius:10px;background:#0d0d1a;border:1px solid #2a2a4a;"><div class="casino-reel" id="casino-reel0"></div></div>
+                <div style="width:88px;height:222px;overflow:hidden;border-radius:10px;background:#0d0d1a;border:1px solid #2a2a4a;"><div class="casino-reel" id="casino-reel1"></div></div>
+                <div style="width:88px;height:222px;overflow:hidden;border-radius:10px;background:#0d0d1a;border:1px solid #2a2a4a;"><div class="casino-reel" id="casino-reel2"></div></div>
+            </div>
+            <div style="text-align:center;font-size:0.85rem;color:#aaa;margin-bottom:8px;">BET: <strong style="color:#fff;">10 chips / spin</strong></div>
+            <button id="casino-spin-btn" onclick="casinoSpin()" style="width:100%;padding:14px;background:linear-gradient(135deg,#ffd700,#ffaa00);color:#000;font-size:1.1rem;font-weight:bold;border:none;border-radius:12px;cursor:pointer;letter-spacing:2px;">SPIN</button>
+        </div>
+        <!-- 変換パネル -->
+        <div style="background:#1a1a2e;border:1px solid #333;border-radius:16px;padding:16px;margin-top:16px;">
+            <div style="font-size:0.85rem;color:#aaa;margin-bottom:10px;letter-spacing:1px;">💎 GEM → CHIP 変換</div>
+            <div id="casino-gem-rows"></div>
+        </div>
+        <!-- ペイテーブル -->
+        <div style="background:#1a1a2e;border:1px solid #333;border-radius:16px;padding:16px;margin-top:10px;margin-bottom:16px;">
+            <div style="font-size:0.85rem;color:#aaa;margin-bottom:10px;letter-spacing:1px;">📋 PAYTABLE（BET 10chips）</div>
+            <div id="casino-pay-rows"></div>
+            <div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-top:8px;padding-top:8px;border-top:1px solid #333;">
+                <span style="color:#aaa;">同種2つ</span><span style="color:#ffd700;">+10 (元返し)</span>
+            </div>
+        </div>
     </div>
 
     <div id="content-factory">
@@ -2625,55 +2688,39 @@
 
         // タブ切り替えロジック
         function switchTab(tabName) {
-            // ティア2-2（Index 7）クリアのALL CLEAR!（Index 8以上）に到達するまでは自動化ラインへの切り替えをブロック
             if (tabName === 'automation' && currentTierIndex < 8) {
                 setFeedback("🔒 自動化ラインはティア3（ALL CLEAR!）に到達すると解放されます！");
                 return;
             }
 
-            const factoryContent = document.getElementById('content-factory');
-            const automationContent = document.getElementById('content-automation');
-            const storageContent = document.getElementById('content-storage');
-            const tierContent = document.getElementById('content-tier');
-            const trophyContent = document.getElementById('content-trophy');
+            const panels = ['factory','automation','storage','tier','trophy','casino'];
+            panels.forEach(id => {
+                const el = document.getElementById('content-' + id);
+                if (el) el.style.display = 'none';
+                const btn = document.getElementById('tab-' + id);
+                if (btn) btn.classList.remove('active');
+            });
 
-            const factoryBtn = document.getElementById('tab-factory');
-            const automationBtn = document.getElementById('tab-automation');
-            const storageBtn = document.getElementById('tab-storage');
-            const tierBtn = document.getElementById('tab-tier');
-            const trophyBtn = document.getElementById('tab-trophy');
-
-            factoryContent.style.display = 'none';
-            automationContent.style.display = 'none';
-            storageContent.style.display = 'none';
-            tierContent.style.display = 'none';
-            trophyContent.style.display = 'none';
-
-            factoryBtn.classList.remove('active');
-            automationBtn.classList.remove('active');
-            storageBtn.classList.remove('active');
-            tierBtn.classList.remove('active');
-            trophyBtn.classList.remove('active');
+            const btn = document.getElementById('tab-' + tabName);
+            if (btn) btn.classList.add('active');
 
             if (tabName === 'factory') {
-                factoryContent.style.display = 'flex';
-                factoryBtn.classList.add('active');
+                document.getElementById('content-factory').style.display = 'flex';
             } else if (tabName === 'automation') {
-                automationContent.style.display = 'flex';
-                automationBtn.classList.add('active');
+                document.getElementById('content-automation').style.display = 'flex';
                 renderAll();
             } else if (tabName === 'storage') {
-                storageContent.style.display = 'grid';
-                storageBtn.classList.add('active');
+                document.getElementById('content-storage').style.display = 'grid';
                 updateUI();
             } else if (tabName === 'tier') {
-                tierContent.style.display = 'flex';
-                tierBtn.classList.add('active');
+                document.getElementById('content-tier').style.display = 'flex';
                 updateTierUI();
             } else if (tabName === 'trophy') {
-                trophyContent.style.display = 'block';
-                trophyBtn.classList.add('active');
+                document.getElementById('content-trophy').style.display = 'block';
                 updateTrophyUI();
+            } else if (tabName === 'casino') {
+                document.getElementById('content-casino').style.display = 'block';
+                casinoUpdateExchange();
             }
         }
 
@@ -6145,6 +6192,242 @@
 
         window.onload = init;
     </script>
+
+    <!-- ════════════════════════ CASINO ════════════════════════ -->
+    <script>
+    (() => {
+        // ── 定数 ─────────────────────────────────────────────────────────────
+        const C_GEMS = [
+            { kind:'raw',      label:'点',   chipValue:1  },
+            { kind:'line',     label:'線',   chipValue:2  },
+            { kind:'triangle', label:'三角', chipValue:5  },
+            { kind:'square',   label:'四角', chipValue:10 },
+            { kind:'pentagon', label:'五角', chipValue:25 },
+            { kind:'hexagon',  label:'六角', chipValue:50 },
+        ];
+        const C_PAYOUTS = [
+            { kind:'hexagon',  mult:50 },
+            { kind:'pentagon', mult:20 },
+            { kind:'square',   mult:10 },
+            { kind:'triangle', mult:5  },
+            { kind:'line',     mult:3  },
+            { kind:'raw',      mult:2  },
+        ];
+        const C_BET = 10, C_REEL_SIZE = 20, C_FEVER_SPINS = 5, C_FEVER_MULT = 2;
+        const C_REEL_POOL = [
+            ...Array(8).fill('raw'), ...Array(6).fill('line'),
+            ...Array(5).fill('triangle'), ...Array(4).fill('square'),
+            ...Array(2).fill('pentagon'), ...Array(1).fill('hexagon'),
+        ];
+
+        // ── 状態 ─────────────────────────────────────────────────────────────
+        let cChips = 0, cTension = 0, cFeverLeft = 0, cSpinning = false;
+
+        // ── チップSVG ─────────────────────────────────────────────────────────
+        function chipSVG(size) {
+            const s = size || 20, h = s / 2;
+            const uid = Math.random().toString(36).slice(2,5);
+            const r = h*.88, ri = h*.62, nR = h*.76, nW = h*.14, nH = h*.22;
+            let notches = '';
+            for (let i = 0; i < 8; i++) {
+                const a = (i/8)*Math.PI*2 - Math.PI/2;
+                const cx = h + nR*Math.cos(a), cy = h + nR*Math.sin(a), deg = (i/8)*360;
+                notches += `<rect x="${cx-nW/2}" y="${cy-nH/2}" width="${nW}" height="${nH}" rx="${nW*.3}" fill="white" opacity="0.9" transform="rotate(${deg},${cx},${cy})"/>`;
+            }
+            return `<svg width="${s}" height="${s}" viewBox="0 0 ${s} ${s}" xmlns="http://www.w3.org/2000/svg">
+                <defs><filter id="cf-${uid}" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur in="SourceGraphic" stdDeviation="${s*.08}" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+                <g filter="url(#cf-${uid})">
+                <circle cx="${h}" cy="${h}" r="${r}" fill="#002200" stroke="#22cc55" stroke-width="${s*.07}"/>
+                ${notches}
+                <circle cx="${h}" cy="${h}" r="${ri}" fill="#003a12"/>
+                <circle cx="${h}" cy="${h}" r="${ri}" fill="none" stroke="#22cc55" stroke-width="${s*.045}"/>
+                <ellipse cx="${h*.78}" cy="${h*.62}" rx="${ri*.35}" ry="${ri*.2}" fill="white" opacity="0.35" transform="rotate(-30,${h*.78},${h*.62})"/>
+                <circle cx="${h*.72}" cy="${h*.58}" r="${ri*.1}" fill="white" opacity="0.6"/>
+                </g></svg>`;
+        }
+
+        // ── リール ────────────────────────────────────────────────────────────
+        function shuffle(arr) {
+            const a = [...arr];
+            for (let i = a.length-1; i > 0; i--) { const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+            return a;
+        }
+        const cReelStrips = [0,1,2].map(() => {
+            const s = []; while (s.length < C_REEL_SIZE) s.push(...shuffle(C_REEL_POOL));
+            return s.slice(0, C_REEL_SIZE);
+        });
+
+        function casinoBuildReels() {
+            for (let r = 0; r < 3; r++) {
+                const el = document.getElementById('casino-reel' + r);
+                el.innerHTML = '';
+                for (let rep = 0; rep < 3; rep++) {
+                    cReelStrips[r].forEach(kind => {
+                        const cell = document.createElement('div');
+                        cell.className = 'casino-reel-cell';
+                        cell.innerHTML = gemSVG(kind, 48);
+                        el.appendChild(cell);
+                    });
+                }
+                el.style.transform = `translateY(${-C_REEL_SIZE * 74}px)`;
+            }
+        }
+
+        // ── スピン ────────────────────────────────────────────────────────────
+        window.casinoSpin = function() {
+            if (cSpinning) return;
+            if (cChips < C_BET) { cShowResult('チップが足りません','lose'); return; }
+            cChips -= C_BET;
+            cUpdateChips();
+            document.getElementById('casino-spin-btn').disabled = true;
+            document.getElementById('casino-result-msg').textContent = '';
+            cSpinning = true;
+            const targets = cReelStrips.map(s => Math.floor(Math.random() * C_REEL_SIZE));
+            for (let r = 0; r < 3; r++) cSpinReel(r, targets[r], r*300, 800+r*300);
+            setTimeout(() => {
+                const res = cCalcResult(targets);
+                cApplyResult(res);
+                cSpinning = false;
+                document.getElementById('casino-spin-btn').disabled = false;
+            }, 1900);
+        };
+
+        function cSpinReel(r, targetIdx, delay, duration) {
+            const el = document.getElementById('casino-reel' + r);
+            const cellH = 74, stripLen = C_REEL_SIZE;
+            setTimeout(() => {
+                el.classList.add('spinning');
+                let pos = 0;
+                const iv = setInterval(() => {
+                    pos = (pos+3) % stripLen;
+                    el.style.transform = `translateY(${-(stripLen+pos)*cellH}px)`;
+                }, 40);
+                setTimeout(() => {
+                    clearInterval(iv);
+                    el.classList.remove('spinning');
+                    const finalY = -(stripLen*cellH + targetIdx*cellH - cellH);
+                    el.style.transition = `transform 0.5s cubic-bezier(0.25,0.46,0.45,0.94)`;
+                    el.style.transform = `translateY(${finalY}px)`;
+                    setTimeout(() => { el.style.transition = ''; }, 600);
+                }, duration);
+            }, delay);
+        }
+
+        // ── 判定 ─────────────────────────────────────────────────────────────
+        function cCalcResult(targets) {
+            const syms = targets.map((t,r) => cReelStrips[r][t]);
+            const inFever = cFeverLeft > 0;
+            if (syms[0]===syms[1] && syms[1]===syms[2]) {
+                const p = C_PAYOUTS.find(p => p.kind===syms[0]);
+                const baseMult = p ? p.mult : 2;
+                return { type:'triple', kind:syms[0], win:C_BET*(inFever?baseMult*C_FEVER_MULT:baseMult), baseMult, inFever };
+            }
+            if (syms[0]===syms[1] || syms[1]===syms[2] || syms[0]===syms[2]) {
+                return { type:'pair', win:inFever?C_BET*C_FEVER_MULT:C_BET, inFever };
+            }
+            return { type:'lose', win:0, inFever };
+        }
+
+        function cApplyResult(res) {
+            cChips += res.win;
+            cUpdateChips();
+            if (cFeverLeft > 0) { cFeverLeft--; if (cFeverLeft===0) cEndFever(); else cUpdateTension(); }
+            if (cFeverLeft===0 && !res.inFever) {
+                if (res.type==='triple') cAddTension(-20);
+                else if (res.type==='pair') cAddTension(3);
+                else cAddTension(15);
+            }
+            const fx = res.inFever ? ' 🔥×2' : '';
+            if (res.type==='triple') { cShowResult(`🎉 3つ揃い！ +${res.win} chips (×${res.baseMult}${fx})`, 'win'); cFlashLine(); }
+            else if (res.type==='pair') { cShowResult(`2つ揃い +${res.win} chips${fx}`, 'push'); cFlashLine(); }
+            else cShowResult('ハズレ', 'lose');
+        }
+
+        // ── テンション ────────────────────────────────────────────────────────
+        function cAddTension(d) {
+            cTension = Math.max(0, Math.min(100, cTension+d));
+            cUpdateTension();
+            if (cTension >= 100 && cFeverLeft===0) { cTension=0; cFeverLeft=C_FEVER_SPINS; document.getElementById('casino-slot-machine').classList.add('fever'); cUpdateTension(); }
+        }
+        function cEndFever() { document.getElementById('casino-slot-machine').classList.remove('fever'); cUpdateTension(); }
+        function cUpdateTension() {
+            const bar = document.getElementById('casino-tension-bar');
+            const lbl = document.getElementById('casino-fever-label');
+            if (cFeverLeft > 0) { bar.style.width='100%'; lbl.textContent=`🔥 残り${cFeverLeft}スピン`; }
+            else { bar.style.width=(cTension)+'%'; lbl.textContent=cTension>=70?'もうすぐ…！':''; }
+        }
+
+        // ── UI ───────────────────────────────────────────────────────────────
+        function cShowResult(msg, cls) {
+            const el = document.getElementById('casino-result-msg');
+            el.textContent = msg;
+            el.style.color = cls==='win'?'#ffd700':cls==='push'?'#88aaff':'#ff6666';
+        }
+        function cUpdateChips() { document.getElementById('casino-chip-count').textContent = cChips; }
+        function cFlashLine() {
+            const b = document.getElementById('casino-win-line-border');
+            b.style.transition='none'; b.style.boxShadow='0 0 24px #fff,0 0 24px #ffd700';
+            setTimeout(() => { b.style.transition='box-shadow 0.5s'; b.style.boxShadow='0 -2px 8px #ffd70044,0 2px 8px #ffd70044'; }, 50);
+        }
+
+        // ── 変換パネル ────────────────────────────────────────────────────────
+        window.casinoUpdateExchange = function() {
+            const container = document.getElementById('casino-gem-rows');
+            container.innerHTML = '';
+            C_GEMS.forEach(g => {
+                const stock = (typeof resources !== 'undefined' ? resources[g.kind] : 0) || 0;
+                const row = document.createElement('div');
+                row.style.cssText = 'display:flex;align-items:center;gap:6px;margin-bottom:7px;';
+                row.innerHTML = `
+                    <span style="width:28px;display:flex;justify-content:center;">${gemSVG(g.kind,22)}</span>
+                    <span style="flex:1;font-size:0.82rem;color:#ccc;">${g.label}</span>
+                    <span id="casino-stock-${g.kind}" style="width:44px;text-align:right;font-size:0.82rem;color:#22cc55;">${stock}</span>
+                    <span style="width:44px;text-align:center;font-size:0.72rem;color:#888;display:flex;align-items:center;gap:2px;">=<span style="font-size:0.82rem;">${g.chipValue}</span>${chipSVG(13)}</span>
+                    <button onclick="casinoExchange('${g.kind}',1)" style="padding:3px 8px;background:#2a2a4a;border:1px solid #4a4a7a;border-radius:5px;color:#ccc;font-size:0.75rem;cursor:pointer;">×1</button>
+                    <button onclick="casinoExchange('${g.kind}',10)" style="padding:3px 8px;background:#2a2a4a;border:1px solid #4a4a7a;border-radius:5px;color:#ccc;font-size:0.75rem;cursor:pointer;">×10</button>`;
+                container.appendChild(row);
+            });
+        };
+
+        window.casinoExchange = function(kind, amount) {
+            if (typeof resources === 'undefined') return;
+            const gem = C_GEMS.find(g => g.kind===kind);
+            const actual = Math.min(amount, resources[kind]||0);
+            if (actual <= 0) return;
+            resources[kind] = (resources[kind]||0) - actual;
+            cChips += actual * gem.chipValue;
+            cUpdateChips();
+            updateUI();
+            const el = document.getElementById('casino-stock-'+kind);
+            if (el) el.textContent = resources[kind];
+        };
+
+        // ── ペイテーブル ──────────────────────────────────────────────────────
+        function casinoBuildPaytable() {
+            const container = document.getElementById('casino-pay-rows');
+            C_PAYOUTS.forEach(p => {
+                const row = document.createElement('div');
+                row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;font-size:0.82rem;';
+                row.innerHTML = `<div style="display:flex;gap:2px;">${gemSVG(p.kind,18)}${gemSVG(p.kind,18)}${gemSVG(p.kind,18)}</div><span style="color:#ffd700;">+${C_BET*p.mult} chips (×${p.mult})</span>`;
+                container.appendChild(row);
+            });
+        }
+
+        // ── 初期化 ────────────────────────────────────────────────────────────
+        function casinoInit() {
+            casinoBuildReels();
+            casinoBuildPaytable();
+            document.getElementById('casino-chip-icon').innerHTML = chipSVG(20);
+            cUpdateChips();
+            cUpdateTension();
+        }
+
+        // DOM準備後に実行
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', casinoInit);
+        else casinoInit();
+    })();
+    </script>
+
 <script>if('serviceWorker'in navigator)navigator.serviceWorker.register('/Gesture-Factory/sw.js');</script>
 </body>
 </html>
