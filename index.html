@@ -8,6 +8,53 @@
     <link rel="apple-touch-icon" href="/Gesture-Factory/icon-192.png">
     <title>GESTURE&amp;FACTORY</title>
     <style>
+        /* コインシステム */
+        #coin-display {
+            display: flex; align-items: center; gap: 5px;
+            background: #1a1500; border: 1px solid #554400;
+            border-radius: 20px; padding: 4px 10px;
+            font-size: 13px; font-weight: bold; color: #ffd700;
+            cursor: pointer; flex-shrink: 0;
+        }
+        #coin-display:hover { border-color: #ffd700; }
+        .coin-btn {
+            width: 100%; margin-top: 5px;
+            padding: 6px 8px; border-radius: 6px;
+            border: 1px solid #554400; background: #1a1500;
+            color: #ffd700; font-size: 11px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 4px;
+        }
+        .coin-btn:hover:not(:disabled) { border-color: #ffd700; background: #2a2000; }
+        .coin-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .resource-value.over-limit { color: #ff9900 !important; }
+
+        /* 広告視聴モーダル */
+        #ad-modal {
+            display: none; position: fixed; inset: 0; z-index: 8500;
+            background: rgba(0,0,0,0.8); align-items: center; justify-content: center;
+        }
+        #ad-modal.open { display: flex; }
+        #ad-modal-inner {
+            background: #1a1500; border: 1px solid #ffd700; border-radius: 12px;
+            padding: 28px 24px; max-width: 320px; width: 90%; text-align: center;
+        }
+        #ad-modal-inner h2 { color: #ffd700; font-size: 18px; margin-bottom: 12px; }
+        #ad-modal-inner p { color: #aaa; font-size: 13px; margin-bottom: 20px; line-height: 1.6; }
+        #ad-progress-bar {
+            width: 100%; height: 6px; background: #333; border-radius: 3px; margin-bottom: 16px; overflow: hidden;
+        }
+        #ad-progress-fill { height: 100%; background: #ffd700; width: 0%; transition: width 0.1s linear; }
+        #ad-close-btn {
+            padding: 10px 24px; background: #ffd700; color: #000;
+            border: none; border-radius: 8px; font-size: 14px; font-weight: bold;
+            cursor: pointer; display: none;
+        }
+        #ad-skip-btn {
+            margin-top: 10px; padding: 8px 20px; background: transparent;
+            border: 1px solid #444; color: #666; border-radius: 8px;
+            font-size: 12px; cursor: pointer;
+        }
+
         @keyframes omega-glow {
             from { text-shadow: 0 0 6px #ffd700, 0 0 14px #ff8800; opacity: 0.85; }
             to   { text-shadow: 0 0 14px #ffd700, 0 0 30px #ffaa00, 0 0 50px #ff6600; opacity: 1; }
@@ -1319,6 +1366,17 @@
 </head>
 <body>
 
+<!-- 広告視聴モーダル -->
+<div id="ad-modal">
+    <div id="ad-modal-inner">
+        <h2>🪙 コインを獲得</h2>
+        <p id="ad-modal-desc">動画広告を視聴すると<br><strong style="color:#ffd700;">🪙 5枚</strong>獲得できます！<br><span id="ad-count-info" style="font-size:11px;color:#888;"></span></p>
+        <div id="ad-progress-bar"><div id="ad-progress-fill"></div></div>
+        <button id="ad-close-btn" onclick="finishAd()">🪙 ×5 受け取る</button>
+        <button id="ad-skip-btn" onclick="closeAdModal()">閉じる</button>
+    </div>
+</div>
+
 <!-- オープニング画面 -->
 <div id="opening-screen">
     <div id="opening-bg"></div>
@@ -1332,6 +1390,7 @@
     <div style="display:flex; align-items:center; padding:0 12px; width:100%; box-sizing:border-box;">
         <div style="width:36px; flex-shrink:0;"></div>
         <h1 id="game-title" onclick="handleTitleClick()" style="margin:0; flex:1; text-align:center;">GESTURE&FACTORY</h1>
+        <div id="coin-display" onclick="openAdModal()" title="広告を見てコインを獲得">🪙 <span id="coin-count">0</span></div>
         <button id="settings-btn" onclick="openSettings()" data-i18n-title="settings_btn_title" title="設定" style="flex-shrink:0; background:none; border:1.5px solid #444; border-radius:8px; color:#aaa; font-size:20px; width:36px; height:36px; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0;">⚙</button>
     </div>
 
@@ -1434,6 +1493,8 @@
         <div class="resource-card point" id="card-point">
             <div class="resource-name">点 (Points)</div>
             <div class="resource-value" id="point-val">0 / 20</div>
+            <button class="coin-btn" id="coin-refill-point" onclick="coinRefill('point')" disabled>🪙 ×3 補充 +100</button>
+            <button class="coin-btn" id="coin-storage-point" onclick="coinUpgradeStorage('point')" disabled>🪙 ×15 上限 +50</button>
             <button class="upgrade-btn" id="up-point" onclick="upgradeStorage('point')" style="margin-bottom: 5px;">📦 拡張 (■×6)</button>
             <button class="upgrade-btn" id="prod-point" onclick="upgradeProduction('point')" style="margin-bottom: 5px;">⚡ 生産量強化 (🔺×10)</button>
             <button class="upgrade-btn" id="auto-prod-point" onclick="upgradeAutoProduction('point')">🤖 自動生産強化 (🔺×5, ■×5)</button>
@@ -1441,6 +1502,8 @@
         <div class="resource-card line locked" id="card-line">
             <div class="resource-name">線 (Lines) <span style="font-size:10px;color:#ff3366;">[未解放]</span></div>
             <div class="resource-value" id="line-val">0 / 20</div>
+            <button class="coin-btn" id="coin-refill-line" onclick="coinRefill('line')" disabled>🪙 ×3 補充 +100</button>
+            <button class="coin-btn" id="coin-storage-line" onclick="coinUpgradeStorage('line')" disabled>🪙 ×15 上限 +50</button>
             <button class="upgrade-btn" id="up-line" onclick="upgradeStorage('line')" disabled style="margin-bottom: 5px;">📦 拡張 (■×6)</button>
             <button class="upgrade-btn" id="prod-line" onclick="upgradeProduction('line')" disabled style="margin-bottom: 5px;">⚡ 生産量強化 (🔺×15)</button>
             <button class="upgrade-btn" id="auto-prod-line" onclick="upgradeAutoProduction('line')" disabled>🤖 自動生産強化 (⬠×5, ⬢×5)</button>
@@ -1448,21 +1511,29 @@
         <div class="resource-card triangle locked" id="card-triangle">
             <div class="resource-name">三角形 (Triangles) <span style="font-size:10px;color:#ff3366;">[未解放]</span></div>
             <div class="resource-value" id="triangle-val">0 / 20</div>
+            <button class="coin-btn" id="coin-refill-triangle" onclick="coinRefill('triangle')" disabled>🪙 ×3 補充 +100</button>
+            <button class="coin-btn" id="coin-storage-triangle" onclick="coinUpgradeStorage('triangle')" disabled>🪙 ×15 上限 +50</button>
             <button class="upgrade-btn" id="up-triangle" onclick="upgradeStorage('triangle')" disabled>📦 拡張 (■×6)</button>
         </div>
         <div class="resource-card square locked" id="card-square">
             <div class="resource-name">四角形 (Squares) <span style="font-size:10px;color:#ff3366;">[未解放]</span></div>
             <div class="resource-value" id="square-val">0 / 20</div>
+            <button class="coin-btn" id="coin-refill-square" onclick="coinRefill('square')" disabled>🪙 ×3 補充 +100</button>
+            <button class="coin-btn" id="coin-storage-square" onclick="coinUpgradeStorage('square')" disabled>🪙 ×15 上限 +50</button>
             <button class="upgrade-btn" id="up-square" onclick="upgradeStorage('square')" disabled>📦 拡張 (■×6)</button>
         </div>
         <div class="resource-card pentagon locked" id="card-pentagon">
             <div class="resource-name">五角形 (Pentagons) <span style="font-size:10px;color:#ff3366;">[未解放]</span></div>
             <div class="resource-value" id="pentagon-val">0 / 20</div>
+            <button class="coin-btn" id="coin-refill-pentagon" onclick="coinRefill('pentagon')" disabled>🪙 ×3 補充 +100</button>
+            <button class="coin-btn" id="coin-storage-pentagon" onclick="coinUpgradeStorage('pentagon')" disabled>🪙 ×15 上限 +50</button>
             <button class="upgrade-btn" id="up-pentagon" onclick="upgradeStorage('pentagon')" disabled>📦 拡張 (■×6)</button>
         </div>
         <div class="resource-card hexagon locked" id="card-hexagon">
             <div class="resource-name">六角形 (Hexagons) <span style="font-size:10px;color:#ff3366;">[未解放]</span></div>
             <div class="resource-value" id="hexagon-val">0 / 20</div>
+            <button class="coin-btn" id="coin-refill-hexagon" onclick="coinRefill('hexagon')" disabled>🪙 ×3 補充 +100</button>
+            <button class="coin-btn" id="coin-storage-hexagon" onclick="coinUpgradeStorage('hexagon')" disabled>🪙 ×15 上限 +50</button>
             <button class="upgrade-btn" id="up-hexagon" onclick="upgradeStorage('hexagon')" disabled>📦 拡張 (■×6)</button>
         </div>
     </div>
@@ -2014,6 +2085,9 @@
         let genesisUnlocked = false;
         let genesisChallenging = false;
         let genesisEverCleared = false;
+        let coins = 0;
+        let adWatchedCount = 0;   // 今日見た広告回数
+        let adLastDate = '';       // 最後に広告を見た日付 (YYYY-MM-DD)
 
         // トロフィーシステム
         const TROPHIES = [
@@ -2357,6 +2431,7 @@
                 }
                 updateUI();
                 updateTierUI();
+            updateCoinDisplay();
             }
         }
 
@@ -4811,9 +4886,14 @@
             if (autoProdLineBtn) {
                 autoProdLineBtn.disabled = (!isUnlocked('autoLine') || Math.floor(resources.pentagon) < 5 || Math.floor(resources.hexagon) < 5);
             }
+            updateResourceDisplay();
+            updateCoinDisplay();
         }
 
         // ── ダイソンスフィア / Genesis UI ────────────────────
+        // updateUI から呼ばれるようにする
+        const _origUpdateUI = updateUI;
+
         function updateDysonUI() {
             const panel = document.getElementById('dyson-panel');
             const content = document.getElementById('dyson-panel-content');
@@ -5255,6 +5335,115 @@
             showDysonClearScreen();
         }
 
+        // ── コインシステム ──────────────────────────────────────────────────
+
+        function getTodayStr() {
+            const d = new Date();
+            return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+        }
+
+        function updateCoinDisplay() {
+            const el = document.getElementById('coin-count');
+            if (el) el.textContent = coins;
+            // コインボタンの有効/無効
+            const types = ['point','line','triangle','square','pentagon','hexagon'];
+            types.forEach(type => {
+                const refill = document.getElementById('coin-refill-' + type);
+                const storage = document.getElementById('coin-storage-' + type);
+                const unlocked = isUnlocked(type === 'point' ? 'point' : type);
+                if (refill) {
+                    refill.disabled = !unlocked || coins < 3;
+                    refill.textContent = '🪙 ×3 補充 +100';
+                }
+                if (storage) {
+                    storage.disabled = !unlocked || coins < 15;
+                    storage.textContent = '🪙 ×15 上限 +50';
+                }
+            });
+        }
+
+        function openAdModal() {
+            const today = getTodayStr();
+            if (adLastDate !== today) { adWatchedCount = 0; adLastDate = today; }
+            const remaining = 3 - adWatchedCount;
+            const info = document.getElementById('ad-count-info');
+            if (info) info.textContent = '今日残り ' + remaining + ' 回';
+            const closeBtn = document.getElementById('ad-close-btn');
+            const fill = document.getElementById('ad-progress-fill');
+            if (closeBtn) closeBtn.style.display = 'none';
+            if (fill) fill.style.width = '0%';
+            if (remaining <= 0) {
+                const desc = document.getElementById('ad-modal-desc');
+                if (desc) desc.innerHTML = '今日の広告視聴は終了しました。<br><span style="color:#888;font-size:12px;">明日またどうぞ！</span>';
+                document.getElementById('ad-modal').classList.add('open');
+                return;
+            }
+            document.getElementById('ad-modal').classList.add('open');
+            // 広告シミュレーション（AdMob実装後はここをSDK呼び出しに置き換え）
+            let progress = 0;
+            const timer = setInterval(() => {
+                progress += 3.33;
+                if (fill) fill.style.width = Math.min(progress, 100) + '%';
+                if (progress >= 100) {
+                    clearInterval(timer);
+                    if (closeBtn) closeBtn.style.display = 'inline-block';
+                }
+            }, 100);
+        }
+
+        function closeAdModal() {
+            document.getElementById('ad-modal').classList.remove('open');
+        }
+
+        function finishAd() {
+            const today = getTodayStr();
+            if (adLastDate !== today) { adWatchedCount = 0; adLastDate = today; }
+            if (adWatchedCount >= 3) return;
+            adWatchedCount++;
+            adLastDate = today;
+            coins += 5;
+            updateCoinDisplay();
+            saveGame();
+            closeAdModal();
+            setFeedback('🪙 ×5 獲得！（今日残り ' + (3 - adWatchedCount) + ' 回）');
+        }
+
+        function coinRefill(type) {
+            if (coins < 3) return;
+            coins -= 3;
+            resources[type] = (resources[type] || 0) + 100;
+            updateCoinDisplay();
+            updateResourceDisplay();
+            saveGame();
+            setFeedback('🪙 ×3 消費 → ' + type + ' +100 補充！');
+        }
+
+        function coinUpgradeStorage(type) {
+            if (coins < 15) return;
+            coins -= 15;
+            maxStorage[type] = (maxStorage[type] || 20) + 50;
+            updateCoinDisplay();
+            updateResourceDisplay();
+            saveGame();
+            setFeedback('🪙 ×15 消費 → ' + type + ' 上限 +50！');
+        }
+
+        function updateResourceDisplay() {
+            const types = ['point','line','triangle','square','pentagon','hexagon'];
+            types.forEach(type => {
+                const valEl = document.getElementById(type + '-val');
+                if (!valEl) return;
+                const cur = Math.floor(resources[type] || 0);
+                const max = maxStorage[type] || 20;
+                valEl.textContent = cur + ' / ' + max;
+                if (cur > max) {
+                    valEl.classList.add('over-limit');
+                } else {
+                    valEl.classList.remove('over-limit');
+                }
+            });
+        }
+
         function checkGenesisClear() {
             if (!isGenesisComplete()) return;
             genesisChallenging = false;
@@ -5396,6 +5585,9 @@
                     genesisUnlocked,
                     genesisChallenging,
                     genesisEverCleared,
+                    coins,
+                    adWatchedCount,
+                    adLastDate,
                     trophies,
                     lifetimeProduced,
                     placedObjects,
@@ -5441,6 +5633,9 @@
                 if (data.genesisChallenging !== undefined) genesisChallenging = data.genesisChallenging;
                 if (data.genesisEverCleared !== undefined) genesisEverCleared = data.genesisEverCleared;
                 if (genesisEverCleared) applyGenesisTheme();
+                if (data.coins !== undefined) coins = data.coins;
+                if (data.adWatchedCount !== undefined) adWatchedCount = data.adWatchedCount;
+                if (data.adLastDate !== undefined) adLastDate = data.adLastDate;
                 if (data.trophies) Object.assign(trophies, data.trophies);
                 if (data.lifetimeProduced) Object.assign(lifetimeProduced, data.lifetimeProduced);
                 if (data.placedObjects) Object.assign(placedObjects, data.placedObjects);
