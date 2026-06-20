@@ -66,6 +66,53 @@
             pointer-events: none;
         }
 
+        /* パーツストア */
+        #parts-store-modal {
+            display: none; position: fixed; inset: 0; z-index: 8500;
+            background: rgba(0,0,0,0.82); align-items: center; justify-content: center;
+        }
+        #parts-store-modal.open { display: flex; }
+        #parts-store-inner {
+            background: #13131e; border: 1.5px solid #333355; border-radius: 14px;
+            padding: 20px; width: 92%; max-width: 480px; max-height: 88vh;
+            display: flex; flex-direction: column;
+        }
+        #parts-store-inner h2 {
+            font-size: 16px; color: #fff; margin: 0 0 6px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        #parts-store-coin-bar {
+            font-size: 13px; color: #ffd700; margin-bottom: 14px;
+            padding-bottom: 10px; border-bottom: 1px solid #222;
+        }
+        #parts-store-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 8px; overflow-y: auto;
+        }
+        .store-card {
+            background: #1a1a2a; border: 1px solid #2a2a3a; border-radius: 10px;
+            padding: 10px 8px; display: flex; flex-direction: column;
+            align-items: center; gap: 4px;
+        }
+        .store-card .store-icon { font-size: 22px; }
+        .store-card .store-name { font-size: 11px; color: #ccc; text-align: center; line-height: 1.3; }
+        .store-card .store-stock { font-size: 12px; color: #888; }
+        .store-card .store-btns { display: flex; gap: 4px; margin-top: 4px; width: 100%; }
+        .store-buy-btn {
+            flex: 1; padding: 5px 0; border-radius: 6px;
+            border: 1px solid #554400; background: #1a1500;
+            color: #ffd700; font-size: 10px; cursor: pointer;
+            white-space: nowrap; text-align: center;
+        }
+        .store-buy-btn:hover:not(:disabled) { border-color: #ffd700; background: #2a2000; }
+        .store-buy-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+        #parts-store-close {
+            margin-top: 14px; width: 100%; padding: 10px;
+            background: none; border: 1.5px solid #444; border-radius: 8px;
+            color: #aaa; font-size: 13px; cursor: pointer;
+        }
+
         /* ダイソンスフィア背景 */
         body.dyson-cleared::before {
             content: '';
@@ -1399,6 +1446,16 @@
 </head>
 <body>
 
+<!-- パーツストアモーダル -->
+<div id="parts-store-modal">
+    <div id="parts-store-inner">
+        <h2>🏪 <span data-i18n="parts_store_title">パーツストア</span></h2>
+        <div id="parts-store-coin-bar">🪙 <span id="store-coin-count">0</span> <span data-i18n="parts_store_balance">コイン所持</span></div>
+        <div id="parts-store-grid"></div>
+        <button id="parts-store-close" onclick="closePartsStore()" data-i18n="close">閉じる</button>
+    </div>
+</div>
+
 <!-- 広告視聴モーダル -->
 <div id="ad-modal">
     <div id="ad-modal-inner">
@@ -1701,7 +1758,7 @@
                 <span data-unlock="factory" style="display:none"><span class="part-label">🏭</span><span class="part-num zero" id="disp-parts-factory">0</span></span>
             </div>
             <div style="padding:2px 4px;">
-                <button id="coin-parts-btn" onclick="coinRefillParts()" title="🪙×8でパーツ補充 (+5ずつ)" style="padding:4px 10px;border-radius:6px;border:1px solid #554400;background:#1a1500;color:#ffd700;font-size:11px;cursor:pointer;white-space:nowrap;" disabled>🪙 ×8 パーツ補充 +5</button>
+                <button id="coin-parts-btn" onclick="openPartsStore()" style="padding:4px 10px;border-radius:6px;border:1px solid #554400;background:#1a1500;color:#ffd700;font-size:11px;cursor:pointer;white-space:nowrap;">🏪 <span data-i18n="parts_store_btn">パーツストア</span></button>
             </div>
             <div id="sector-selector">
                 <button id="btn-prev-sector">◀</button>
@@ -1849,6 +1906,9 @@
                 genesis_complete_desc: (n, m) => `転生 ${n} 回。モノリス倍率 ×${m}。<br>この宇宙に、あなたが建てたものがある。`,
                 close: '閉じる',
                 dyson_sink_locked: '🔒 ダイソンスフィア納品口はT4解放後に使用できます',
+                parts_store_title: 'パーツストア',
+                parts_store_btn: 'パーツストア',
+                parts_store_balance: 'コイン所持',
                 coin_refill_btn: '🪙 ×3 補充 +100',
                 coin_storage_btn: '🪙 ×15 倉庫拡張 +50',
                 storage_expand_btn: (n) => `📦 倉庫拡張 (■×${n})`,
@@ -1933,6 +1993,9 @@
                 genesis_complete_desc: (n, m) => `${n} ${n === 1 ? 'reincarnation' : 'reincarnations'}. Monolith ×${m}.<br>In this universe, what you built remains.`,
                 close: 'Close',
                 dyson_sink_locked: '🔒 Dyson Sphere output unlocks after Tier 4',
+                parts_store_title: 'Parts Store',
+                parts_store_btn: 'Parts Store',
+                parts_store_balance: 'coins',
                 coin_refill_btn: '🪙 ×3 Refill +100',
                 coin_storage_btn: '🪙 ×15 Expand +50',
                 storage_expand_btn: (n) => `📦 Expand Storage (■×${n})`,
@@ -5459,6 +5522,84 @@
             setFeedback('🪙 ×5 獲得！（今日残り ' + (3 - adWatchedCount) + ' 回）');
         }
 
+        // ── パーツストア ──────────────────────────────────────────────────────
+        const PART_STORE_CONFIG = [
+            { key: 'belt',          icon: '🟫', price1: 1,  price5: 4  },
+            { key: 'inserter',      icon: '🦾', price1: 1,  price5: 4  },
+            { key: 'assembler',     icon: '🟣', price1: 2,  price5: 8  },
+            { key: 'storageSource', icon: '📦', price1: 2,  price5: 8  },
+            { key: 'storageSink',   icon: '📤', price1: 2,  price5: 8  },
+            { key: 'fastBelt',      icon: '⚡🟫', price1: 3, price5: 12 },
+            { key: 'fastInserter',  icon: '⚡🦾', price1: 3, price5: 12 },
+            { key: 'doubleBelt',    icon: '〓', price1: 3,  price5: 12 },
+            { key: 'crossBelt',     icon: '✛', price1: 3,  price5: 12 },
+            { key: 'fastAssembler', icon: '⚡🟣', price1: 4, price5: 16 },
+            { key: 'fastCrossBelt', icon: '⚡✛', price1: 4, price5: 16 },
+            { key: 'splitter',      icon: '🔀', price1: 4,  price5: 16 },
+            { key: 'merger',        icon: '🔁', price1: 4,  price5: 16 },
+            { key: 'longInserter',  icon: '⟹', price1: 4,  price5: 16 },
+            { key: 'factory',       icon: '🏭', price1: 6,  price5: 24 },
+        ];
+
+        function openPartsStore() {
+            renderPartsStore();
+            document.getElementById('parts-store-modal').classList.add('open');
+        }
+
+        function closePartsStore() {
+            document.getElementById('parts-store-modal').classList.remove('open');
+        }
+
+        function renderPartsStore() {
+            document.getElementById('store-coin-count').textContent = coins;
+            const grid = document.getElementById('parts-store-grid');
+            grid.innerHTML = '';
+            const nameMap = currentLang === 'en' ? PART_NAMES_EN : {
+                belt:'ベルト', inserter:'インサーター', assembler:'組立機',
+                storageSource:'材料ST', storageSink:'完成品ST',
+                fastBelt:'高速ベルト', fastInserter:'高速インサーター',
+                doubleBelt:'デュアルベルト', crossBelt:'交差ベルト',
+                fastAssembler:'高速組立機', fastCrossBelt:'高速交差ベルト',
+                splitter:'分岐機', merger:'合流機', longInserter:'ロングアーム',
+                factory:'部品工場'
+            };
+            PART_STORE_CONFIG.forEach(cfg => {
+                if (!isUnlocked(cfg.key)) return;
+                const stock = parts[cfg.key] || 0;
+                const card = document.createElement('div');
+                card.className = 'store-card';
+                card.id = 'store-card-' + cfg.key;
+                card.innerHTML = `
+                    <div class="store-icon">${cfg.icon}</div>
+                    <div class="store-name">${nameMap[cfg.key] || cfg.key}</div>
+                    <div class="store-stock" id="store-stock-${cfg.key}">×${stock}</div>
+                    <div class="store-btns">
+                        <button class="store-buy-btn" onclick="buyPart('${cfg.key}',1)" ${coins < cfg.price1 ? 'disabled' : ''}>🪙${cfg.price1}<br>+1</button>
+                        <button class="store-buy-btn" onclick="buyPart('${cfg.key}',5)" ${coins < cfg.price5 ? 'disabled' : ''}>🪙${cfg.price5}<br>+5</button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function buyPart(key, qty) {
+            const cfg = PART_STORE_CONFIG.find(c => c.key === key);
+            if (!cfg) return;
+            const price = qty === 1 ? cfg.price1 : cfg.price5;
+            if (coins < price) return;
+            coins -= price;
+            parts[key] = (parts[key] || 0) + qty;
+            updatePartsDisplay();
+            saveGame();
+            // ストア内の表示を更新
+            const stockEl = document.getElementById('store-stock-' + key);
+            if (stockEl) stockEl.textContent = '×' + parts[key];
+            document.getElementById('store-coin-count').textContent = coins;
+            updateCoinDisplay();
+            // ボタンの有効/無効を再描画
+            renderPartsStore();
+        }
+
         function coinUnlockSector() {
             if (coins < 25) return;
             const nextId = currentSectorId + 1;
@@ -5472,26 +5613,7 @@
             setFeedback('🪙 ×25 消費 → SECTOR ' + String(nextId).padStart(2,'0') + ' を解放！');
         }
 
-        function coinRefillParts() {
-            if (coins < 8) return;
-            coins -= 8;
-            // 解放済みパーツに+5ずつ
-            const allParts = ['belt','inserter','assembler','storageSource','storageSink',
-                'fastBelt','fastInserter','fastAssembler','splitter','merger',
-                'longInserter','doubleBelt','crossBelt','fastCrossBelt',
-                'factory'];
-            let added = 0;
-            allParts.forEach(p => {
-                if (parts[p] !== undefined && isUnlocked(p)) {
-                    parts[p] += 5;
-                    added++;
-                }
-            });
-            updateCoinDisplay();
-            updatePartsDisplay();
-            saveGame();
-            setFeedback('🪙 ×8 消費 → 解放済みパーツ +5 補充！');
-        }
+
 
         function coinRefill(type) {
             if (coins < 3) return;
