@@ -4366,6 +4366,18 @@
         }
 
         // 初期設定
+        // テキスト中の図形記号をgemSVGに変換するユーティリティ
+        function replaceSymbols(text, size = 14) {
+            const gem = (kind) => `<span style="display:inline-flex;align-items:center;vertical-align:middle;">${gemSVG(kind, size)}</span>`;
+            return String(text)
+                .replace(/●/g, gem('raw'))
+                .replace(/─/g, gem('line'))
+                .replace(/[▲△🔺]/g, gem('triangle'))
+                .replace(/[■□🟥]/g, gem('square'))
+                .replace(/[⬠🔵]/g, gem('pentagon'))
+                .replace(/[⬡⬢🟠]/g, gem('hexagon'));
+        }
+
         function initIcons() {
             const kindMap = k => k === 'point' ? 'raw' : k;
 
@@ -4425,32 +4437,19 @@
             ['up-point','up-line','up-triangle','up-square','up-pentagon','up-hexagon'].forEach(id => {
                 const btn = document.getElementById(id);
                 if (!btn) return;
-                btn.innerHTML = btn.innerHTML
-                    .replace('📦', `<span style="display:inline-flex;align-items:center;vertical-align:middle;">${partSVG('storageSink',15)}</span>`)
-                    .replace(/■/g, `<span style="display:inline-flex;align-items:center;vertical-align:middle;">${gemSVG('square',13)}</span>`);
+                btn.innerHTML = replaceSymbols(
+                    btn.innerHTML.replace('📦', `<span style="display:inline-flex;align-items:center;vertical-align:middle;">${partSVG('storageSink',15)}</span>`),
+                    13
+                );
             });
-            ['prod-point','prod-line'].forEach(id => {
+            ['prod-point','prod-line','auto-prod-point','auto-prod-line'].forEach(id => {
                 const btn = document.getElementById(id);
-                if (!btn) return;
-                btn.innerHTML = btn.innerHTML
-                    .replace(/🔺/g, `<span style="display:inline-flex;align-items:center;vertical-align:middle;">${gemSVG('triangle',13)}</span>`);
+                if (btn) btn.innerHTML = replaceSymbols(btn.innerHTML, 13);
             });
-            const apPoint = document.getElementById('auto-prod-point');
-            if (apPoint) apPoint.innerHTML = apPoint.innerHTML
-                .replace(/🔺/g, `<span style="display:inline-flex;align-items:center;vertical-align:middle;">${gemSVG('triangle',13)}</span>`)
-                .replace(/■/g, `<span style="display:inline-flex;align-items:center;vertical-align:middle;">${gemSVG('square',13)}</span>`);
-            const apLine = document.getElementById('auto-prod-line');
-            if (apLine) apLine.innerHTML = apLine.innerHTML
-                .replace(/⬠/g, `<span style="display:inline-flex;align-items:center;vertical-align:middle;">${gemSVG('pentagon',13)}</span>`)
-                .replace(/⬢/g, `<span style="display:inline-flex;align-items:center;vertical-align:middle;">${gemSVG('hexagon',13)}</span>`);
 
             // 操作説明文
             const instr = document.querySelector('.instructions');
-            if (instr) instr.innerHTML = instr.innerHTML
-                .replace('🔺', `<span style="display:inline-flex;align-items:center;vertical-align:middle;">${gemSVG('triangle',14)}</span>`)
-                .replace('🟥', `<span style="display:inline-flex;align-items:center;vertical-align:middle;">${gemSVG('square',14)}</span>`)
-                .replace('⬠', `<span style="display:inline-flex;align-items:center;vertical-align:middle;">${gemSVG('pentagon',14)}</span>`)
-                .replace('⬢', `<span style="display:inline-flex;align-items:center;vertical-align:middle;">${gemSVG('hexagon',14)}</span>`);
+            if (instr) instr.innerHTML = replaceSymbols(instr.innerHTML, 14);
         }
 
         function init() {
@@ -4926,7 +4925,7 @@
             const kindMap = { point: 'raw', line: 'line', triangle: 'triangle', square: 'square', pentagon: 'pentagon', hexagon: 'hexagon' };
             const cfg = getTierConfig(currentTierIndex) || config;
             if (nameEl) nameEl.innerText = cfg.name;
-            if (descEl) descEl.innerText = cfg.desc;
+            if (descEl) descEl.innerHTML = replaceSymbols(cfg.desc);
 
             if (Object.keys(config.reqs).length === 0) {
                 if (currentTierIndex >= TIER_CONFIGS.length - 1) {
