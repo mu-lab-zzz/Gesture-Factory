@@ -3414,7 +3414,7 @@
             </div>`;
         }
 
-        function gemSVG(kind, size) {
+        function gemSVG(kind, size, noGlow) {
             const s = size || 22;
             const h = s / 2;
             const f = { // filter id suffix per kind
@@ -3422,7 +3422,7 @@
             }[kind] || 'gem-r';
             const fid = f + '-' + Math.random().toString(36).slice(2,6);
             const blur = Math.max(2, s * 0.15);
-            const defs = `<defs><filter id="${fid}" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur in="SourceGraphic" stdDeviation="${blur}" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>`;
+            const defs = noGlow ? '' : `<defs><filter id="${fid}" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur in="SourceGraphic" stdDeviation="${blur}" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>`;
             let shapes = '';
             if (kind === 'raw') {
                 const r = h * 0.85, r2 = h * 0.55, r3 = h * 0.32;
@@ -3468,7 +3468,8 @@
                 for(let i=0;i<6;i++){const sw2=Math.max(0.5,s*0.025);shapes+=`<line x1="${pts[i][0]}" y1="${pts[i][1]}" x2="${ipts[i][0]}" y2="${ipts[i][1]}" stroke="#aaddff" stroke-width="${sw2}" opacity="0.5"/>`;}
                 shapes+=`<polygon points="${ipstr}" fill="none" stroke="#aaddff" stroke-width="${Math.max(0.5,s*0.025)}" opacity="0.45"/>`;
             }
-            return `<svg width="${s}" height="${s}" viewBox="0 0 ${s} ${s}" xmlns="http://www.w3.org/2000/svg">${defs}<g filter="url(#${fid})">${shapes}</g></svg>`;
+            const gAttr = noGlow ? '' : ` filter="url(#${fid})"`;
+            return `<svg width="${s}" height="${s}" viewBox="0 0 ${s} ${s}" xmlns="http://www.w3.org/2000/svg">${defs}<g${gAttr}>${shapes}</g></svg>`;
         }
 
         function partSVG(kind, size) {
@@ -6542,19 +6543,19 @@
             const rv = HL_RANK_VAL[card.rank] || 0;
             const pipSize = rv <= 3 ? 28 : rv <= 6 ? 24 : 20;
 
-            const corner = `<div class="hl-c-corner hl-c-tl" style="color:${color}"><span>${card.rank}</span>${gemSVG(card.suit.kind,11)}</div><div class="hl-c-corner hl-c-br" style="color:${color}"><span>${card.rank}</span>${gemSVG(card.suit.kind,11)}</div>`;
+            const corner = `<div class="hl-c-corner hl-c-tl" style="color:${color}"><span>${card.rank}</span>${gemSVG(card.suit.kind,11,true)}</div><div class="hl-c-corner hl-c-br" style="color:${color}"><span>${card.rank}</span>${gemSVG(card.suit.kind,11,true)}</div>`;
 
             let center = '';
             if (isAce) {
-                center = `<div class="hl-c-pips"><div class="hl-c-pip" style="left:50%;top:50%">${gemSVG(card.suit.kind,58)}</div></div>`;
+                center = `<div class="hl-c-pips"><div class="hl-c-pip" style="left:50%;top:50%">${gemSVG(card.suit.kind,58,true)}</div></div>`;
             } else if (isFace) {
-                center = `<div class="hl-c-face-inner" style="border:2px solid ${color}55"><div style="font-size:18px;font-weight:900;color:${color}">${card.rank}</div>${gemSVG(card.suit.kind,46)}<div style="font-size:9px;color:${color}88">${card.suit.label}</div></div>`;
+                center = `<div class="hl-c-face-inner" style="border:2px solid ${color}55"><div style="font-size:18px;font-weight:900;color:${color}">${card.rank}</div>${gemSVG(card.suit.kind,46,true)}<div style="font-size:9px;color:${color}88">${card.suit.label}</div></div>`;
             } else {
                 const ax=14,ay=24,aw=82,ah=106;
                 const pipEls = pips.map(([px,py]) => {
                     const x=ax+(px/100)*aw, y=ay+(py/100)*ah;
                     const rot = py > 55 ? 'rotate(180deg)' : '';
-                    return `<div class="hl-c-pip" style="left:${x}px;top:${y}px;transform:translate(-50%,-50%) ${rot}">${gemSVG(card.suit.kind,pipSize)}</div>`;
+                    return `<div class="hl-c-pip" style="left:${x}px;top:${y}px;transform:translate(-50%,-50%) ${rot}">${gemSVG(card.suit.kind,pipSize,true)}</div>`;
                 }).join('');
                 center = `<div class="hl-c-pips">${pipEls}</div>`;
             }
