@@ -7291,6 +7291,32 @@
     })();
     </script>
 
-<script>if('serviceWorker'in navigator)navigator.serviceWorker.register('/Gesture-Factory/sw.js');</script>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/Gesture-Factory/sw.js').then(reg => {
+    // 定期チェック（30秒ごと）
+    setInterval(() => reg.update(), 30000);
+
+    reg.addEventListener('updatefound', () => {
+      const newSW = reg.installing;
+      newSW.addEventListener('statechange', () => {
+        if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+          // 新バージョン待機中 → トースト表示
+          const toast = document.createElement('div');
+          toast.id = 'sw-update-toast';
+          toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1a1a2e;border:1px solid #4488ff;color:#cce;padding:10px 16px;border-radius:10px;font-size:13px;z-index:9999;display:flex;gap:10px;align-items:center;box-shadow:0 4px 20px #0008';
+          toast.innerHTML = '<span>🔄 新バージョンがあります</span><button onclick="navigator.serviceWorker.controller.postMessage({type:\'SKIP_WAITING\'});location.reload()" style="background:#4488ff;color:#fff;border:none;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:12px">更新</button>';
+          document.body.appendChild(toast);
+        }
+      });
+    });
+  });
+
+  // SW側からSKIP_WAITINGを受け取ったら即リロード
+  navigator.serviceWorker.addEventListener('message', e => {
+    if (e.data && e.data.type === 'RELOAD') location.reload();
+  });
+}
+</script>
 </body>
 </html>
