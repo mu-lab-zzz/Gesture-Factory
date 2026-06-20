@@ -191,7 +191,8 @@
         .vp-card.flip { transform:rotateY(180deg); }
         .vp-card-front,.vp-card-back { position:absolute;inset:0;border-radius:6px;backface-visibility:hidden; }
         .vp-card-front { background:#f5f0e8;overflow:hidden;transform:rotateY(0deg); }
-        .vp-card-back { background:#1a1060;border:2px solid #3a3a8a;transform:rotateY(180deg);display:flex;align-items:center;justify-content:center;font-size:1.2rem; }
+        .vp-card-back { background:#1a1060;border:2px solid #3a3a8a;transform:rotateY(180deg);display:flex;align-items:center;justify-content:center;font-size:1.2rem;background-image:url('opening.png');background-size:cover;background-position:center; }
+        .vp-card-back::after { content:'';position:absolute;inset:0;background:#1a1060cc;border-radius:4px; }
         .vp-card.held .vp-card-front { outline:2px solid #ffd700; }
         .vp-hold-badge { font-size:0.6rem;font-weight:bold;letter-spacing:1px;color:#ffd700;background:#1a1a00;border:1px solid #ffd700;border-radius:4px;padding:1px 5px;height:14px;display:flex;align-items:center;opacity:0;transition:opacity 0.15s; }
         .vp-hold-badge.show { opacity:1; }
@@ -1799,7 +1800,7 @@
         <div style="display:flex;gap:8px;margin-bottom:16px;">
             <button class="casino-game-btn active" id="casino-gbtn-slot" onclick="casinoSwitchGame('slot')"><span style="font-size:1.4rem;">🎰</span><span data-i18n="casino_slot">スロット</span></button>
             <button class="casino-game-btn" id="casino-gbtn-hilow" onclick="casinoSwitchGame('hilow')"><span style="font-size:1.4rem;">🃏</span><span data-i18n="casino_hilow">ハイアンドロー</span></button>
-            <button class="casino-game-btn" id="casino-gbtn-poker" onclick="casinoSwitchGame('poker')"><span style="font-size:1.4rem;">🎴</span><span data-i18n="casino_poker">ポーカー</span></button>
+            <button class="casino-game-btn" id="casino-gbtn-poker" onclick="casinoSwitchGame('poker')"><span style="font-size:1.4rem;">♠️</span><span data-i18n="casino_poker">ポーカー</span></button>
             <button class="casino-game-btn" id="casino-gbtn-void" onclick="casinoSwitchGame('void')"><span style="font-size:1.4rem;">🌑</span><span data-i18n="casino_void">虚無</span></button>
         </div>
         <!-- スロットパネル -->
@@ -6986,7 +6987,7 @@
                 const slot=document.createElement('div');
                 slot.className='vp-card-slot';
                 slot.onclick=()=>vpToggleHold(i);
-                slot.innerHTML=`<div class="vp-card-wrap"><div class="vp-card" id="vp-c-${i}"><div class="vp-card-front" id="vp-f-${i}"></div><div class="vp-card-back">🎴</div></div></div><div class="vp-hold-badge" id="vp-h-${i}">HOLD</div>`;
+                slot.innerHTML=`<div class="vp-card-wrap"><div class="vp-card" id="vp-c-${i}"><div class="vp-card-front" id="vp-f-${i}"></div><div class="vp-card-back"></div></div></div><div class="vp-hold-badge" id="vp-h-${i}">HOLD</div>`;
                 row.appendChild(slot);
                 // 初期は裏向き
                 document.getElementById(`vp-c-${i}`).classList.add('flip');
