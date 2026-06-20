@@ -1529,46 +1529,46 @@
             <div class="resource-value" id="point-val">0 / 20</div>
             <button class="coin-btn" id="coin-refill-point" onclick="coinRefill('point')" disabled>🪙 ×3 補充 +100</button>
             <button class="coin-btn" id="coin-storage-point" onclick="coinUpgradeStorage('point')" disabled>🪙 ×15 倉庫拡張 +50</button>
-            <button class="upgrade-btn" id="up-point" onclick="upgradeStorage('point')" style="margin-bottom: 5px;">📦 倉庫拡張 (■×6)</button>
-            <button class="upgrade-btn" id="prod-point" onclick="upgradeProduction('point')" style="margin-bottom: 5px;">⚡ 生産量強化 (🔺×10)</button>
-            <button class="upgrade-btn" id="auto-prod-point" onclick="upgradeAutoProduction('point')">🤖 自動生産強化 (🔺×5, ■×5)</button>
+            <button class="upgrade-btn" id="up-point" onclick="upgradeStorage('point')" data-i18n-storage-expand="6" style="margin-bottom: 5px;">📦 倉庫拡張 (■×6)</button>
+            <button class="upgrade-btn" id="prod-point" onclick="upgradeProduction('point')" data-i18n-prod-boost="10" style="margin-bottom: 5px;">⚡ 生産量強化 (🔺×10)</button>
+            <button class="upgrade-btn" id="auto-prod-point" onclick="upgradeAutoProduction('point')" data-i18n="auto_prod_btn_pt">🤖 自動生産強化 (🔺×5, ■×5)</button>
         </div>
         <div class="resource-card line locked" id="card-line">
             <div class="resource-name">線 (Lines) <span style="font-size:10px;color:#ff3366;">[未解放]</span></div>
             <div class="resource-value" id="line-val">0 / 20</div>
             <button class="coin-btn" id="coin-refill-line" onclick="coinRefill('line')" disabled>🪙 ×3 補充 +100</button>
             <button class="coin-btn" id="coin-storage-line" onclick="coinUpgradeStorage('line')" disabled>🪙 ×15 倉庫拡張 +50</button>
-            <button class="upgrade-btn" id="up-line" onclick="upgradeStorage('line')" disabled style="margin-bottom: 5px;">📦 倉庫拡張 (■×6)</button>
-            <button class="upgrade-btn" id="prod-line" onclick="upgradeProduction('line')" disabled style="margin-bottom: 5px;">⚡ 生産量強化 (🔺×15)</button>
-            <button class="upgrade-btn" id="auto-prod-line" onclick="upgradeAutoProduction('line')" disabled>🤖 自動生産強化 (⬠×5, ⬢×5)</button>
+            <button class="upgrade-btn" id="up-line" onclick="upgradeStorage('line')" data-i18n-storage-expand="6" disabled style="margin-bottom: 5px;">📦 倉庫拡張 (■×6)</button>
+            <button class="upgrade-btn" id="prod-line" onclick="upgradeProduction('line')" data-i18n-prod-boost="15" disabled style="margin-bottom: 5px;">⚡ 生産量強化 (🔺×15)</button>
+            <button class="upgrade-btn" id="auto-prod-line" onclick="upgradeAutoProduction('line')" data-i18n="auto_prod_btn_ln" disabled>🤖 自動生産強化 (⬠×5, ⬢×5)</button>
         </div>
         <div class="resource-card triangle locked" id="card-triangle">
             <div class="resource-name">三角形 (Triangles) <span style="font-size:10px;color:#ff3366;">[未解放]</span></div>
             <div class="resource-value" id="triangle-val">0 / 20</div>
             <button class="coin-btn" id="coin-refill-triangle" onclick="coinRefill('triangle')" disabled>🪙 ×3 補充 +100</button>
             <button class="coin-btn" id="coin-storage-triangle" onclick="coinUpgradeStorage('triangle')" disabled>🪙 ×15 倉庫拡張 +50</button>
-            <button class="upgrade-btn" id="up-triangle" onclick="upgradeStorage('triangle')" disabled>📦 倉庫拡張 (■×6)</button>
+            <button class="upgrade-btn" id="up-triangle" onclick="upgradeStorage('triangle')" data-i18n-storage-expand="6" disabled>📦 倉庫拡張 (■×6)</button>
         </div>
         <div class="resource-card square locked" id="card-square">
             <div class="resource-name">四角形 (Squares) <span style="font-size:10px;color:#ff3366;">[未解放]</span></div>
             <div class="resource-value" id="square-val">0 / 20</div>
             <button class="coin-btn" id="coin-refill-square" onclick="coinRefill('square')" disabled>🪙 ×3 補充 +100</button>
             <button class="coin-btn" id="coin-storage-square" onclick="coinUpgradeStorage('square')" disabled>🪙 ×15 倉庫拡張 +50</button>
-            <button class="upgrade-btn" id="up-square" onclick="upgradeStorage('square')" disabled>📦 倉庫拡張 (■×6)</button>
+            <button class="upgrade-btn" id="up-square" onclick="upgradeStorage('square')" data-i18n-storage-expand="6" disabled>📦 倉庫拡張 (■×6)</button>
         </div>
         <div class="resource-card pentagon locked" id="card-pentagon">
             <div class="resource-name">五角形 (Pentagons) <span style="font-size:10px;color:#ff3366;">[未解放]</span></div>
             <div class="resource-value" id="pentagon-val">0 / 20</div>
             <button class="coin-btn" id="coin-refill-pentagon" onclick="coinRefill('pentagon')" disabled>🪙 ×3 補充 +100</button>
             <button class="coin-btn" id="coin-storage-pentagon" onclick="coinUpgradeStorage('pentagon')" disabled>🪙 ×15 倉庫拡張 +50</button>
-            <button class="upgrade-btn" id="up-pentagon" onclick="upgradeStorage('pentagon')" disabled>📦 倉庫拡張 (■×6)</button>
+            <button class="upgrade-btn" id="up-pentagon" onclick="upgradeStorage('pentagon')" data-i18n-storage-expand="6" disabled>📦 倉庫拡張 (■×6)</button>
         </div>
         <div class="resource-card hexagon locked" id="card-hexagon">
             <div class="resource-name">六角形 (Hexagons) <span style="font-size:10px;color:#ff3366;">[未解放]</span></div>
             <div class="resource-value" id="hexagon-val">0 / 20</div>
             <button class="coin-btn" id="coin-refill-hexagon" onclick="coinRefill('hexagon')" disabled>🪙 ×3 補充 +100</button>
             <button class="coin-btn" id="coin-storage-hexagon" onclick="coinUpgradeStorage('hexagon')" disabled>🪙 ×15 倉庫拡張 +50</button>
-            <button class="upgrade-btn" id="up-hexagon" onclick="upgradeStorage('hexagon')" disabled>📦 倉庫拡張 (■×6)</button>
+            <button class="upgrade-btn" id="up-hexagon" onclick="upgradeStorage('hexagon')" data-i18n-storage-expand="6" disabled>📦 倉庫拡張 (■×6)</button>
         </div>
     </div>
 
@@ -1849,6 +1849,12 @@
                 genesis_complete_desc: (n, m) => `転生 ${n} 回。モノリス倍率 ×${m}。<br>この宇宙に、あなたが建てたものがある。`,
                 close: '閉じる',
                 dyson_sink_locked: '🔒 ダイソンスフィア納品口はT4解放後に使用できます',
+                coin_refill_btn: '🪙 ×3 補充 +100',
+                coin_storage_btn: '🪙 ×15 倉庫拡張 +50',
+                storage_expand_btn: (n) => `📦 倉庫拡張 (■×${n})`,
+                prod_boost_btn: (n) => `⚡ 生産量強化 (🔺×${n})`,
+                auto_prod_btn_pt: '🤖 自動生産強化 (🔺×5, ■×5)',
+                auto_prod_btn_ln: '🤖 自動生産強化 (⬠×5, ⬢×5)',
                 debug_dyson_clear: 'ダイソンスフィア即クリア',
                 debug_genesis_clear: 'Genesis Omega即クリア',
             },
@@ -1927,6 +1933,12 @@
                 genesis_complete_desc: (n, m) => `${n} ${n === 1 ? 'reincarnation' : 'reincarnations'}. Monolith ×${m}.<br>In this universe, what you built remains.`,
                 close: 'Close',
                 dyson_sink_locked: '🔒 Dyson Sphere output unlocks after Tier 4',
+                coin_refill_btn: '🪙 ×3 Refill +100',
+                coin_storage_btn: '🪙 ×15 Expand +50',
+                storage_expand_btn: (n) => `📦 Expand Storage (■×${n})`,
+                prod_boost_btn: (n) => `⚡ Prod. Boost (🔺×${n})`,
+                auto_prod_btn_pt: '🤖 Auto-Prod (🔺×5, ■×5)',
+                auto_prod_btn_ln: '🤖 Auto-Prod (⬠×5, ⬢×5)',
                 debug_dyson_clear: 'Instant Dyson Clear',
                 debug_genesis_clear: 'Instant Genesis Clear',
             }
@@ -2028,6 +2040,12 @@
         function applyLang() {
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 el.textContent = t(el.dataset.i18n);
+            });
+            document.querySelectorAll('[data-i18n-storage-expand]').forEach(el => {
+                el.textContent = t('storage_expand_btn', el.dataset.i18nStorageExpand);
+            });
+            document.querySelectorAll('[data-i18n-prod-boost]').forEach(el => {
+                el.textContent = t('prod_boost_btn', el.dataset.i18nProdBoost);
             });
             document.querySelectorAll('[data-i18n-html]').forEach(el => {
                 el.innerHTML = t(el.dataset.i18nHtml);
@@ -5386,11 +5404,11 @@
                 const unlocked = isUnlocked(type === 'point' ? 'point' : type);
                 if (refill) {
                     refill.disabled = !unlocked || coins < 3;
-                    refill.textContent = '🪙 ×3 補充 +100';
+                    refill.textContent = t('coin_refill_btn');
                 }
                 if (storage) {
                     storage.disabled = !unlocked || coins < 15;
-                    storage.textContent = '🪙 ×15 倉庫拡張 +50';
+                    storage.textContent = t('coin_storage_btn');
                 }
             });
         }
