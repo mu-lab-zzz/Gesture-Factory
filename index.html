@@ -55,6 +55,17 @@
             font-size: 12px; cursor: pointer;
         }
 
+        /* Genesis Omega背景 */
+        body.genesis-cleared::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background: url('jenesis-bg.jpg') center center / cover no-repeat;
+            opacity: 0.13;
+            pointer-events: none;
+        }
+
         /* ダイソンスフィア背景 */
         body.dyson-cleared::before {
             content: '';
@@ -5514,11 +5525,16 @@
             if (!isGenesisComplete()) return;
             genesisChallenging = false;
             genesisEverCleared = true;
+            applyGenesisBg();
             unlockTrophy('genesis_clear');
             if (reincarnationCount === 0) unlockTrophy('genesis_no_reinc');
             applyGenesisTheme();
             saveGame();
             showGenesisClearScreen();
+        }
+
+        function applyGenesisBg() {
+            document.body.classList.add('genesis-cleared');
         }
 
         function applyGenesisTheme() {
@@ -5699,6 +5715,7 @@
                 if (data.genesisChallenging !== undefined) genesisChallenging = data.genesisChallenging;
                 if (data.genesisEverCleared !== undefined) genesisEverCleared = data.genesisEverCleared;
                 if (genesisEverCleared) applyGenesisTheme();
+                if (genesisEverCleared) applyGenesisBg();
                 if (data.coins !== undefined) coins = data.coins;
                 if (data.adWatchedCount !== undefined) adWatchedCount = data.adWatchedCount;
                 if (data.adLastDate !== undefined) adLastDate = data.adLastDate;
