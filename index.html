@@ -55,6 +55,28 @@
             font-size: 12px; cursor: pointer;
         }
 
+        /* ダイソンスフィア背景 */
+        body.dyson-cleared::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background: url('dyson-bg.jpg') center center / cover no-repeat;
+            opacity: 0.13;
+            pointer-events: none;
+            transition: opacity 2s ease;
+        }
+        body.dyson-cleared-in::before {
+            opacity: 0.13;
+        }
+        /* ゲームUI要素がbefore疑似要素より前面になるよう確認用 */
+        #app, #header-bar, #tab-bar, #content-factory, #content-automation,
+        #content-inventory, #content-dyson, #content-tier,
+        #settings-modal, #ad-modal, #reset-modal {
+            position: relative;
+            z-index: 1;
+        }
+
         @keyframes omega-glow {
             from { text-shadow: 0 0 6px #ffd700, 0 0 14px #ff8800; opacity: 0.85; }
             to   { text-shadow: 0 0 14px #ffd700, 0 0 30px #ffaa00, 0 0 50px #ff6600; opacity: 1; }
@@ -5330,10 +5352,15 @@
             return Object.keys(GENESIS_REQUIREMENTS).every(k => genesisProgress[k] >= GENESIS_REQUIREMENTS[k]);
         }
 
+        function applyDysonBg() {
+            document.body.classList.add('dyson-cleared');
+        }
+
         function checkDysonClear() {
             if (dysonCleared || !isDysonComplete()) return;
             dysonCleared = true;
             genesisUnlocked = true;
+            applyDysonBg();
             unlockTrophy('dyson_clear');
             if (reincarnationCount === 0) unlockTrophy('dyson_no_reinc');
             saveGame();
