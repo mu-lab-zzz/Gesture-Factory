@@ -2874,7 +2874,15 @@
             bgmEnabled = !bgmEnabled;
             document.getElementById('bgm-toggle').classList.toggle('on', bgmEnabled);
             const bgm = document.getElementById('bgm');
-            if (bgm) bgmEnabled ? bgm.play().catch(()=>{}) : bgm.pause();
+            const casBgm = window._casinoBgm;
+            const casinoOpen = casBgm && !casBgm.paused;
+            if (bgm) {
+                if (bgmEnabled && !casinoOpen) bgm.play().catch(() => {});
+                else bgm.pause();
+            }
+            if (casBgm && casinoOpen) {
+                bgmEnabled ? casBgm.play().catch(() => {}) : casBgm.pause();
+            }
         }
         function confirmReset() {
             document.getElementById('reset-modal').style.display = 'flex';
