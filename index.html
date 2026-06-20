@@ -6533,9 +6533,11 @@
             document.getElementById('casino-spin-btn').disabled = true;
             document.getElementById('casino-result-msg').textContent = '';
             cSpinning = true;
+            sfxSlotSpinStart();
             const targets = cReelStrips.map(s => Math.floor(Math.random() * C_REEL_SIZE));
             for (let r = 0; r < 3; r++) cSpinReel(r, targets[r], r*300, 800+r*300);
             setTimeout(() => {
+                sfxSlotSpinStop();
                 const res = cCalcResult(targets);
                 cApplyResult(res);
                 cSpinning = false;
@@ -6559,6 +6561,7 @@
                     const finalY = -(stripLen*cellH + targetIdx*cellH - cellH);
                     el.style.transition = `transform 0.5s cubic-bezier(0.25,0.46,0.45,0.94)`;
                     el.style.transform = `translateY(${finalY}px)`;
+                    sfxSlotReelStop();
                     setTimeout(() => { el.style.transition = ''; }, 600);
                 }, duration);
             }, delay);
@@ -6589,8 +6592,8 @@
                 else cAddTension(15);
             }
             const fx = res.inFever ? ' 🔥×2' : '';
-            if (res.type==='triple') { cShowResult(t('casino_slot_triple', res.win, ` (×${res.baseMult}${fx})`), 'win'); cFlashLine(); }
-            else if (res.type==='pair') { cShowResult(t('casino_slot_pair', res.win, fx), 'push'); cFlashLine(); }
+            if (res.type==='triple') { cShowResult(t('casino_slot_triple', res.win, ` (×${res.baseMult}${fx})`), 'win'); cFlashLine(); sfxSlotBigWin(); }
+            else if (res.type==='pair') { cShowResult(t('casino_slot_pair', res.win, fx), 'push'); cFlashLine(); sfxSlotWin(); }
             else cShowResult(t('casino_slot_miss'), 'lose');
         }
 
@@ -6674,6 +6677,157 @@
             vpBuildCardRow();
             vpBuildPaytable();
             voidInit();
+        }
+
+        // ─── カジノ SFX ───────────────────────────────────────────────────────────
+        const _sfxCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function _sfx(fn) {
+            if (!sfxEnabled) return;
+            if (_sfxCtx.state === 'suspended') _sfxCtx.resume();
+            fn(_sfxCtx);
+        }
+
+        // スロット：リール回転中のチチチ音（連続クリック）
+        let _slotTickTimer = null;
+        function sfxSlotSpinStart() {
+            _sfx(ctx => {
+                let count = 0;
+                function tick() {
+                    if (!sfxEnabled) return;
+                    const g = ctx.createGain();
+                    g.gain.setValueAtTime(0.18, ctx.currentTime);
+                    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.04);
+                    g.connect(ctx.destination);
+                    const o = ctx.createOscillator();
+                    o.type = 'square';
+                    o.frequency.setValueAtTime(180 + Math.random() * 60, ctx.currentTime);
+                    o.connect(g);
+                    o.start(); o.stop(ctx.currentTime + 0.04);
+                    count++;
+                }
+                tick();
+                _slotTickTimer = setInterval(tick, 80);
+            });
+        }
+        function sfxSlotSpinStop() {
+            clearInterval(_slotTickTimer);
+            _slotTickTimer = null;
+        }
+
+        // スロット：リール停止（ドン）
+        function sfxSlotReelStop() {
+            _sfx(ctx => {
+                const buf = ctx.createBuffer(1, ctx.sampleRate * 0.12, ctx.sampleRate);
+                const d = buf.getChannelData(0);
+                for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 3);
+                const src = ctx.createBufferSource();
+                src.buffer = buf;
+                const g = ctx.createGain();
+                g.gain.setValueAtTime(0.5, ctx.currentTime);
+                g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
+                src.connect(g); g.connect(ctx.destination);
+                src.start();
+            });
+        }
+
+        // スロット：当たり（上昇アルペジオ）
+        function sfxSlotWin() {
+            _sfx(ctx => {
+                const notes = [523, 659, 784, 1047];
+                notes.forEach((freq, i) => {
+                    const t = ctx.currentTime + i * 0.1;
+                    const o = ctx.createOscillator();
+                    o.type = 'sine';
+                    o.frequency.setValueAtTime(freq, t);
+                    const g = ctx.createGain();
+                    g.gain.setValueAtTime(0, t);
+                    g.gain.linearRampToValueAtTime(0.3, t + 0.03);
+                    g.gain.exponentialRampToValueAtTime(0.001, t + 0.25);
+                    o.connect(g); g.connect(ctx.destination);
+                    o.start(t); o.stop(t + 0.25);
+                });
+            });
+        }
+
+        // スロット：大当たり（派手なファンファーレ）
+        function sfxSlotBigWin() {
+            _sfx(ctx => {
+                const melody = [523,659,784,659,784,1047];
+                melody.forEach((freq, i) => {
+                    const t = ctx.currentTime + i * 0.1;
+                    ['sine','triangle'].forEach(type => {
+                        const o = ctx.createOscillator();
+                        o.type = type;
+                        o.frequency.setValueAtTime(freq, t);
+                        const g = ctx.createGain();
+                        g.gain.setValueAtTime(0, t);
+                        g.gain.linearRampToValueAtTime(0.2, t + 0.04);
+                        g.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
+                        o.connect(g); g.connect(ctx.destination);
+                        o.start(t); o.stop(t + 0.3);
+                    });
+                });
+            });
+        }
+
+        // カード：めくり音（シュッ）
+        function sfxCardFlip() {
+            _sfx(ctx => {
+                const buf = ctx.createBuffer(1, ctx.sampleRate * 0.08, ctx.sampleRate);
+                const d = buf.getChannelData(0);
+                for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 1.5) * 0.6;
+                const src = ctx.createBufferSource();
+                src.buffer = buf;
+                const f = ctx.createBiquadFilter();
+                f.type = 'highpass'; f.frequency.value = 3000;
+                src.connect(f); f.connect(ctx.destination);
+                src.start();
+            });
+        }
+
+        // 虚無：チップ投入（吸い込まれる音）
+        function sfxVoidFeed() {
+            _sfx(ctx => {
+                const o = ctx.createOscillator();
+                o.type = 'sine';
+                o.frequency.setValueAtTime(400, ctx.currentTime);
+                o.frequency.exponentialRampToValueAtTime(80, ctx.currentTime + 0.2);
+                const g = ctx.createGain();
+                g.gain.setValueAtTime(0.25, ctx.currentTime);
+                g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2);
+                o.connect(g); g.connect(ctx.destination);
+                o.start(); o.stop(ctx.currentTime + 0.2);
+            });
+        }
+
+        // 虚無：ステージアップ（不気味な低音の唸り）
+        function sfxVoidEvolve() {
+            _sfx(ctx => {
+                // 低音ドローン
+                [40, 60, 80].forEach((freq, i) => {
+                    const o = ctx.createOscillator();
+                    o.type = i === 0 ? 'sawtooth' : 'sine';
+                    o.frequency.setValueAtTime(freq, ctx.currentTime);
+                    o.frequency.linearRampToValueAtTime(freq * 0.6, ctx.currentTime + 1.2);
+                    const g = ctx.createGain();
+                    g.gain.setValueAtTime(0, ctx.currentTime);
+                    g.gain.linearRampToValueAtTime(0.2 - i * 0.05, ctx.currentTime + 0.1);
+                    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.2);
+                    o.connect(g); g.connect(ctx.destination);
+                    o.start(); o.stop(ctx.currentTime + 1.2);
+                });
+                // 高音シャー（ノイズ）
+                const buf = ctx.createBuffer(1, ctx.sampleRate * 0.6, ctx.sampleRate);
+                const d = buf.getChannelData(0);
+                for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 0.5) * 0.15;
+                const src = ctx.createBufferSource();
+                src.buffer = buf;
+                const f = ctx.createBiquadFilter();
+                f.type = 'bandpass'; f.frequency.value = 1200; f.Q.value = 0.5;
+                src.connect(f); f.connect(ctx.destination);
+                src.start();
+            });
         }
 
         // ─── BGM ──────────────────────────────────────────────────────────────────
@@ -6765,6 +6919,7 @@
             if (flip) {
                 const el = document.getElementById('hl-card');
                 el.classList.add('flip');
+                sfxCardFlip();
                 setTimeout(() => el.classList.remove('flip'), 400);
             }
         }
@@ -7019,7 +7174,7 @@
         function vpShowCard(i,card,flip) {
             document.getElementById(`vp-f-${i}`).innerHTML=vpBuildCardFront(card);
             const el=document.getElementById(`vp-c-${i}`);
-            if(flip){el.classList.add('flip');setTimeout(()=>el.classList.remove('flip'),350);}
+            if(flip){el.classList.add('flip');sfxCardFlip();setTimeout(()=>el.classList.remove('flip'),350);}
             el.classList.remove('held');
             document.getElementById(`vp-h-${i}`).classList.remove('show');
         }
@@ -7142,10 +7297,12 @@
             localStorage.setItem('gf_void_absorbed', voidAbsorbed);
             document.getElementById('void-absorbed').textContent = t('casino_void_absorbed', voidAbsorbed);
             voidSpawnParticles();
+            sfxVoidFeed();
             const newIdx = voidCurrentStage();
             if (newIdx !== voidStageIdx) {
                 voidStageIdx = newIdx;
                 voidApplyStage(true);
+                sfxVoidEvolve();
                 const scene = document.getElementById('void-scene');
                 if (scene) { scene.style.animation = 'void-shake 0.4s ease'; setTimeout(() => scene.style.animation = '', 400); }
             }
