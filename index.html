@@ -6669,7 +6669,7 @@
         }
 
         // ─── BGM ──────────────────────────────────────────────────────────────────
-        const casinoBgm = new Audio('The_Unspoken_Guest.mp3');
+        const casinoBgm = window._casinoBgm = new Audio('The_Unspoken_Guest.mp3');
         casinoBgm.loop = true;
         casinoBgm.volume = 0.5;
         window.casinoBgmPlay  = function() {
@@ -7289,6 +7289,23 @@
         if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', casinoInit);
         else casinoInit();
     })();
+
+    // ホームボタン等でバックグラウンドに移った際に音楽を停止・復帰
+    document.addEventListener('visibilitychange', () => {
+        const mainBgm = document.getElementById('bgm');
+        const casBgm = window._casinoBgm;
+        if (document.hidden) {
+            // 再生中のものだけ止めて、どれを止めたか記憶
+            window._bgmStoppedMain = mainBgm && !mainBgm.paused;
+            window._bgmStoppedCas  = casBgm  && !casBgm.paused;
+            if (window._bgmStoppedMain) mainBgm.pause();
+            if (window._bgmStoppedCas)  casBgm.pause();
+        } else {
+            // 自分が止めたものだけ再開（ユーザーがOFFにしたものは再開しない）
+            if (window._bgmStoppedMain) mainBgm.play().catch(() => {});
+            if (window._bgmStoppedCas)  casBgm.play().catch(() => {});
+        }
+    });
     </script>
 
 <script>
