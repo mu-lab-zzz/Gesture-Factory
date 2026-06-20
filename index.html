@@ -1888,7 +1888,7 @@
                 <!-- 役表示 -->
                 <div id="vp-result" style="font-size:1.1rem;font-weight:bold;min-height:1.4rem;text-align:center;color:#aaa;" data-i18n="casino_vp_deal">カードを配ってください</div>
                 <!-- アクションボタン -->
-                <button id="vp-action-btn" onclick="vpAction()" style="width:100%;padding:13px;border:none;border-radius:12px;font-size:1rem;font-weight:bold;cursor:pointer;letter-spacing:2px;background:linear-gradient(135deg,#ffd700,#ffaa00);color:#000;">DEAL 🎴</button>
+                <button id="vp-action-btn" onclick="vpAction()" style="width:100%;padding:13px;border:none;border-radius:12px;font-size:1rem;font-weight:bold;cursor:pointer;letter-spacing:2px;background:linear-gradient(135deg,#ffd700,#ffaa00);color:#000;">DEAL ♠️</button>
                 <!-- ベット -->
                 <div style="display:flex;gap:6px;align-items:center;font-size:0.8rem;color:#aaa;">
                     <span>BET:</span>
@@ -7073,7 +7073,7 @@
                 vpSetResult(t('casino_vp_nohand'),'#ff4466');
             }
             const btn=document.getElementById('vp-action-btn');
-            if(btn){btn.textContent='DEAL 🎴';btn.style.background='linear-gradient(135deg,#ffd700,#ffaa00)';}
+            if(btn){btn.textContent='DEAL ♠️';btn.style.background='linear-gradient(135deg,#ffd700,#ffaa00)';}
         }
 
         window.vpSetBet = function(val, el) {
