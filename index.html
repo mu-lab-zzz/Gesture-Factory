@@ -6683,7 +6683,7 @@
         window.casinoBgmPlay  = function() {
             const main = document.getElementById('bgm');
             if (main && !main.paused) { main.pause(); }
-            casinoBgm.paused && casinoBgm.play().catch(()=>{});
+            if (bgmEnabled) casinoBgm.paused && casinoBgm.play().catch(()=>{});
         };
         window.casinoBgmPause = function() {
             casinoBgm.pause();
