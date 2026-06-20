@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>プライバシーポリシー / Privacy Policy — GESTURE&FACTORY</title>
+    <style>
+        body {
+            background: #121216;
+            color: #e2e2e9;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 40px 20px 80px;
+            line-height: 1.8;
+        }
+        h1 { font-size: 22px; color: #fff; border-bottom: 1px solid #333; padding-bottom: 12px; }
+        h2 { font-size: 16px; color: #aad4ff; margin-top: 32px; }
+        p, li { font-size: 14px; color: #ccc; }
+        a { color: #60a5fa; }
+        .lang-switch { display: flex; gap: 12px; margin-bottom: 32px; }
+        .lang-switch button {
+            padding: 6px 16px; border-radius: 6px; border: 1px solid #444;
+            background: #1a1a24; color: #aaa; cursor: pointer; font-size: 13px;
+        }
+        .lang-switch button.active { background: #3b82f6; border-color: #60a5fa; color: #fff; }
+        .section { display: none; }
+        .section.visible { display: block; }
+        .updated { font-size: 12px; color: #666; margin-top: 8px; }
+    </style>
+</head>
+<body>
+
+<div class="lang-switch">
+    <button class="active" onclick="showLang('ja', this)">日本語</button>
+    <button onclick="showLang('en', this)">English</button>
+</div>
+
+<!-- 日本語 -->
+<div class="section visible" id="section-ja">
+    <h1>プライバシーポリシー</h1>
+    <p class="updated">最終更新日：2026年6月20日</p>
+
+    <h2>アプリについて</h2>
+    <p>
+        GESTURE&FACTORY（以下「本アプリ」）は、ジェスチャー操作で図形を生産し、工場ラインを組み立てるカジュアルゲームです。
+        開発者：mu-lab-zzz
+    </p>
+
+    <h2>収集する情報</h2>
+    <p>
+        本アプリは、ユーザーの個人情報を一切収集しません。<br>
+        氏名・メールアドレス・位置情報・連絡先・端末識別子などの個人データは取得・送信・保存しません。
+    </p>
+
+    <h2>セーブデータについて</h2>
+    <p>
+        ゲームの進行状況（スコア・解放状況など）は、お使いの端末の <strong>ローカルストレージ</strong> にのみ保存されます。
+        このデータは外部サーバーには送信されず、開発者がアクセスすることもありません。
+    </p>
+
+    <h2>広告・解析ツール</h2>
+    <p>
+        本アプリは広告を表示しません。Google Analytics 等の解析ツールも使用していません。
+    </p>
+
+    <h2>第三者へのデータ提供</h2>
+    <p>
+        ユーザーデータを第三者に販売・共有・提供することはありません。
+    </p>
+
+    <h2>お子様のプライバシー</h2>
+    <p>
+        本アプリは13歳未満のお子様から意図的に情報を収集しません。
+    </p>
+
+    <h2>お問い合わせ</h2>
+    <p>
+        プライバシーに関するご質問は、GitHubリポジトリの Issues よりお知らせください。<br>
+        <a href="https://github.com/mu-lab-zzz/Gesture-Factory/issues" target="_blank">
+            https://github.com/mu-lab-zzz/Gesture-Factory/issues
+        </a>
+    </p>
+</div>
+
+<!-- English -->
+<div class="section" id="section-en">
+    <h1>Privacy Policy</h1>
+    <p class="updated">Last updated: June 20, 2026</p>
+
+    <h2>About the App</h2>
+    <p>
+        GESTURE&FACTORY is a casual game where you produce shapes through gesture input and build factory lines.
+        Developer: mu-lab-zzz
+    </p>
+
+    <h2>Information We Collect</h2>
+    <p>
+        This app does not collect any personal information.<br>
+        We do not obtain, transmit, or store personal data such as your name, email address, location, contacts, or device identifiers.
+    </p>
+
+    <h2>Save Data</h2>
+    <p>
+        Your game progress (scores, unlocks, etc.) is stored only in your device's <strong>local storage</strong>.
+        This data is never sent to external servers and cannot be accessed by the developer.
+    </p>
+
+    <h2>Advertising &amp; Analytics</h2>
+    <p>
+        This app does not display advertisements and does not use analytics tools such as Google Analytics.
+    </p>
+
+    <h2>Sharing of Data</h2>
+    <p>
+        We do not sell, share, or provide user data to any third parties.
+    </p>
+
+    <h2>Children's Privacy</h2>
+    <p>
+        This app does not knowingly collect information from children under the age of 13.
+    </p>
+
+    <h2>Contact</h2>
+    <p>
+        If you have any questions regarding privacy, please contact us via the GitHub Issues page.<br>
+        <a href="https://github.com/mu-lab-zzz/Gesture-Factory/issues" target="_blank">
+            https://github.com/mu-lab-zzz/Gesture-Factory/issues
+        </a>
+    </p>
+</div>
+
+<script>
+    function showLang(lang, btn) {
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
+        document.getElementById('section-' + lang).classList.add('visible');
+        document.querySelectorAll('.lang-switch button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+</script>
+</body>
+</html>
