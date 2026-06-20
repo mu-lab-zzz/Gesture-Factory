@@ -6505,8 +6505,17 @@
         const casinoBgm = new Audio('The_Unspoken_Guest.mp3');
         casinoBgm.loop = true;
         casinoBgm.volume = 0.5;
-        window.casinoBgmPlay  = function() { casinoBgm.paused && casinoBgm.play().catch(()=>{}); };
-        window.casinoBgmPause = function() { casinoBgm.pause(); };
+        window.casinoBgmPlay  = function() {
+            const main = document.getElementById('bgm');
+            if (main && !main.paused) { main.pause(); }
+            casinoBgm.paused && casinoBgm.play().catch(()=>{});
+        };
+        window.casinoBgmPause = function() {
+            casinoBgm.pause();
+            casinoBgm.currentTime = 0;
+            const main = document.getElementById('bgm');
+            if (main && bgmEnabled) main.play().catch(()=>{});
+        };
 
         // ─── ゲーム切り替え ────────────────────────────────────────────────────────
         window.casinoSwitchGame = function(game) {
