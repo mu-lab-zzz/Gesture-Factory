@@ -1646,9 +1646,7 @@
                     <button class="craft-part-btn" data-unlock="doubleBelt" onclick="selectCraftTarget('doubleBelt')" style="display:none">
                         〓 <span class="part-count" id="parts-doubleBelt-count">×0</span>
                     </button>
-                    <button class="craft-part-btn" data-unlock="curveBelt" onclick="selectCraftTarget('curveBelt')" style="display:none">
-                        ⌒ <span class="part-count" id="parts-curveBelt-count">×0</span>
-                    </button>
+
                     <button class="craft-part-btn" data-unlock="crossBelt" onclick="selectCraftTarget('crossBelt')" style="display:none">
                         ✛ <span class="part-count" id="parts-crossBelt-count">×0</span>
                     </button>
@@ -1697,7 +1695,7 @@
                 <span data-unlock="merger" style="display:none"><span class="part-label">🔁</span><span class="part-num zero" id="disp-parts-merger">0</span></span>
                 <span data-unlock="longInserter" style="display:none"><span class="part-label">⟹</span><span class="part-num zero" id="disp-parts-longInserter">0</span></span>
                 <span data-unlock="doubleBelt" style="display:none"><span class="part-label">〓</span><span class="part-num zero" id="disp-parts-doubleBelt">0</span></span>
-                <span data-unlock="curveBelt" style="display:none"><span class="part-label">⌒</span><span class="part-num zero" id="disp-parts-curveBelt">0</span></span>
+
                 <span data-unlock="crossBelt" style="display:none"><span class="part-label">✛</span><span class="part-num zero" id="disp-parts-crossBelt">0</span></span>
                 <span data-unlock="fastCrossBelt" style="display:none"><span class="part-label">⚡✛</span><span class="part-num zero" id="disp-parts-fastCrossBelt">0</span></span>
                 <span data-unlock="factory" style="display:none"><span class="part-label">🏭</span><span class="part-num zero" id="disp-parts-factory">0</span></span>
@@ -1737,9 +1735,7 @@
                 <button data-tool="double-belt" data-unlock="doubleBelt" data-tab-group="belt" style="display:none">〓<br>デュアル</button>
                 <button data-tool="cross-belt" data-unlock="crossBelt" data-tab-group="belt" style="display:none">✛<br>交差ベルト</button>
                 <button data-tool="fast-cross-belt" data-unlock="fastCrossBelt" data-tab-group="belt" style="display:none">⚡✛<br>高速交差</button>
-                <button data-tool="curve-belt" data-unlock="curveBelt" data-tab-group="belt" style="display:none">⌒<br>カーブ</button>
-                <button data-tool="fast-curve-belt" data-unlock="fastCurveBelt" data-tab-group="belt" style="display:none">⚡⌒<br>高速カーブ</button>
-                <button data-tool="double-curve-belt" data-unlock="doubleCurveBelt" data-tab-group="belt" style="display:none">⌒⌒<br>デュアルカーブ</button>
+
                 <button data-tool="inserter" data-tab-group="inserter" style="display:none">🦾<br>インサーター</button>
                 <button data-tool="fast-inserter" data-unlock="fastInserter" data-tab-group="inserter" style="display:none">⚡🦾<br>高速インサーター</button>
                 <button data-tool="long-inserter" data-unlock="longInserter" data-tab-group="inserter" style="display:none">⟹<br>ロングアーム</button>
@@ -1986,8 +1982,7 @@
             fastBelt: 'Fast Belt', fastInserter: 'Fast Inserter', fastAssembler: 'Fast Assembler',
             splitter: 'Splitter', merger: 'Merger', longInserter: 'Long-Arm Inserter',
             factory: 'Part Factory', crossBelt: 'Cross Belt', fastCrossBelt: 'Fast Cross Belt',
-            doubleBelt: 'Dual Belt', curveBelt: 'Curve Belt',
-            fastCurveBelt: 'Fast Curve Belt', doubleCurveBelt: 'Dual Curve Belt'
+            doubleBelt: 'Dual Belt'
         };
 
         const SHAPE_NAMES_EN = { point: 'Point', line: 'Line', triangle: 'Triangle', square: 'Square', pentagon: 'Pentagon', hexagon: 'Hexagon' };
@@ -2102,7 +2097,7 @@
         let titleClickTimer = null;
 
         // 部品インベントリ
-        let parts = { belt: 0, inserter: 0, assembler: 0, fastBelt: 0, fastInserter: 0, fastAssembler: 0, splitter: 0, merger: 0, storageSource: 0, storageSink: 0, longInserter: 0, factory: 0, crossBelt: 0, fastCrossBelt: 0, doubleBelt: 0, curveBelt: 0, fastCurveBelt: 0, doubleCurveBelt: 0 };
+        let parts = { belt: 0, inserter: 0, assembler: 0, fastBelt: 0, fastInserter: 0, fastAssembler: 0, splitter: 0, merger: 0, storageSource: 0, storageSink: 0, longInserter: 0, factory: 0, crossBelt: 0, fastCrossBelt: 0, doubleBelt: 0 };
 
         // 転生システム
         let reincarnationCount = 0;
@@ -2185,13 +2180,11 @@
             factory:       { label: '部品工場', ingredients: [{ type: 'square', count: 5 }, { type: 'pentagon', count: 3 }, { type: 'hexagon', count: 2 }] },
             crossBelt:     { label: '交差ベルト',    ingredients: [{ type: 'square', count: 2 }, { type: 'triangle', count: 2 }] },
             fastCrossBelt: { label: '高速交差ベルト', ingredients: [{ type: 'square', count: 4 }, { type: 'pentagon', count: 2 }, { type: 'triangle', count: 2 }] },
-            doubleBelt:    { label: 'デュアルベルト',   ingredients: [{ type: 'square', count: 2 }, { type: 'triangle', count: 2 }] },
-            curveBelt:     { label: 'カーブベルト',       ingredients: [{ type: 'belt', count: 1 }, { type: 'square', count: 1 }] },
-            fastCurveBelt: { label: '高速カーブベルト',   ingredients: [{ type: 'fastBelt', count: 1 }, { type: 'square', count: 1 }] },
-            doubleCurveBelt: { label: 'デュアルカーブベルト', ingredients: [{ type: 'doubleBelt', count: 1 }, { type: 'square', count: 1 }] }
+            doubleBelt:    { label: 'デュアルベルト',   ingredients: [{ type: 'square', count: 2 }, { type: 'triangle', count: 2 }] }
+
         };
 
-        const PART_NAMES = { belt: 'ベルト', inserter: 'インサーター', assembler: '組立機', storageSource: '材料ストレージ', storageSink: '完成品ストレージ', fastBelt: '高速ベルト', fastInserter: '高速インサーター', fastAssembler: '高速組立機', splitter: '分岐機', merger: '合流機', longInserter: 'ロングアームインサーター', factory: '部品工場', crossBelt: '交差ベルト', fastCrossBelt: '高速交差ベルト', doubleBelt: 'デュアルベルト', curveBelt: 'カーブベルト', fastCurveBelt: '高速カーブベルト', doubleCurveBelt: 'デュアルカーブベルト' };
+        const PART_NAMES = { belt: 'ベルト', inserter: 'インサーター', assembler: '組立機', storageSource: '材料ストレージ', storageSink: '完成品ストレージ', fastBelt: '高速ベルト', fastInserter: '高速インサーター', fastAssembler: '高速組立機', splitter: '分岐機', merger: '合流機', longInserter: 'ロングアームインサーター', factory: '部品工場', crossBelt: '交差ベルト', fastCrossBelt: '高速交差ベルト', doubleBelt: 'デュアルベルト' };
 
         const CELL_TYPE_TO_PART_KEY = {
             'belt': 'belt', 'inserter': 'inserter', 'assembler': 'assembler',
@@ -2200,8 +2193,8 @@
             'splitter': 'splitter', 'merger': 'merger',
             'long-inserter': 'longInserter', 'factory': 'factory',
             'cross-belt': 'crossBelt', 'fast-cross-belt': 'fastCrossBelt',
-            'double-belt': 'doubleBelt', 'curve-belt': 'curveBelt',
-            'fast-curve-belt': 'fastCurveBelt', 'double-curve-belt': 'doubleCurveBelt'
+            'double-belt': 'doubleBelt', 'curve-belt': 'belt',
+            'fast-curve-belt': 'fastBelt', 'double-curve-belt': 'doubleBelt'
         };
         const SHAPE_ICONS  = { point: '●', line: '─', triangle: '▲', square: '■', pentagon: '⬠', hexagon: '⬡' };
         const SHAPE_NAMES_JP = { point: '点', line: '線', triangle: '三角形', square: '四角形', pentagon: '五角形', hexagon: '六角形' };
@@ -2240,7 +2233,7 @@
             {
                 name: "1-Complete: ティア1完全制覇",
                 desc: "六角形を合計5個納品して、ティア1のすべての製品ラインを完成させましょう！",
-                unlocked: ["point", "line", "triangle", "square", "pentagon", "hexagon", "crossBelt", "curveBelt"],
+                unlocked: ["point", "line", "triangle", "square", "pentagon", "hexagon", "crossBelt"],
                 reqs: { hexagon: 5 }
             },
             {
@@ -2258,55 +2251,55 @@
             {
                 name: "2-Complete: ティア2制覇！",
                 desc: "お見事！全図形テクノロジーと自動生産ラインが解放されました！続けてティア3に挑戦しましょう。高速化設備と分岐・合流機の解放が待っています！",
-                unlocked: ["point", "line", "triangle", "square", "pentagon", "hexagon", "autoPoint", "autoLine", "crossBelt", "curveBelt", "doubleBelt"],
+                unlocked: ["point", "line", "triangle", "square", "pentagon", "hexagon", "autoPoint", "autoLine", "crossBelt", "doubleBelt"],
                 reqs: {}
             },
             {
                 name: "3-1: 高速ベルトの解放",
                 desc: "六角形50個・五角形30個を納品し、通常の2倍速で動く高速ベルトをアンロックします。グリッド自動化ラインをフル活用して大量生産しましょう！",
-                unlocked: ["point", "line", "triangle", "square", "pentagon", "hexagon", "autoPoint", "autoLine", "crossBelt", "curveBelt", "doubleBelt"],
+                unlocked: ["point", "line", "triangle", "square", "pentagon", "hexagon", "autoPoint", "autoLine", "crossBelt", "doubleBelt"],
                 reqs: { hexagon: 50, pentagon: 30 }
             },
             {
                 name: "3-2: 高速インサーターの解放",
                 desc: "六角形50個・三角形50個を納品し、2マス先から掴める高速インサーターをアンロックします。",
-                unlocked: ["point", "line", "triangle", "square", "pentagon", "hexagon", "autoPoint", "autoLine", "crossBelt", "curveBelt", "doubleBelt", "fastBelt", "fastCrossBelt"],
+                unlocked: ["point", "line", "triangle", "square", "pentagon", "hexagon", "autoPoint", "autoLine", "crossBelt", "doubleBelt", "fastBelt", "fastCrossBelt"],
                 reqs: { hexagon: 50, triangle: 50 }
             },
             {
                 name: "3-3: 高速組立機の解放",
                 desc: "六角形100個・四角形50個を納品し、製造速度2倍の高速組立機をアンロックします。",
-                unlocked: ["point", "line", "triangle", "square", "pentagon", "hexagon", "autoPoint", "autoLine", "crossBelt", "curveBelt", "doubleBelt", "fastBelt", "fastCrossBelt", "fastInserter"],
+                unlocked: ["point", "line", "triangle", "square", "pentagon", "hexagon", "autoPoint", "autoLine", "crossBelt", "doubleBelt", "fastBelt", "fastCrossBelt", "fastInserter"],
                 reqs: { hexagon: 100, square: 50 }
             },
             {
                 name: "3-4: 分岐機＆合流機の解放",
                 desc: "五角形・六角形を各30個納品し、ラインを2方向に分岐させる分岐機と2ラインを1本に合流させる合流機をアンロックします。",
-                unlocked: ["point", "line", "triangle", "square", "pentagon", "hexagon", "autoPoint", "autoLine", "crossBelt", "curveBelt", "doubleBelt", "fastBelt", "fastCrossBelt", "fastInserter", "fastAssembler"],
+                unlocked: ["point", "line", "triangle", "square", "pentagon", "hexagon", "autoPoint", "autoLine", "crossBelt", "doubleBelt", "fastBelt", "fastCrossBelt", "fastInserter", "fastAssembler"],
                 reqs: { pentagon: 30, hexagon: 30 }
             },
             {
                 name: "3-5: ロングアームインサーターの解放",
                 desc: "六角形50個・四角形30個を納品し、2マス先からアイテムを搬送できるロングアームインサーターをアンロックします。",
-                unlocked: ["point", "line", "triangle", "square", "pentagon", "hexagon", "autoPoint", "autoLine", "crossBelt", "curveBelt", "doubleBelt", "fastBelt", "fastCrossBelt", "fastInserter", "fastAssembler", "splitter", "merger"],
+                unlocked: ["point", "line", "triangle", "square", "pentagon", "hexagon", "autoPoint", "autoLine", "crossBelt", "doubleBelt", "fastBelt", "fastCrossBelt", "fastInserter", "fastAssembler", "splitter", "merger"],
                 reqs: { hexagon: 50, square: 30 }
             },
             {
                 name: "T3-Complete: ティア3完全制覇！",
                 desc: "すべての高速化設備と分岐・合流機、ロングアームインサーターが解放されました！次はティア4、部品の自動生産へ挑戦！",
-                unlocked: ["point", "line", "triangle", "square", "pentagon", "hexagon", "autoPoint", "autoLine", "crossBelt", "curveBelt", "doubleBelt", "fastBelt", "fastCrossBelt", "fastInserter", "fastAssembler", "splitter", "merger", "longInserter"],
+                unlocked: ["point", "line", "triangle", "square", "pentagon", "hexagon", "autoPoint", "autoLine", "crossBelt", "doubleBelt", "fastBelt", "fastCrossBelt", "fastInserter", "fastAssembler", "splitter", "merger", "longInserter"],
                 reqs: {}
             },
             {
                 name: "4-1: 部品工場の解放",
                 desc: "六角形100個・五角形100個を納品し、部品を自動生産できる「部品工場」をアンロックします。",
-                unlocked: ["point", "line", "triangle", "square", "pentagon", "hexagon", "autoPoint", "autoLine", "crossBelt", "curveBelt", "doubleBelt", "fastBelt", "fastCrossBelt", "fastInserter", "fastAssembler", "splitter", "merger", "longInserter"],
+                unlocked: ["point", "line", "triangle", "square", "pentagon", "hexagon", "autoPoint", "autoLine", "crossBelt", "doubleBelt", "fastBelt", "fastCrossBelt", "fastInserter", "fastAssembler", "splitter", "merger", "longInserter"],
                 reqs: { hexagon: 100, pentagon: 100 }
             },
             {
                 name: "T4-Complete: ティア4完全制覇！",
                 desc: "部品工場が解放されました！ベルトやインサーターを自動生産ラインで量産できます！",
-                unlocked: ["point", "line", "triangle", "square", "pentagon", "hexagon", "autoPoint", "autoLine", "crossBelt", "curveBelt", "doubleBelt", "fastBelt", "fastCrossBelt", "fastInserter", "fastAssembler", "splitter", "merger", "longInserter", "factory"],
+                unlocked: ["point", "line", "triangle", "square", "pentagon", "hexagon", "autoPoint", "autoLine", "crossBelt", "doubleBelt", "fastBelt", "fastCrossBelt", "fastInserter", "fastAssembler", "splitter", "merger", "longInserter", "factory"],
                 reqs: {}
             }
         ];
@@ -2533,7 +2526,7 @@
 
         // タブ定義
         const TAB_GROUPS = {
-            belt:     ['belt','fast-belt','double-belt','cross-belt','fast-cross-belt','curve-belt','fast-curve-belt','double-curve-belt'],
+            belt:     ['belt','fast-belt','double-belt','cross-belt','fast-cross-belt'],
             inserter: ['inserter','fast-inserter','long-inserter'],
             machine:  ['assembler','fast-assembler','factory'],
             storage:  ['storage-source','storage-sink','dyson-sink'],
@@ -2862,15 +2855,14 @@
                     cell.work = null;
                     curveDrag = null;
                 } else if (currentTool === 'belt' && curveDrag && curveDrag.dir1 && curveDrag.dir2) {
-                    // L字ドラッグ → カーブベルト設置（beltを返却、curveBeltを消費）
-                    parts['belt']++;
+                    // L字ドラッグ → カーブベルト設置（belt消費）
                     if (!isDebugMode) {
-                        if ((parts['curveBelt'] || 0) <= 0) {
-                            setFeedback('⌒ カーブベルトが足りません（倉庫でクラフト）');
+                        if ((parts['belt'] || 0) <= 0) {
+                            setFeedback('⌒ ベルトが足りません');
                             updatePartsDisplay(); curveDrag = null;
                             startCellX = null; startCellY = null; return;
                         }
-                        parts['curveBelt']--;
+                        parts['belt']--;
                         updatePartsDisplay();
                     }
                     cell.type = 'curve-belt';
@@ -2880,15 +2872,14 @@
                     cell.work = null;
                     curveDrag = null;
                 } else if (currentTool === 'fast-belt' && curveDrag && curveDrag.dir1 && curveDrag.dir2) {
-                    // L字ドラッグ → 高速カーブベルト設置
-                    parts['fastBelt']++;
+                    // L字ドラッグ → 高速カーブベルト設置（fastBelt消費）
                     if (!isDebugMode) {
-                        if ((parts['fastCurveBelt'] || 0) <= 0) {
-                            setFeedback('⚡⌒ 高速カーブベルトが足りません（倉庫でクラフト）');
+                        if ((parts['fastBelt'] || 0) <= 0) {
+                            setFeedback('⚡⌒ 高速ベルトが足りません');
                             updatePartsDisplay(); curveDrag = null;
                             startCellX = null; startCellY = null; return;
                         }
-                        parts['fastCurveBelt']--;
+                        parts['fastBelt']--;
                         updatePartsDisplay();
                     }
                     cell.type = 'fast-curve-belt';
@@ -2896,15 +2887,14 @@
                     cell.dir = curveDrag.dir1; cell.work = null;
                     curveDrag = null;
                 } else if (currentTool === 'double-belt' && curveDrag && curveDrag.dir1 && curveDrag.dir2) {
-                    // L字ドラッグ → デュアルカーブベルト設置
-                    parts['doubleBelt']++;
+                    // L字ドラッグ → デュアルカーブベルト設置（doubleBelt消費）
                     if (!isDebugMode) {
-                        if ((parts['doubleCurveBelt'] || 0) <= 0) {
-                            setFeedback('⌒⌒ デュアルカーブベルトが足りません（倉庫でクラフト）');
+                        if ((parts['doubleBelt'] || 0) <= 0) {
+                            setFeedback('〓 デュアルベルトが足りません');
                             updatePartsDisplay(); curveDrag = null;
                             startCellX = null; startCellY = null; return;
                         }
-                        parts['doubleCurveBelt']--;
+                        parts['doubleBelt']--;
                         updatePartsDisplay();
                     }
                     cell.type = 'double-curve-belt';
@@ -5470,8 +5460,8 @@
             // 解放済みパーツに+5ずつ
             const allParts = ['belt','inserter','assembler','storageSource','storageSink',
                 'fastBelt','fastInserter','fastAssembler','splitter','merger',
-                'longInserter','doubleBelt','curveBelt','crossBelt','fastCrossBelt',
-                'factory','fastCurveBelt','doubleCurveBelt'];
+                'longInserter','doubleBelt','crossBelt','fastCrossBelt',
+                'factory'];
             let added = 0;
             allParts.forEach(p => {
                 if (parts[p] !== undefined && isUnlocked(p)) {
