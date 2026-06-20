@@ -1669,10 +1669,14 @@
                 <span data-unlock="fastCrossBelt" style="display:none"><span class="part-label">⚡✛</span><span class="part-num zero" id="disp-parts-fastCrossBelt">0</span></span>
                 <span data-unlock="factory" style="display:none"><span class="part-label">🏭</span><span class="part-num zero" id="disp-parts-factory">0</span></span>
             </div>
+            <div style="padding:2px 4px;">
+                <button id="coin-parts-btn" onclick="coinRefillParts()" title="🪙×8でパーツ補充 (+5ずつ)" style="padding:4px 10px;border-radius:6px;border:1px solid #554400;background:#1a1500;color:#ffd700;font-size:11px;cursor:pointer;white-space:nowrap;" disabled>🪙 ×8 パーツ補充 +5</button>
+            </div>
             <div id="sector-selector">
                 <button id="btn-prev-sector">◀</button>
                 <div id="sector-display">SECTOR 00</div>
                 <button id="btn-next-sector">▶</button>
+                <button id="coin-sector-btn" onclick="coinUnlockSector()" title="🪙×25でセクター解放" style="padding:3px 7px;border-radius:6px;border:1px solid #554400;background:#1a1500;color:#ffd700;font-size:11px;cursor:pointer;white-space:nowrap;display:none;">🪙×25</button>
             </div>
         </div>
 
@@ -5407,6 +5411,40 @@
             saveGame();
             closeAdModal();
             setFeedback('🪙 ×5 獲得！（今日残り ' + (3 - adWatchedCount) + ' 回）');
+        }
+
+        function coinUnlockSector() {
+            if (coins < 25) return;
+            const nextId = currentSectorId + 1;
+            if (nextId >= TOTAL_SECTORS) return;
+            if (unlockedSectors.has(nextId)) return;
+            coins -= 25;
+            unlockedSectors.add(nextId);
+            updateCoinDisplay();
+            updateSectorUI();
+            saveGame();
+            setFeedback('🪙 ×25 消費 → SECTOR ' + String(nextId).padStart(2,'0') + ' を解放！');
+        }
+
+        function coinRefillParts() {
+            if (coins < 8) return;
+            coins -= 8;
+            // 解放済みパーツに+5ずつ
+            const allParts = ['belt','inserter','assembler','storageSource','storageSink',
+                'fastBelt','fastInserter','fastAssembler','splitter','merger',
+                'longInserter','doubleBelt','curveBelt','crossBelt','fastCrossBelt',
+                'factory','fastCurveBelt','doubleCurveBelt'];
+            let added = 0;
+            allParts.forEach(p => {
+                if (parts[p] !== undefined && isUnlocked(p)) {
+                    parts[p] += 5;
+                    added++;
+                }
+            });
+            updateCoinDisplay();
+            updatePartsDisplay();
+            saveGame();
+            setFeedback('🪙 ×8 消費 → 解放済みパーツ +5 補充！');
         }
 
         function coinRefill(type) {
