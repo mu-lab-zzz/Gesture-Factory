@@ -667,6 +667,7 @@
             flex-direction: column;
             align-items: flex-start;
             gap: 8px;
+            width: 100%;
         }
 
         /* セクター選択（トップバーに統合） */
@@ -801,9 +802,11 @@
 
         #stage-container {
             position: relative;
-            overflow-x: auto;
+            overflow: auto;
             width: fit-content;
             max-width: 100%;
+            max-height: calc(100dvh - 300px);
+            min-height: 120px;
         }
         #grid {
             display: grid;
