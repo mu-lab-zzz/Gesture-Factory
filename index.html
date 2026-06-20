@@ -4927,6 +4927,36 @@
             if (Object.keys(config.reqs).length === 0) {
                 if (currentTierIndex >= TIER_CONFIGS.length - 1) {
                     reqsContainer.innerHTML = '<div style="color:var(--accent-point);text-align:center;font-weight:bold;margin-top:10px;">✨ ALL CLEAR ✨</div>';
+                } else if (config.name.startsWith("2-Complete")) {
+                    // 自動生産速度が両方1.0/s以上でないと進めない
+                    const ptRate = autoProductionRates.point;
+                    const lnRate = autoProductionRates.line;
+                    const ptMet = ptRate >= 1.0;
+                    const lnMet = lnRate >= 1.0;
+                    const allMet = ptMet && lnMet;
+                    const condLabel = currentLang === 'en' ? 'Condition: Auto-production ≥ 1.0/s' : '条件：自動生産速度を両方 1.0/s 以上にする';
+                    const ptLabel = currentLang === 'en' ? 'Point auto' : '点の自動生産';
+                    const lnLabel = currentLang === 'en' ? 'Line auto' : '線の自動生産';
+                    const nextLabel = currentLang === 'en' ? 'Next Tier →' : '次のティアへ進む →';
+                    const clearMsg = currentLang === 'en' ? '✨ Tier Cleared! ✨' : '✨ このティアをクリア！ ✨';
+                    reqsContainer.innerHTML = `<div style="margin-top:10px;">
+                        <div style="font-size:12px;color:#aaa;margin-bottom:10px;">${condLabel}</div>
+                        <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px;">
+                            <div style="display:flex;justify-content:space-between;font-size:13px;">
+                                <span style="color:${ptMet?'#4ade80':'#aaa'};">${ptLabel}</span>
+                                <span style="color:${ptMet?'#4ade80':'#ffd700'};font-weight:bold;">${ptRate.toFixed(1)} / 1.0 /s ${ptMet?'✅':''}</span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;font-size:13px;">
+                                <span style="color:${lnMet?'#4ade80':'#aaa'};">${lnLabel}</span>
+                                <span style="color:${lnMet?'#4ade80':'#ffd700'};font-weight:bold;">${lnRate.toFixed(1)} / 1.0 /s ${lnMet?'✅':''}</span>
+                            </div>
+                        </div>
+                        ${allMet ? `
+                        <div style="text-align:center;">
+                            <div style="color:var(--accent-point);font-weight:bold;font-size:15px;margin-bottom:12px;">${clearMsg}</div>
+                            <button class="submit-action-btn" onclick="advanceTier()" style="font-size:14px;padding:10px 24px;">${nextLabel}</button>
+                        </div>` : ''}
+                    </div>`;
                 } else {
                     const nextLabel = currentLang === 'en' ? 'Next Tier →' : '次のティアへ進む →';
                     const clearMsg = currentLang === 'en' ? '✨ Tier Cleared! ✨' : '✨ このティアをクリア！ ✨';
