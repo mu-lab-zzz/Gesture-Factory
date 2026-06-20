@@ -4823,9 +4823,9 @@
             if (strokePoints.length === 2 && totalLength < 35) {
                 if (addResource('point', productionRates.point * monolithMultiplier)) {
                     addEffect({ type: 'point', x: startPoint.x, y: startPoint.y });
-                    setFeedback(`「点」を ${(productionRates.point * monolithMultiplier).toFixed(1)} つ生産しました`);
+                    setFeedback(`「点」を ${(productionRates.point * monolithMultiplier).toFixed(1)} 生産しました`);
                 } else {
-                    setFeedback(`「点」の倉庫が上限(${maxStorage.point})です！ティア画面から納品してください。`);
+                    setFeedback(`「点」の倉庫が上限(${maxStorage.point})です！`);
                 }
                 updateUI();
                 return;
@@ -4838,9 +4838,9 @@
                 }
                 if (addResource('line', productionRates.line * monolithMultiplier)) {
                     addEffect({ type: 'line', x1: startPoint.x, y1: startPoint.y, x2: lastP.x, y2: lastP.y });
-                    setFeedback(`「線」を ${(productionRates.line * monolithMultiplier).toFixed(1)} つ生産しました`);
+                    setFeedback(`「線」を ${(productionRates.line * monolithMultiplier).toFixed(1)} 生産しました`);
                 } else {
-                    setFeedback(`「線」の倉庫が上限(${maxStorage.line})です！ティア画面から納品してください。`);
+                    setFeedback(`「線」の倉庫が上限(${maxStorage.line})です！`);
                 }
                 updateUI();
                 return;
@@ -4858,7 +4858,7 @@
                             addEffect({ type: 'triangle', points: [startPoint, corners[0], corners[1]] });
                             setFeedback(isDebugMode ? "🔧[DEBUG] 「三角形」を合成" : "「三角形」を合成しました (点-3, 線-3)");
                         } else {
-                            setFeedback("「三角形」の倉庫が上限です！ティア画面から納品してください。");
+                            setFeedback("「三角形」の倉庫が上限です！");
                         }
                     } else {
                         setFeedback("素材が不足しています (必要: 点3, 線3)");
@@ -4877,7 +4877,7 @@
                             addEffect({ type: 'square', points: [startPoint, corners[0], corners[1], corners[2]] });
                             setFeedback(isDebugMode ? "🔧[DEBUG] 「四角形」を合成" : "「四角形」を合成しました (点-4, 線-4)");
                         } else {
-                            setFeedback("「四角形」の倉庫が上限です！ティア画面から納品してください。");
+                            setFeedback("「四角形」の倉庫が上限です！");
                         }
                     } else {
                         setFeedback("素材が不足しています (必要: 点4, 線4)");
@@ -4896,7 +4896,7 @@
                             addEffect({ type: 'pentagon', points: [startPoint, ...corners] });
                             setFeedback(isDebugMode ? "🔧[DEBUG] 「五角形」を合成" : "「五角形」を合成しました (点-5, 線-5)");
                         } else {
-                            setFeedback("「五角形」の倉庫が上限です！ティア画面から納品してください。");
+                            setFeedback("「五角形」の倉庫が上限です！");
                         }
                     } else {
                         setFeedback("素材が不足しています (必要: 点5, 線5)");
@@ -4915,7 +4915,7 @@
                             addEffect({ type: 'hexagon', points: [startPoint, ...corners] });
                             setFeedback(isDebugMode ? "🔧[DEBUG] 「六角形」を合成" : "「六角形」を合成しました (点-6, 線-6)");
                         } else {
-                            setFeedback("「六角形」の倉庫が上限です！ティア画面から納品してください. ");
+                            setFeedback("「六角形」の倉庫が上限です！");
                         }
                     } else {
                         setFeedback("素材が不足しています (必要: 点6, 線6)");
