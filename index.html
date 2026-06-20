@@ -166,6 +166,24 @@
         #casino-slot-machine.fever #casino-spin-btn { background:linear-gradient(135deg,#ff44ff,#ff88aa) !important; }
         #casino-slot-machine.fever #casino-fever-badge { display:block !important; animation:casino-badge-pop 0.3s ease; }
         @keyframes casino-badge-pop { from { transform:scale(0.5);opacity:0; } to { transform:scale(1);opacity:1; } }
+        /* ゲームセレクター */
+        .casino-game-btn { flex:1;padding:10px 6px;border:1.5px solid #333;border-radius:10px;background:#0d0d1a;cursor:pointer;text-align:center;font-size:0.82rem;color:#aaa;display:flex;flex-direction:column;align-items:center;gap:4px;transition:border-color 0.15s,background 0.15s; }
+        .casino-game-btn.active { border-color:#ffd700;background:#ffd70018;color:#fff;font-weight:bold; }
+        /* ハイアンドロー */
+        .hl-card-wrap { perspective:600px;width:110px;height:154px; }
+        .hl-card { width:110px;height:154px;border-radius:10px;position:relative;transform-style:preserve-3d;transition:transform 0.4s ease; }
+        .hl-card.flip { transform:rotateY(180deg); }
+        .hl-card-front,.hl-card-back { position:absolute;inset:0;border-radius:10px;backface-visibility:hidden; }
+        .hl-card-front { background:#f5f0e8;overflow:hidden;transform:rotateY(0deg); }
+        .hl-card-back { background:#1a1060;border:3px solid #3a3a8a;transform:rotateY(180deg);display:flex;align-items:center;justify-content:center;font-size:2rem; }
+        .hl-c-corner { position:absolute;display:flex;flex-direction:column;align-items:center;font-size:13px;font-weight:bold;line-height:1.1;gap:1px; }
+        .hl-c-tl { top:4px;left:5px; }
+        .hl-c-br { bottom:4px;right:5px;transform:rotate(180deg); }
+        .hl-c-pips { position:absolute;inset:0; }
+        .hl-c-pip { position:absolute;transform:translate(-50%,-50%); }
+        .hl-c-face-inner { position:absolute;inset:6px;border-radius:4px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2px; }
+        .hl-streak-dot { width:10px;height:10px;border-radius:50%;background:#ffd700;box-shadow:0 0 6px #ffd700;animation:hl-pop 0.2s ease; }
+        @keyframes hl-pop { from { transform:scale(0); } to { transform:scale(1); } }
         #casino-slot-machine.fever #casino-tension-bar { background:linear-gradient(90deg,#ff44aa,#ff88ff,#fff) !important; box-shadow:0 0 8px #ff88ffaa; }
 
         #app, #header-bar, #tab-bar, #content-factory, #content-automation,
@@ -1737,6 +1755,13 @@
             <span>CHIPS</span>
             <span id="casino-chip-count" style="color:#22cc55;font-size:1.4rem;font-weight:bold;margin-left:auto;">0</span>
         </div>
+        <!-- ゲームセレクター -->
+        <div style="display:flex;gap:8px;margin-bottom:16px;">
+            <button class="casino-game-btn active" id="casino-gbtn-slot" onclick="casinoSwitchGame('slot')"><span style="font-size:1.4rem;">🎰</span><span>スロット</span></button>
+            <button class="casino-game-btn" id="casino-gbtn-hilow" onclick="casinoSwitchGame('hilow')"><span style="font-size:1.4rem;">🃏</span><span>ハイアンドロー</span></button>
+        </div>
+        <!-- スロットパネル -->
+        <div id="casino-panel-slot">
         <!-- スロット本体 -->
         <div id="casino-slot-machine" style="background:linear-gradient(160deg,#1e1e3a,#12122a);border:2px solid #3a3a6a;border-radius:20px;padding:20px;box-shadow:0 0 30px #6060ff33;">
             <div id="casino-fever-badge" style="display:none;background:linear-gradient(135deg,#ff44ff,#ff88aa);color:#fff;font-weight:bold;font-size:0.85rem;padding:4px 12px;border-radius:20px;letter-spacing:2px;text-align:center;margin-bottom:6px;">🔥 FEVER TIME! 🔥</div>
@@ -1762,13 +1787,64 @@
             <div style="text-align:center;font-size:0.85rem;color:#aaa;margin-bottom:8px;">BET: <strong style="color:#fff;">10 chips / spin</strong></div>
             <button id="casino-spin-btn" onclick="casinoSpin()" style="width:100%;padding:14px;background:linear-gradient(135deg,#ffd700,#ffaa00);color:#000;font-size:1.1rem;font-weight:bold;border:none;border-radius:12px;cursor:pointer;letter-spacing:2px;">SPIN</button>
         </div>
-        <!-- 変換パネル -->
+        </div><!-- /#casino-panel-slot -->
+
+        <!-- ハイアンドローパネル -->
+        <div id="casino-panel-hilow" style="display:none;">
+            <div style="background:linear-gradient(160deg,#1e1e3a,#12122a);border:2px solid #3a3a6a;border-radius:20px;padding:20px;box-shadow:0 0 30px #6060ff33;display:flex;flex-direction:column;align-items:center;gap:12px;">
+                <!-- ストリーク -->
+                <div id="hl-streak-bar" style="display:flex;gap:4px;height:14px;align-items:center;min-height:14px;"></div>
+                <!-- 累積獲得表示 -->
+                <div id="hl-mult-display" style="font-size:1.4rem;font-weight:bold;color:#ffd700;min-height:1.8rem;text-shadow:0 0 10px #ffd70066;"></div>
+                <!-- カード -->
+                <div class="hl-card-wrap"><div class="hl-card" id="hl-card"><div class="hl-card-front" id="hl-card-front"></div><div class="hl-card-back">🎴</div></div></div>
+                <!-- オッズ -->
+                <div style="display:flex;gap:10px;font-size:0.8rem;color:#aaa;width:100%;">
+                    <div id="hl-odds-high" style="flex:1;background:#0d0d1a;border:1px solid #2a2a4a;border-radius:8px;padding:6px 8px;text-align:center;">
+                        <div style="font-size:0.7rem;">HIGH ↑</div>
+                        <div id="hl-odds-high-val" style="font-size:1rem;color:#fff;font-weight:bold;">–</div>
+                        <div id="hl-odds-high-prob" style="font-size:0.65rem;color:#888;"></div>
+                    </div>
+                    <div id="hl-odds-low" style="flex:1;background:#0d0d1a;border:1px solid #2a2a4a;border-radius:8px;padding:6px 8px;text-align:center;">
+                        <div style="font-size:0.7rem;">LOW ↓</div>
+                        <div id="hl-odds-low-val" style="font-size:1rem;color:#fff;font-weight:bold;">–</div>
+                        <div id="hl-odds-low-prob" style="font-size:0.65rem;color:#888;"></div>
+                    </div>
+                </div>
+                <!-- メッセージ -->
+                <div id="hl-msg" style="font-size:0.95rem;font-weight:bold;min-height:1.3rem;text-align:center;"></div>
+                <!-- ボタン行 -->
+                <div id="hl-action-row" style="display:flex;gap:8px;width:100%;">
+                    <button id="hl-btn-deal" onclick="hlDeal()" style="flex:1;padding:12px 6px;border:none;border-radius:10px;font-size:1rem;font-weight:bold;cursor:pointer;background:linear-gradient(135deg,#ffd700,#ffaa00);color:#000;letter-spacing:1px;">DEAL 🃏</button>
+                    <button id="hl-btn-high" onclick="hlGuess('high')" style="display:none;flex:1;padding:12px 6px;border:none;border-radius:10px;font-size:1rem;font-weight:bold;cursor:pointer;background:linear-gradient(135deg,#ff6633,#ff9900);color:#000;">HIGH ↑</button>
+                    <button id="hl-btn-low" onclick="hlGuess('low')" style="display:none;flex:1;padding:12px 6px;border:none;border-radius:10px;font-size:1rem;font-weight:bold;cursor:pointer;background:linear-gradient(135deg,#3388ff,#66ccff);color:#000;">LOW ↓</button>
+                    <button id="hl-btn-walk" onclick="hlWalkAway()" style="display:none;flex:1;padding:12px 6px;border:none;border-radius:10px;font-size:1rem;font-weight:bold;cursor:pointer;background:linear-gradient(135deg,#22cc55,#88ffaa);color:#000;">回収 💰</button>
+                </div>
+                <!-- ベット選択 -->
+                <div style="display:flex;gap:6px;align-items:center;font-size:0.8rem;color:#aaa;">
+                    <span>BET:</span>
+                    <button class="hl-bet-btn active" onclick="hlSetBet(10,this)" style="padding:4px 10px;background:#2a2a4a;border:1px solid #4a4a7a;border-radius:6px;color:#fff;font-size:0.8rem;cursor:pointer;">10</button>
+                    <button class="hl-bet-btn" onclick="hlSetBet(25,this)" style="padding:4px 10px;background:#1a1a2e;border:1px solid #2a2a4a;border-radius:6px;color:#ccc;font-size:0.8rem;cursor:pointer;">25</button>
+                    <button class="hl-bet-btn" onclick="hlSetBet(50,this)" style="padding:4px 10px;background:#1a1a2e;border:1px solid #2a2a4a;border-radius:6px;color:#ccc;font-size:0.8rem;cursor:pointer;">50</button>
+                    <button class="hl-bet-btn" onclick="hlSetBet(100,this)" style="padding:4px 10px;background:#1a1a2e;border:1px solid #2a2a4a;border-radius:6px;color:#ccc;font-size:0.8rem;cursor:pointer;">100</button>
+                </div>
+                <!-- 履歴 -->
+                <div id="hl-history" style="display:flex;gap:4px;flex-wrap:wrap;justify-content:center;min-height:24px;"></div>
+            </div>
+            <!-- オッズ説明 -->
+            <div style="background:#1a1a2e;border:1px solid #333;border-radius:12px;padding:12px;margin-top:10px;font-size:0.78rem;color:#aaa;line-height:1.6;">
+                <strong style="color:#fff;">ルール:</strong> 次のカードのランクが現在より高いか低いかを当てる。<br>
+                確率が低いほど配当が高い。正解後は続けて倍率を積むか、回収するかを選択。同ランクは引き分け（元返し）。
+            </div>
+        </div><!-- /#casino-panel-hilow -->
+
+        <!-- 変換パネル（共通） -->
         <div style="background:#1a1a2e;border:1px solid #333;border-radius:16px;padding:16px;margin-top:16px;">
             <div style="font-size:0.85rem;color:#aaa;margin-bottom:10px;letter-spacing:1px;">💎 GEM → CHIP 変換</div>
             <div id="casino-gem-rows"></div>
         </div>
-        <!-- ペイテーブル -->
-        <div style="background:#1a1a2e;border:1px solid #333;border-radius:16px;padding:16px;margin-top:10px;margin-bottom:16px;">
+        <!-- ペイテーブル（スロット用・ゲーム切替で表示制御） -->
+        <div id="casino-paytable-slot" style="background:#1a1a2e;border:1px solid #333;border-radius:16px;padding:16px;margin-top:10px;margin-bottom:16px;">
             <div style="font-size:0.85rem;color:#aaa;margin-bottom:10px;letter-spacing:1px;">📋 PAYTABLE（BET 10chips）</div>
             <div id="casino-pay-rows"></div>
             <div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-top:8px;padding-top:8px;border-top:1px solid #333;">
@@ -6421,6 +6497,217 @@
             cUpdateChips();
             cUpdateTension();
         }
+
+        // ─── ゲーム切り替え ────────────────────────────────────────────────────────
+        window.casinoSwitchGame = function(game) {
+            document.getElementById('casino-panel-slot').style.display   = game === 'slot'   ? '' : 'none';
+            document.getElementById('casino-panel-hilow').style.display  = game === 'hilow'  ? '' : 'none';
+            document.getElementById('casino-paytable-slot').style.display = game === 'slot'  ? '' : 'none';
+            document.getElementById('casino-gbtn-slot').classList.toggle('active', game === 'slot');
+            document.getElementById('casino-gbtn-hilow').classList.toggle('active', game === 'hilow');
+        };
+
+        // ─── ハイアンドロー ────────────────────────────────────────────────────────
+        const HL_SUITS = [
+            { kind:'triangle', color:'#cc7700', label:'▲' },
+            { kind:'square',   color:'#cc1133', label:'■' },
+            { kind:'pentagon', color:'#8833cc', label:'⬠' },
+            { kind:'hexagon',  color:'#3388cc', label:'⬡' },
+        ];
+        const HL_RANKS = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+        const HL_RANK_VAL = {A:1,2:2,3:3,4:4,5:5,6:6,7:7,8:8,9:9,10:10,J:11,Q:12,K:13};
+        const HL_PIP_DEFS = {
+            '2': [[50,14],[50,86]],
+            '3': [[50,12],[50,50],[50,88]],
+            '4': [[27,20],[73,20],[27,80],[73,80]],
+            '5': [[27,18],[73,18],[50,50],[27,82],[73,82]],
+            '6': [[27,17],[73,17],[27,50],[73,50],[27,83],[73,83]],
+            '7': [[27,15],[73,15],[50,32],[27,52],[73,52],[27,85],[73,85]],
+            '8': [[27,14],[73,14],[50,30],[27,49],[73,49],[50,68],[27,84],[73,84]],
+            '9': [[27,13],[73,13],[27,36],[73,36],[50,50],[27,64],[73,64],[27,87],[73,87]],
+            '10':[[27,12],[73,12],[50,28],[27,42],[73,42],[27,58],[73,58],[50,72],[27,88],[73,88]],
+        };
+
+        let hlCard = null, hlStreak = 0, hlPendingWin = 0, hlBet = 10, hlPhase = 'deal';
+
+        function hlRandCard() {
+            return { rank: HL_RANKS[Math.floor(Math.random()*13)], suit: HL_SUITS[Math.floor(Math.random()*4)] };
+        }
+
+        function hlBuildCardFront(card) {
+            const color = card.suit.color;
+            const isFace = ['J','Q','K'].includes(card.rank);
+            const isAce  = card.rank === 'A';
+            const pips   = HL_PIP_DEFS[card.rank];
+            const rv = HL_RANK_VAL[card.rank] || 0;
+            const pipSize = rv <= 3 ? 28 : rv <= 6 ? 24 : 20;
+
+            const corner = `<div class="hl-c-corner hl-c-tl" style="color:${color}"><span>${card.rank}</span>${gemSVG(card.suit.kind,11)}</div><div class="hl-c-corner hl-c-br" style="color:${color}"><span>${card.rank}</span>${gemSVG(card.suit.kind,11)}</div>`;
+
+            let center = '';
+            if (isAce) {
+                center = `<div class="hl-c-pips"><div class="hl-c-pip" style="left:50%;top:50%">${gemSVG(card.suit.kind,58)}</div></div>`;
+            } else if (isFace) {
+                center = `<div class="hl-c-face-inner" style="border:2px solid ${color}55"><div style="font-size:18px;font-weight:900;color:${color}">${card.rank}</div>${gemSVG(card.suit.kind,46)}<div style="font-size:9px;color:${color}88">${card.suit.label}</div></div>`;
+            } else {
+                const ax=14,ay=24,aw=82,ah=106;
+                const pipEls = pips.map(([px,py]) => {
+                    const x=ax+(px/100)*aw, y=ay+(py/100)*ah;
+                    const rot = py > 55 ? 'rotate(180deg)' : '';
+                    return `<div class="hl-c-pip" style="left:${x}px;top:${y}px;transform:translate(-50%,-50%) ${rot}">${gemSVG(card.suit.kind,pipSize)}</div>`;
+                }).join('');
+                center = `<div class="hl-c-pips">${pipEls}</div>`;
+            }
+            return corner + center;
+        }
+
+        function hlShowCard(card, flip) {
+            document.getElementById('hl-card-front').innerHTML = hlBuildCardFront(card);
+            if (flip) {
+                const el = document.getElementById('hl-card');
+                el.classList.add('flip');
+                setTimeout(() => el.classList.remove('flip'), 400);
+            }
+        }
+
+        function hlCalcOdds(rank) {
+            const val = HL_RANK_VAL[rank];
+            const higher = (13 - val) * 4;
+            const lower  = (val - 1) * 4;
+            const total  = 52;
+            return {
+                high: higher > 0 ? Math.max(1.05, 0.95 / (higher/total)).toFixed(2) : null,
+                low:  lower  > 0 ? Math.max(1.05, 0.95 / (lower /total)).toFixed(2) : null,
+                higher, lower, total
+            };
+        }
+
+        function hlUpdateOdds(card) {
+            const o = hlCalcOdds(card.rank);
+            const setBox = (id, valId, probId, val, prob) => {
+                document.getElementById(valId).textContent  = val ? val+'x' : '–';
+                document.getElementById(probId).textContent = val ? `${prob}/${o.total}` : '不可';
+                document.getElementById(id).style.opacity   = val ? '1' : '0.3';
+                const btn = document.getElementById(id === 'hl-odds-high' ? 'hl-btn-high' : 'hl-btn-low');
+                if (btn) btn.disabled = !val;
+            };
+            setBox('hl-odds-high','hl-odds-high-val','hl-odds-high-prob', o.high, o.higher);
+            setBox('hl-odds-low', 'hl-odds-low-val', 'hl-odds-low-prob',  o.low,  o.lower);
+        }
+
+        function hlSetMsg(text, color) {
+            const el = document.getElementById('hl-msg');
+            el.textContent = text;
+            el.style.color = color || '#fff';
+        }
+
+        function hlUpdateStreak() {
+            document.getElementById('hl-streak-bar').innerHTML =
+                Array.from({length:hlStreak},(_,i)=>`<div class="hl-streak-dot" style="animation-delay:${i*0.05}s"></div>`).join('');
+        }
+
+        function hlUpdateMult() {
+            const el = document.getElementById('hl-mult-display');
+            el.textContent = hlPendingWin > 0 ? `+${hlPendingWin} chips` : '';
+        }
+
+        function hlAddHistory(rank, suit, result) {
+            const hist = document.getElementById('hl-history');
+            const item = document.createElement('div');
+            item.style.cssText = `font-size:0.7rem;padding:2px 6px;border-radius:4px;background:#1a1a2e;border:1px solid ${result==='win'?'#ffd700':result==='lose'?'#ff4466':'#444'};color:${suit.color}`;
+            item.textContent = suit.label + rank;
+            hist.insertBefore(item, hist.firstChild);
+            while (hist.children.length > 8) hist.removeChild(hist.lastChild);
+        }
+
+        function hlSetBtns(mode) {
+            document.getElementById('hl-btn-deal').style.display  = mode==='deal'     ? 'block' : 'none';
+            document.getElementById('hl-btn-high').style.display  = mode!=='deal'     ? 'block' : 'none';
+            document.getElementById('hl-btn-low').style.display   = mode!=='deal'     ? 'block' : 'none';
+            document.getElementById('hl-btn-walk').style.display  = mode==='continue' ? 'block' : 'none';
+        }
+
+        window.hlDeal = function() {
+            if (cChips < hlBet) { hlSetMsg('チップが足りません', '#ff4466'); return; }
+            cChips -= hlBet;
+            cUpdateChips();
+            hlPendingWin = 0; hlStreak = 0;
+            hlUpdateStreak(); hlUpdateMult();
+            hlCard = hlRandCard();
+            hlShowCard(hlCard, true);
+            hlUpdateOdds(hlCard);
+            hlSetMsg('HIGH か LOW を選んでください');
+            hlSetBtns('playing');
+            hlPhase = 'playing';
+        };
+
+        window.hlGuess = function(dir) {
+            if (hlPhase === 'deal') return;
+            const next = hlRandCard();
+            const cv = HL_RANK_VAL[hlCard.rank], nv = HL_RANK_VAL[next.rank];
+            const o = hlCalcOdds(hlCard.rank);
+            const odds = parseFloat(dir === 'high' ? o.high : o.low);
+
+            hlAddHistory(hlCard.rank, hlCard.suit, '');
+
+            let result;
+            if (nv === cv)           result = 'push';
+            else if (dir==='high' && nv > cv) result = 'win';
+            else if (dir==='low'  && nv < cv) result = 'win';
+            else                     result = 'lose';
+
+            hlCard = next;
+            hlShowCard(hlCard, true);
+
+            if (result === 'win') {
+                hlPendingWin += Math.round(hlBet * odds);
+                hlStreak++;
+                hlUpdateStreak(); hlUpdateMult();
+                hlSetMsg(`✅ 正解！ +${Math.round(hlBet*odds)} chips`, '#ffd700');
+                hlUpdateOdds(hlCard);
+                hlSetBtns('continue');
+                hlPhase = 'continue';
+                hlAddHistory(next.rank, next.suit, 'win');
+            } else if (result === 'push') {
+                hlPendingWin += hlBet;
+                hlStreak++;
+                hlUpdateStreak(); hlUpdateMult();
+                hlSetMsg('🤝 引き分け（元返し）', '#88aaff');
+                hlUpdateOdds(hlCard);
+                hlSetBtns('continue');
+                hlPhase = 'continue';
+                hlAddHistory(next.rank, next.suit, 'win');
+            } else {
+                hlAddHistory(next.rank, next.suit, 'lose');
+                hlSetMsg(`❌ ハズレ${hlStreak>0?' — '+hlStreak+'連続の夢が…':''}`, '#ff4466');
+                hlPendingWin = 0; hlStreak = 0;
+                hlUpdateStreak(); hlUpdateMult();
+                hlSetBtns('deal');
+                hlPhase = 'deal';
+            }
+        };
+
+        window.hlWalkAway = function() {
+            cChips += hlPendingWin;
+            cUpdateChips();
+            hlSetMsg(`💰 ${hlPendingWin} chips 回収！ (${hlStreak}連続正解)`, '#ffd700');
+            hlPendingWin = 0; hlStreak = 0;
+            hlUpdateStreak(); hlUpdateMult();
+            hlSetBtns('deal');
+            hlPhase = 'deal';
+        };
+
+        window.hlSetBet = function(val, el) {
+            hlBet = val;
+            document.querySelectorAll('.hl-bet-btn').forEach(b => {
+                b.style.background = '#1a1a2e';
+                b.style.borderColor = '#2a2a4a';
+                b.style.color = '#ccc';
+            });
+            el.style.background = '#2a2a4a';
+            el.style.borderColor = '#4a4a7a';
+            el.style.color = '#fff';
+        };
 
         // DOM準備後に実行
         if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', casinoInit);
