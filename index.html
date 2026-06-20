@@ -479,24 +479,65 @@
             width: 0;
             min-width: 100%;
             box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
         }
 
-        /* スクロール部分 */
+        /* タブ行 */
+        #tool-tab-bar {
+            display: flex;
+            flex-direction: row;
+            gap: 3px;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        #tool-tab-bar::-webkit-scrollbar { display: none; }
+        .tool-tab-btn {
+            padding: 5px 8px;
+            border-radius: 6px;
+            border: 1px solid #333345;
+            background: #1a1a24;
+            color: #aaa;
+            cursor: pointer;
+            font-size: 12px;
+            white-space: nowrap;
+            flex-shrink: 0;
+            position: relative;
+            transition: background 0.15s, color 0.15s;
+        }
+        .tool-tab-btn.active-tab {
+            background: #252535;
+            border-color: #556;
+            color: #eee;
+        }
+        /* 選択中ツールがあるタブに青ドット */
+        .tool-tab-btn.has-selection::after {
+            content: '';
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: #3b82f6;
+        }
+
+        /* ツールパネル */
         #toolbar {
             display: flex;
             flex-direction: row;
             flex-wrap: nowrap;
             gap: 4px;
-            flex: 1;
-            min-width: 0;
             overflow-x: auto;
             overflow-y: hidden;
             scrollbar-width: none;
             -ms-overflow-style: none;
             -webkit-overflow-scrolling: touch;
             touch-action: pan-x;
-            padding-bottom: 4px;
             box-sizing: border-box;
+            min-height: 60px;
         }
         #toolbar::-webkit-scrollbar { display: none; }
         #toolbar button {
@@ -1570,25 +1611,37 @@
                 <div id="item-layer" class="item-layer"></div>
             </div>
 
-            <div id="toolbar-wrap" style="display:flex;gap:4px;align-items:stretch;">
-            <button id="erase-btn" data-tool="erase" class="active" style="flex-shrink:0;padding:8px 6px;border-radius:6px;border:1px solid #333345;color:#eee;cursor:pointer;font-size:11px;text-align:center;line-height:1.3;min-width:52px;">🗑️<br>消しゴム</button>
+            <div id="toolbar-wrap">
+            <!-- タブ行 -->
+            <div id="tool-tab-bar">
+                <button id="erase-btn" data-tool="erase" class="active tool-tab-btn" style="min-width:52px;">🗑️<br>消しゴム</button>
+                <button class="tool-tab-btn active-tab" data-tab="belt">🟫 ベルト</button>
+                <button class="tool-tab-btn" data-tab="inserter">🦾 インサーター</button>
+                <button class="tool-tab-btn" data-tab="machine">🟣 機械</button>
+                <button class="tool-tab-btn" data-tab="storage">📦 ストレージ</button>
+                <button class="tool-tab-btn" data-tab="branch">🔀 分岐</button>
+            </div>
+            <!-- ツールパネル -->
             <div id="toolbar">
-                <button data-tool="storage-source">📦<br>材料ST</button>
-                <button data-tool="storage-sink">📤<br>完成ST</button>
-                <button data-tool="belt">🟫<br>ベルト</button>
-                <button data-tool="inserter">🦾<br>インサーター</button>
-                <button data-tool="assembler">🟣<br>組立機</button>
-                <button data-tool="fast-belt" data-unlock="fastBelt" style="display:none">⚡🟫<br>高速ベルト</button>
-                <button data-tool="fast-inserter" data-unlock="fastInserter" style="display:none">⚡🦾<br>高速インサーター</button>
-                <button data-tool="fast-assembler" data-unlock="fastAssembler" style="display:none">⚡🟣<br>高速組立機</button>
-                <button data-tool="splitter" data-unlock="splitter" style="display:none">🔀<br>分岐機</button>
-                <button data-tool="merger" data-unlock="merger" style="display:none">🔁<br>合流機</button>
-                <button data-tool="long-inserter" data-unlock="longInserter" style="display:none">⟹<br>ロングアーム</button>
-                <button data-tool="double-belt" data-unlock="doubleBelt" style="display:none">〓<br>デュアル</button>
-                <button data-tool="cross-belt" data-unlock="crossBelt" style="display:none">✛<br>交差ベルト</button>
-                <button data-tool="fast-cross-belt" data-unlock="fastCrossBelt" style="display:none">⚡✛<br>高速交差</button>
-                <button data-tool="factory" data-unlock="factory" style="display:none">🏭<br>部品工場</button>
-                <button data-tool="dyson-sink" data-unlock="factory" style="display:none">🌐<br>DS納品口</button>
+                <button data-tool="belt" data-tab-group="belt">🟫<br>ベルト</button>
+                <button data-tool="fast-belt" data-unlock="fastBelt" data-tab-group="belt" style="display:none">⚡🟫<br>高速ベルト</button>
+                <button data-tool="double-belt" data-unlock="doubleBelt" data-tab-group="belt" style="display:none">〓<br>デュアル</button>
+                <button data-tool="cross-belt" data-unlock="crossBelt" data-tab-group="belt" style="display:none">✛<br>交差ベルト</button>
+                <button data-tool="fast-cross-belt" data-unlock="fastCrossBelt" data-tab-group="belt" style="display:none">⚡✛<br>高速交差</button>
+                <button data-tool="curve-belt" data-unlock="curveBelt" data-tab-group="belt" style="display:none">⌒<br>カーブ</button>
+                <button data-tool="fast-curve-belt" data-unlock="fastCurveBelt" data-tab-group="belt" style="display:none">⚡⌒<br>高速カーブ</button>
+                <button data-tool="double-curve-belt" data-unlock="doubleCurveBelt" data-tab-group="belt" style="display:none">⌒⌒<br>デュアルカーブ</button>
+                <button data-tool="inserter" data-tab-group="inserter" style="display:none">🦾<br>インサーター</button>
+                <button data-tool="fast-inserter" data-unlock="fastInserter" data-tab-group="inserter" style="display:none">⚡🦾<br>高速インサーター</button>
+                <button data-tool="long-inserter" data-unlock="longInserter" data-tab-group="inserter" style="display:none">⟹<br>ロングアーム</button>
+                <button data-tool="assembler" data-tab-group="machine" style="display:none">🟣<br>組立機</button>
+                <button data-tool="fast-assembler" data-unlock="fastAssembler" data-tab-group="machine" style="display:none">⚡🟣<br>高速組立機</button>
+                <button data-tool="factory" data-unlock="factory" data-tab-group="machine" style="display:none">🏭<br>部品工場</button>
+                <button data-tool="storage-source" data-tab-group="storage" style="display:none">📦<br>材料ST</button>
+                <button data-tool="storage-sink" data-tab-group="storage" style="display:none">📤<br>完成ST</button>
+                <button data-tool="dyson-sink" data-unlock="factory" data-tab-group="storage" style="display:none">🌐<br>DS納品口</button>
+                <button data-tool="splitter" data-unlock="splitter" data-tab-group="branch" style="display:none">🔀<br>分岐機</button>
+                <button data-tool="merger" data-unlock="merger" data-tab-group="branch" style="display:none">🔁<br>合流機</button>
             </div>
             </div>
         </div>
@@ -2365,17 +2418,62 @@
         const eraseBtn = document.getElementById('erase-btn');
         const allToolBtns = () => [...toolbarEl.querySelectorAll('button'), eraseBtn];
 
+        // タブ定義
+        const TAB_GROUPS = {
+            belt:     ['belt','fast-belt','double-belt','cross-belt','fast-cross-belt','curve-belt','fast-curve-belt','double-curve-belt'],
+            inserter: ['inserter','fast-inserter','long-inserter'],
+            machine:  ['assembler','fast-assembler','factory'],
+            storage:  ['storage-source','storage-sink','dyson-sink'],
+            branch:   ['splitter','merger'],
+        };
+        let currentTab = 'belt';
+
+        function getTabForTool(tool) {
+            for (const [tab, tools] of Object.entries(TAB_GROUPS)) {
+                if (tools.includes(tool)) return tab;
+            }
+            return null;
+        }
+
+        function switchToolTab(tab) {
+            currentTab = tab;
+            // タブボタンのactive-tab更新
+            document.querySelectorAll('.tool-tab-btn[data-tab]').forEach(b => {
+                b.classList.toggle('active-tab', b.dataset.tab === tab);
+            });
+            // ツールボタンの表示切替（解放済みのものだけ表示）
+            toolbarEl.querySelectorAll('button[data-tab-group]').forEach(b => {
+                const inTab = b.dataset.tabGroup === tab;
+                const unlockKey = b.dataset.unlock;
+                const unlocked = !unlockKey || isUnlocked(unlockKey);
+                b.style.display = (inTab && unlocked) ? '' : 'none';
+            });
+        }
+
         function selectTool(tool, activeBtn) {
             currentTool = tool;
             allToolBtns().forEach(b => b.classList.remove('active'));
             activeBtn.classList.add('active');
+            // タブのhas-selectionドット更新
+            document.querySelectorAll('.tool-tab-btn[data-tab]').forEach(b => {
+                const tab = b.dataset.tab;
+                const isSelected = tool !== 'erase' && TAB_GROUPS[tab]?.includes(tool);
+                b.classList.toggle('has-selection', isSelected);
+            });
         }
+
+        // タブクリック
+        document.getElementById('tool-tab-bar').addEventListener('click', (e) => {
+            const tabBtn = e.target.closest('.tool-tab-btn[data-tab]');
+            if (!tabBtn) return;
+            switchToolTab(tabBtn.dataset.tab);
+        });
 
         eraseBtn.addEventListener('click', () => selectTool('erase', eraseBtn));
 
         toolbarEl.addEventListener('click', (e) => {
             const btn = e.target.closest('button');
-            if (!btn) return;
+            if (!btn || !btn.dataset.tool) return;
             selectTool(btn.dataset.tool, btn);
         });
 
@@ -4998,12 +5096,12 @@
             t3Unlocks.forEach(key => {
                 const unlocked = isUnlocked(key);
                 document.querySelectorAll(`[data-unlock="${key}"]`).forEach(el => {
+                    if (el.closest('#toolbar')) return; // ツールバーはswitchToolTabで管理
                     el.style.display = unlocked ? '' : 'none';
                 });
             });
-            // DS納品口はfactory解放後に表示（craftには不要なのでtoolbarのみ）
-            const dysonBtn = document.querySelector('#toolbar button[data-tool="dyson-sink"]');
-            if (dysonBtn) dysonBtn.style.display = isUnlocked('factory') ? '' : 'none';
+            // ツールタブを再適用してunlock済みボタンの表示を正しく制御
+            switchToolTab(currentTab);
         }
 
         // ── セーブ＆ロードシステム ──────────────────────────
