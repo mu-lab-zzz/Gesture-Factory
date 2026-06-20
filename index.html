@@ -1678,7 +1678,7 @@
         <button class="tab-btn" id="tab-storage" onclick="switchTab('storage')" data-i18n="tab_storage">📦 倉庫</button>
         <button class="tab-btn" id="tab-tier" onclick="switchTab('tier')" data-i18n="tab_tier">🏆 ティア</button>
         <button class="tab-btn" id="tab-trophy" onclick="switchTab('trophy')" data-i18n="tab_trophy">🎖 実績</button>
-        <button class="tab-btn" id="tab-casino" onclick="switchTab('casino')">🎰 カジノ</button>
+        <button class="tab-btn" id="tab-casino" onclick="switchTab('casino')" data-i18n="tab_casino">🎰 カジノ</button>
     </div>
 
     <div class="mini-inventory">
@@ -1774,9 +1774,9 @@
         </div>
         <!-- ゲームセレクター -->
         <div style="display:flex;gap:8px;margin-bottom:16px;">
-            <button class="casino-game-btn active" id="casino-gbtn-slot" onclick="casinoSwitchGame('slot')"><span style="font-size:1.4rem;">🎰</span><span>スロット</span></button>
-            <button class="casino-game-btn" id="casino-gbtn-hilow" onclick="casinoSwitchGame('hilow')"><span style="font-size:1.4rem;">🃏</span><span>ハイアンドロー</span></button>
-            <button class="casino-game-btn" id="casino-gbtn-poker" onclick="casinoSwitchGame('poker')"><span style="font-size:1.4rem;">🎴</span><span>ポーカー</span></button>
+            <button class="casino-game-btn active" id="casino-gbtn-slot" onclick="casinoSwitchGame('slot')"><span style="font-size:1.4rem;">🎰</span><span data-i18n="casino_slot">スロット</span></button>
+            <button class="casino-game-btn" id="casino-gbtn-hilow" onclick="casinoSwitchGame('hilow')"><span style="font-size:1.4rem;">🃏</span><span data-i18n="casino_hilow">ハイアンドロー</span></button>
+            <button class="casino-game-btn" id="casino-gbtn-poker" onclick="casinoSwitchGame('poker')"><span style="font-size:1.4rem;">🎴</span><span data-i18n="casino_poker">ポーカー</span></button>
         </div>
         <!-- スロットパネル -->
         <div id="casino-panel-slot">
@@ -1851,8 +1851,7 @@
             </div>
             <!-- オッズ説明 -->
             <div style="background:#1a1a2e;border:1px solid #333;border-radius:12px;padding:12px;margin-top:10px;font-size:0.78rem;color:#aaa;line-height:1.6;">
-                <strong style="color:#fff;">ルール:</strong> 次のカードのランクが現在より高いか低いかを当てる。<br>
-                確率が低いほど配当が高い。正解後は続けて倍率を積むか、回収するかを選択。同ランクは引き分け（元返し）。
+                <strong style="color:#fff;" data-i18n-text="rule_label">ルール:</strong> <span id="casino-hl-rule-text">次のカードのランクが現在より高いか低いかを当てる。確率が低いほど配当が高い。正解後は続けて倍率を積むか、回収するかを選択。同ランクは引き分け（元返し）。</span>
             </div>
         </div><!-- /#casino-panel-hilow -->
 
@@ -1862,7 +1861,7 @@
                 <!-- カード5枚 -->
                 <div id="vp-card-row" style="display:flex;gap:5px;justify-content:center;"></div>
                 <!-- 役表示 -->
-                <div id="vp-result" style="font-size:1.1rem;font-weight:bold;min-height:1.4rem;text-align:center;color:#aaa;">カードを配ってください</div>
+                <div id="vp-result" style="font-size:1.1rem;font-weight:bold;min-height:1.4rem;text-align:center;color:#aaa;" data-i18n="casino_vp_deal">カードを配ってください</div>
                 <!-- アクションボタン -->
                 <button id="vp-action-btn" onclick="vpAction()" style="width:100%;padding:13px;border:none;border-radius:12px;font-size:1rem;font-weight:bold;cursor:pointer;letter-spacing:2px;background:linear-gradient(135deg,#ffd700,#ffaa00);color:#000;">DEAL 🎴</button>
                 <!-- ベット -->
@@ -1883,7 +1882,7 @@
 
         <!-- 変換パネル（共通） -->
         <div style="background:#1a1a2e;border:1px solid #333;border-radius:16px;padding:16px;margin-top:16px;">
-            <div style="font-size:0.85rem;color:#aaa;margin-bottom:10px;letter-spacing:1px;">💎 GEM → CHIP 変換</div>
+            <div style="font-size:0.85rem;color:#aaa;margin-bottom:10px;letter-spacing:1px;" data-i18n="casino_exchange">💎 GEM → CHIP 変換</div>
             <div id="casino-gem-rows"></div>
         </div>
         <!-- ペイテーブル（スロット用・ゲーム切替で表示制御） -->
@@ -1891,7 +1890,7 @@
             <div style="font-size:0.85rem;color:#aaa;margin-bottom:10px;letter-spacing:1px;">📋 PAYTABLE（BET 10chips）</div>
             <div id="casino-pay-rows"></div>
             <div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-top:8px;padding-top:8px;border-top:1px solid #333;">
-                <span style="color:#aaa;">同種2つ</span><span style="color:#ffd700;">+10 (元返し)</span>
+                <span style="color:#aaa;" data-i18n="casino_slot_pair_label">同種2つ</span><span style="color:#ffd700;" data-i18n="casino_slot_return_label">+10 (元返し)</span>
             </div>
         </div>
     </div>
@@ -2103,7 +2102,7 @@
                 tab_factory: '⚙️ 工房', tab_automation: '🏭 工場',
                 tab_storage: '📦 倉庫', tab_tier: '🏆 ティア', tab_trophy: '🎖 実績',
                 mode_factory: '⚙️ 製造モード', mode_craft: '🔧 クラフトモード',
-                feedback_default: 'キャンバスをタップorスワイプ',
+                feedback_default: 'タップorスワイプ',
                 craft_hint_full: '✅ 完成！',
                 craft_hint_slots: (n) => `残り ${n} スロット　↓ 材料をスワイプ↑ or タップ`,
                 predict: (p) => `予測検知: ${p}`,
@@ -2164,6 +2163,36 @@
                 kofi_btn: '☕ Ko-fiで開発を支援する',
                 debug_dyson_clear: 'ダイソンスフィア即クリア',
                 debug_genesis_clear: 'Genesis Omega即クリア',
+                tab_casino: '🎰 カジノ',
+                casino_slot: 'スロット',
+                casino_hilow: 'ハイアンドロー',
+                casino_poker: 'ポーカー',
+                casino_exchange: '💎 GEM → CHIP 変換',
+                casino_no_chips: 'チップが足りません',
+                casino_hl_prompt: 'HIGH か LOW を選んでください',
+                casino_hl_correct: (n) => `✅ 正解！ +${n} chips`,
+                casino_hl_tie: '🤝 引き分け（元返し）',
+                casino_hl_wrong: (n) => `❌ ハズレ${n > 0 ? ' — ' + n + '連続の夢が…' : ''}`,
+                casino_hl_collect: (chips, streak) => `💰 ${chips} chips 回収！ (${streak}連続正解)`,
+                casino_hl_rule: '次のカードのランクが現在より高いか低いかを当てる。確率が低いほど配当が高い。正解後は続けて倍率を積むか、回収するかを選択。同ランクは引き分け（元返し）。',
+                casino_vp_deal: 'カードを配ってください',
+                casino_vp_hold: '残したいカードをタップ → DRAW',
+                casino_vp_nohand: '役なし…',
+                casino_vp_win: (name, n) => `🎉 ${name}！ +${n} chips`,
+                casino_slot_triple: (n, fx) => `🎉 3つ揃い！ +${n} chips${fx}`,
+                casino_slot_pair: (n, fx) => `2つ揃い +${n} chips${fx}`,
+                casino_slot_miss: 'ハズレ',
+                casino_slot_pair_label: '同種2つ',
+                casino_slot_return_label: '+10 (元返し)',
+                casino_vp_rf: 'ロイヤルフラッシュ',
+                casino_vp_sf: 'ストレートフラッシュ',
+                casino_vp_fk: 'フォーカード',
+                casino_vp_fh: 'フルハウス',
+                casino_vp_fl: 'フラッシュ',
+                casino_vp_st: 'ストレート',
+                casino_vp_tk: 'スリーカード',
+                casino_vp_tp: 'ツーペア',
+                casino_vp_jp: 'J以上ワンペア',
             },
             en: {
                 settings_title: 'Settings', sfx: '🔊 Sound Effects', bgm: '🎵 BGM',
@@ -2192,7 +2221,7 @@
                 tab_factory: '⚙️ Workshop', tab_automation: '🏭 Factory',
                 tab_storage: '📦 Storage', tab_tier: '🏆 Tiers', tab_trophy: '🎖 Trophies',
                 mode_factory: '⚙️ Craft Mode', mode_craft: '🔧 Factory Mode',
-                feedback_default: 'Draw a line or perform a gesture',
+                feedback_default: 'Tap or swipe',
                 craft_hint_full: '✅ Complete!',
                 craft_hint_slots: (n) => `${n} slot(s) left — Swipe ↑ or tap to add`,
                 predict: (p) => `Prediction: ${p}`,
@@ -2252,6 +2281,36 @@
                 stats_btn: '📊 View Stats',
                 kofi_btn: '☕ Support on Ko-fi',
                 debug_dyson_clear: 'Instant Dyson Clear',
+                tab_casino: '🎰 Casino',
+                casino_slot: 'Slots',
+                casino_hilow: 'Hi-Lo',
+                casino_poker: 'Poker',
+                casino_exchange: '💎 GEM → CHIP Exchange',
+                casino_no_chips: 'Not enough chips',
+                casino_hl_prompt: 'Choose HIGH or LOW',
+                casino_hl_correct: (n) => `✅ Correct! +${n} chips`,
+                casino_hl_tie: '🤝 Tie (bet returned)',
+                casino_hl_wrong: (n) => `❌ Wrong!${n > 0 ? ' — ' + n + '-streak gone…' : ''}`,
+                casino_hl_collect: (chips, streak) => `💰 ${chips} chips collected! (${streak} streak)`,
+                casino_hl_rule: 'Guess if the next card rank is HIGHER or LOWER. Higher risk = higher reward. After a win, keep going for multipliers or collect your chips. Same rank = tie (bet returned).',
+                casino_vp_deal: 'Deal cards to start',
+                casino_vp_hold: 'Tap cards to HOLD, then DRAW',
+                casino_vp_nohand: 'No hand…',
+                casino_vp_win: (name, n) => `🎉 ${name}! +${n} chips`,
+                casino_slot_triple: (n, fx) => `🎉 Triple! +${n} chips${fx}`,
+                casino_slot_pair: (n, fx) => `Pair! +${n} chips${fx}`,
+                casino_slot_miss: 'No match',
+                casino_slot_pair_label: 'Same 2 symbols',
+                casino_slot_return_label: '+10 (bet back)',
+                casino_vp_rf: 'Royal Flush',
+                casino_vp_sf: 'Straight Flush',
+                casino_vp_fk: 'Four of a Kind',
+                casino_vp_fh: 'Full House',
+                casino_vp_fl: 'Flush',
+                casino_vp_st: 'Straight',
+                casino_vp_tk: 'Three of a Kind',
+                casino_vp_tp: 'Two Pair',
+                casino_vp_jp: 'Jacks or Better',
                 debug_genesis_clear: 'Instant Genesis Clear',
             }
         };
@@ -2393,6 +2452,9 @@
             if (typeof updateTierUI === 'function') updateTierUI();
             if (typeof renderTrophies === 'function') renderTrophies();
             if (typeof updateStorageUI === 'function') updateStorageUI();
+            const hlRuleEl = document.getElementById('casino-hl-rule-text');
+            if (hlRuleEl) hlRuleEl.textContent = t('casino_hl_rule');
+            if (typeof vpBuildPaytable === 'function') vpBuildPaytable();
         }
         let sfxEnabled = true;
         let bgmEnabled = true;
@@ -5368,7 +5430,7 @@
                 selectCraftTarget(currentCraftTarget);
                 setFeedback('🔧 クラフトモード：下の材料ボタンをスワイプ↑ or タップして投入！');
             } else {
-                setFeedback('タップorスワイプ');
+                setFeedback(t('feedback_default'));
             }
         }
 
@@ -6398,7 +6460,7 @@
         // ── スピン ────────────────────────────────────────────────────────────
         window.casinoSpin = function() {
             if (cSpinning) return;
-            if (cChips < C_BET) { cShowResult('チップが足りません','lose'); return; }
+            if (cChips < C_BET) { cShowResult(t('casino_no_chips'),'lose'); return; }
             cChips -= C_BET;
             cUpdateChips();
             document.getElementById('casino-spin-btn').disabled = true;
@@ -6460,9 +6522,9 @@
                 else cAddTension(15);
             }
             const fx = res.inFever ? ' 🔥×2' : '';
-            if (res.type==='triple') { cShowResult(`🎉 3つ揃い！ +${res.win} chips (×${res.baseMult}${fx})`, 'win'); cFlashLine(); }
-            else if (res.type==='pair') { cShowResult(`2つ揃い +${res.win} chips${fx}`, 'push'); cFlashLine(); }
-            else cShowResult('ハズレ', 'lose');
+            if (res.type==='triple') { cShowResult(t('casino_slot_triple', res.win, ` (×${res.baseMult}${fx})`), 'win'); cFlashLine(); }
+            else if (res.type==='pair') { cShowResult(t('casino_slot_pair', res.win, fx), 'push'); cFlashLine(); }
+            else cShowResult(t('casino_slot_miss'), 'lose');
         }
 
         // ── テンション ────────────────────────────────────────────────────────
@@ -6694,7 +6756,7 @@
         }
 
         window.hlDeal = function() {
-            if (cChips < hlBet) { hlSetMsg('チップが足りません', '#ff4466'); return; }
+            if (cChips < hlBet) { hlSetMsg(t('casino_no_chips'), '#ff4466'); return; }
             cChips -= hlBet;
             cUpdateChips();
             hlPendingWin = 0; hlStreak = 0;
@@ -6702,7 +6764,7 @@
             hlCard = hlRandCard();
             hlShowCard(hlCard, true);
             hlUpdateOdds(hlCard);
-            hlSetMsg('HIGH か LOW を選んでください');
+            hlSetMsg(t('casino_hl_prompt'));
             hlSetBtns('playing');
             hlPhase = 'playing';
         };
@@ -6729,7 +6791,7 @@
                 hlPendingWin += Math.round(hlBet * odds);
                 hlStreak++;
                 hlUpdateStreak(); hlUpdateMult();
-                hlSetMsg(`✅ 正解！ +${Math.round(hlBet*odds)} chips`, '#ffd700');
+                hlSetMsg(t('casino_hl_correct', Math.round(hlBet*odds)), '#ffd700');
                 hlUpdateOdds(hlCard);
                 hlSetBtns('continue');
                 hlPhase = 'continue';
@@ -6738,14 +6800,14 @@
                 hlPendingWin += hlBet;
                 hlStreak++;
                 hlUpdateStreak(); hlUpdateMult();
-                hlSetMsg('🤝 引き分け（元返し）', '#88aaff');
+                hlSetMsg(t('casino_hl_tie'), '#88aaff');
                 hlUpdateOdds(hlCard);
                 hlSetBtns('continue');
                 hlPhase = 'continue';
                 hlAddHistory(next.rank, next.suit, 'win');
             } else {
                 hlAddHistory(next.rank, next.suit, 'lose');
-                hlSetMsg(`❌ ハズレ${hlStreak>0?' — '+hlStreak+'連続の夢が…':''}`, '#ff4466');
+                hlSetMsg(t('casino_hl_wrong', hlStreak), '#ff4466');
                 hlPendingWin = 0; hlStreak = 0;
                 hlUpdateStreak(); hlUpdateMult();
                 hlSetBtns('deal');
@@ -6756,7 +6818,7 @@
         window.hlWalkAway = function() {
             cChips += hlPendingWin;
             cUpdateChips();
-            hlSetMsg(`💰 ${hlPendingWin} chips 回収！ (${hlStreak}連続正解)`, '#ffd700');
+            hlSetMsg(t('casino_hl_collect', hlPendingWin, hlStreak), '#ffd700');
             hlPendingWin = 0; hlStreak = 0;
             hlUpdateStreak(); hlUpdateMult();
             hlSetBtns('deal');
@@ -6777,15 +6839,15 @@
 
         // ─── ビデオポーカー ────────────────────────────────────────────────────────
         const VP_PAYOUTS = [
-            {name:'ロイヤルフラッシュ',  mult:800},
-            {name:'ストレートフラッシュ', mult:50},
-            {name:'フォーカード',         mult:25},
-            {name:'フルハウス',           mult:9},
-            {name:'フラッシュ',           mult:6},
-            {name:'ストレート',           mult:4},
-            {name:'スリーカード',         mult:3},
-            {name:'ツーペア',             mult:2},
-            {name:'J以上ワンペア',        mult:1},
+            {key:'casino_vp_rf', mult:800},
+            {key:'casino_vp_sf', mult:50},
+            {key:'casino_vp_fk', mult:25},
+            {key:'casino_vp_fh', mult:9},
+            {key:'casino_vp_fl', mult:6},
+            {key:'casino_vp_st', mult:4},
+            {key:'casino_vp_tk', mult:3},
+            {key:'casino_vp_tp', mult:2},
+            {key:'casino_vp_jp', mult:1},
         ];
         const VP_SUITS = [
             {kind:'triangle',color:'#cc7700',label:'▲'},
@@ -6846,17 +6908,17 @@
                 if(vals[4]-vals[0]===4) return true;
                 return JSON.stringify(vals)===JSON.stringify([1,2,3,4,5]);
             })();
-            if(isFlush&&isStraight&&vals[0]===10) return {idx:0,name:'ロイヤルフラッシュ', mult:800};
-            if(isFlush&&isStraight)                return {idx:1,name:'ストレートフラッシュ',mult:50};
-            if(groups[0]===4)                      return {idx:2,name:'フォーカード',        mult:25};
-            if(groups[0]===3&&groups[1]===2)       return {idx:3,name:'フルハウス',          mult:9};
-            if(isFlush)                            return {idx:4,name:'フラッシュ',          mult:6};
-            if(isStraight)                         return {idx:5,name:'ストレート',          mult:4};
-            if(groups[0]===3)                      return {idx:6,name:'スリーカード',        mult:3};
-            if(groups[0]===2&&groups[1]===2)       return {idx:7,name:'ツーペア',            mult:2};
+            if(isFlush&&isStraight&&vals[0]===10) return {idx:0,key:'casino_vp_rf', mult:800};
+            if(isFlush&&isStraight)                return {idx:1,key:'casino_vp_sf', mult:50};
+            if(groups[0]===4)                      return {idx:2,key:'casino_vp_fk', mult:25};
+            if(groups[0]===3&&groups[1]===2)       return {idx:3,key:'casino_vp_fh', mult:9};
+            if(isFlush)                            return {idx:4,key:'casino_vp_fl', mult:6};
+            if(isStraight)                         return {idx:5,key:'casino_vp_st', mult:4};
+            if(groups[0]===3)                      return {idx:6,key:'casino_vp_tk', mult:3};
+            if(groups[0]===2&&groups[1]===2)       return {idx:7,key:'casino_vp_tp', mult:2};
             if(groups[0]===2){
                 const pv=parseInt(Object.keys(counts).find(k=>counts[k]===2));
-                if(pv>=11) return {idx:8,name:'J以上ワンペア',mult:1};
+                if(pv>=11) return {idx:8,key:'casino_vp_jp', mult:1};
             }
             return null;
         }
@@ -6906,7 +6968,7 @@
             const c=document.getElementById('vp-paytable-rows');
             if(!c) return;
             c.innerHTML=VP_PAYOUTS.map((p,i)=>
-                `<div class="vp-pt-row" id="vp-pt-${i}"><span class="vp-pt-name">${p.name}</span><span class="vp-pt-pay">${p.mult*vpBet}</span></div>`
+                `<div class="vp-pt-row" id="vp-pt-${i}"><span class="vp-pt-name">${t(p.key)}</span><span class="vp-pt-pay">${p.mult*vpBet}</span></div>`
             ).join('');
         }
 
@@ -6916,13 +6978,13 @@
         };
 
         function vpDeal() {
-            if(cChips<vpBet){vpSetResult('チップが足りません','#ff4466');return;}
+            if(cChips<vpBet){vpSetResult(t('casino_no_chips'),'#ff4466');return;}
             cChips-=vpBet; cUpdateChips();
             vpDeck=vpMakeDeck();
             vpHand=vpDeck.splice(0,5);
             vpHeld=[false,false,false,false,false];
             vpHand.forEach((c,i)=>vpShowCard(i,c,true));
-            vpSetResult('残したいカードをタップ → DRAW');
+            vpSetResult(t('casino_vp_hold'));
             vpHighlightPaytable(null);
             const btn=document.getElementById('vp-action-btn');
             if(btn){btn.textContent='DRAW ✨';btn.style.background='linear-gradient(135deg,#3388ff,#66ccff)';}
@@ -6950,9 +7012,9 @@
             if(result){
                 const gain=vpBet*result.mult;
                 cChips+=gain; cUpdateChips();
-                vpSetResult(`🎉 ${result.name}！ +${gain} chips`,'#ffd700');
+                vpSetResult(t('casino_vp_win', t(result.key), gain),'#ffd700');
             } else {
-                vpSetResult('役なし…','#ff4466');
+                vpSetResult(t('casino_vp_nohand'),'#ff4466');
             }
             const btn=document.getElementById('vp-action-btn');
             if(btn){btn.textContent='DEAL 🎴';btn.style.background='linear-gradient(135deg,#ffd700,#ffaa00)';}
