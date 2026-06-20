@@ -184,6 +184,23 @@
         .hl-c-face-inner { position:absolute;inset:6px;border-radius:4px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2px; }
         .hl-streak-dot { width:10px;height:10px;border-radius:50%;background:#ffd700;box-shadow:0 0 6px #ffd700;animation:hl-pop 0.2s ease; }
         @keyframes hl-pop { from { transform:scale(0); } to { transform:scale(1); } }
+        /* ビデオポーカー */
+        .vp-card-slot { display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer; }
+        .vp-card-wrap { width:58px;height:82px;perspective:400px; }
+        .vp-card { width:58px;height:82px;border-radius:6px;position:relative;transform-style:preserve-3d;transition:transform 0.35s ease; }
+        .vp-card.flip { transform:rotateY(180deg); }
+        .vp-card-front,.vp-card-back { position:absolute;inset:0;border-radius:6px;backface-visibility:hidden; }
+        .vp-card-front { background:#f5f0e8;overflow:hidden;transform:rotateY(0deg); }
+        .vp-card-back { background:#1a1060;border:2px solid #3a3a8a;transform:rotateY(180deg);display:flex;align-items:center;justify-content:center;font-size:1.2rem; }
+        .vp-card.held .vp-card-front { outline:2px solid #ffd700; }
+        .vp-hold-badge { font-size:0.6rem;font-weight:bold;letter-spacing:1px;color:#ffd700;background:#1a1a00;border:1px solid #ffd700;border-radius:4px;padding:1px 5px;height:14px;display:flex;align-items:center;opacity:0;transition:opacity 0.15s; }
+        .vp-hold-badge.show { opacity:1; }
+        .vp-pt-row { display:flex;justify-content:space-between;font-size:0.78rem;padding:3px 2px;border-bottom:1px solid #222; }
+        .vp-pt-row:last-child { border-bottom:none; }
+        .vp-pt-row.active { background:#ffd70022;border-radius:4px;padding:3px 4px; }
+        .vp-pt-row.active .vp-pt-name { color:#ffd700; }
+        .vp-pt-name { color:#ccc; }
+        .vp-pt-pay { color:#ffd700;font-weight:bold; }
         #casino-slot-machine.fever #casino-tension-bar { background:linear-gradient(90deg,#ff44aa,#ff88ff,#fff) !important; box-shadow:0 0 8px #ff88ffaa; }
 
         #app, #header-bar, #tab-bar, #content-factory, #content-automation,
@@ -1759,6 +1776,7 @@
         <div style="display:flex;gap:8px;margin-bottom:16px;">
             <button class="casino-game-btn active" id="casino-gbtn-slot" onclick="casinoSwitchGame('slot')"><span style="font-size:1.4rem;">🎰</span><span>スロット</span></button>
             <button class="casino-game-btn" id="casino-gbtn-hilow" onclick="casinoSwitchGame('hilow')"><span style="font-size:1.4rem;">🃏</span><span>ハイアンドロー</span></button>
+            <button class="casino-game-btn" id="casino-gbtn-poker" onclick="casinoSwitchGame('poker')"><span style="font-size:1.4rem;">🎴</span><span>ポーカー</span></button>
         </div>
         <!-- スロットパネル -->
         <div id="casino-panel-slot">
@@ -1837,6 +1855,31 @@
                 確率が低いほど配当が高い。正解後は続けて倍率を積むか、回収するかを選択。同ランクは引き分け（元返し）。
             </div>
         </div><!-- /#casino-panel-hilow -->
+
+        <!-- ポーカーパネル -->
+        <div id="casino-panel-poker" style="display:none;">
+            <div style="background:linear-gradient(160deg,#1e1e3a,#12122a);border:2px solid #3a3a6a;border-radius:20px;padding:16px;box-shadow:0 0 30px #6060ff33;display:flex;flex-direction:column;align-items:center;gap:12px;">
+                <!-- カード5枚 -->
+                <div id="vp-card-row" style="display:flex;gap:5px;justify-content:center;"></div>
+                <!-- 役表示 -->
+                <div id="vp-result" style="font-size:1.1rem;font-weight:bold;min-height:1.4rem;text-align:center;color:#aaa;">カードを配ってください</div>
+                <!-- アクションボタン -->
+                <button id="vp-action-btn" onclick="vpAction()" style="width:100%;padding:13px;border:none;border-radius:12px;font-size:1rem;font-weight:bold;cursor:pointer;letter-spacing:2px;background:linear-gradient(135deg,#ffd700,#ffaa00);color:#000;">DEAL 🎴</button>
+                <!-- ベット -->
+                <div style="display:flex;gap:6px;align-items:center;font-size:0.8rem;color:#aaa;">
+                    <span>BET:</span>
+                    <button class="vp-bet-btn active" onclick="vpSetBet(10,this)" style="padding:4px 10px;background:#2a2a4a;border:1px solid #4a4a7a;border-radius:6px;color:#fff;font-size:0.8rem;cursor:pointer;">10</button>
+                    <button class="vp-bet-btn" onclick="vpSetBet(25,this)" style="padding:4px 10px;background:#1a1a2e;border:1px solid #2a2a4a;border-radius:6px;color:#ccc;font-size:0.8rem;cursor:pointer;">25</button>
+                    <button class="vp-bet-btn" onclick="vpSetBet(50,this)" style="padding:4px 10px;background:#1a1a2e;border:1px solid #2a2a4a;border-radius:6px;color:#ccc;font-size:0.8rem;cursor:pointer;">50</button>
+                    <button class="vp-bet-btn" onclick="vpSetBet(100,this)" style="padding:4px 10px;background:#1a1a2e;border:1px solid #2a2a4a;border-radius:6px;color:#ccc;font-size:0.8rem;cursor:pointer;">100</button>
+                </div>
+            </div>
+            <!-- ペイテーブル -->
+            <div style="background:#1a1a2e;border:1px solid #333;border-radius:12px;padding:12px 14px;margin-top:10px;">
+                <div style="font-size:0.8rem;color:#aaa;margin-bottom:8px;letter-spacing:1px;">📋 PAYTABLE</div>
+                <div id="vp-paytable-rows"></div>
+            </div>
+        </div><!-- /#casino-panel-poker -->
 
         <!-- 変換パネル（共通） -->
         <div style="background:#1a1a2e;border:1px solid #333;border-radius:16px;padding:16px;margin-top:16px;">
@@ -6499,6 +6542,8 @@
             document.getElementById('casino-chip-icon').innerHTML = chipSVG(20);
             cUpdateChips();
             cUpdateTension();
+            vpBuildCardRow();
+            vpBuildPaytable();
         }
 
         // ─── BGM ──────────────────────────────────────────────────────────────────
@@ -6519,11 +6564,13 @@
 
         // ─── ゲーム切り替え ────────────────────────────────────────────────────────
         window.casinoSwitchGame = function(game) {
-            document.getElementById('casino-panel-slot').style.display   = game === 'slot'   ? '' : 'none';
-            document.getElementById('casino-panel-hilow').style.display  = game === 'hilow'  ? '' : 'none';
+            document.getElementById('casino-panel-slot').style.display    = game === 'slot'  ? '' : 'none';
+            document.getElementById('casino-panel-hilow').style.display   = game === 'hilow' ? '' : 'none';
+            document.getElementById('casino-panel-poker').style.display   = game === 'poker' ? '' : 'none';
             document.getElementById('casino-paytable-slot').style.display = game === 'slot'  ? '' : 'none';
-            document.getElementById('casino-gbtn-slot').classList.toggle('active', game === 'slot');
+            document.getElementById('casino-gbtn-slot').classList.toggle('active',  game === 'slot');
             document.getElementById('casino-gbtn-hilow').classList.toggle('active', game === 'hilow');
+            document.getElementById('casino-gbtn-poker').classList.toggle('active', game === 'poker');
         };
 
         // ─── ハイアンドロー ────────────────────────────────────────────────────────
@@ -6726,6 +6773,198 @@
             el.style.background = '#2a2a4a';
             el.style.borderColor = '#4a4a7a';
             el.style.color = '#fff';
+        };
+
+        // ─── ビデオポーカー ────────────────────────────────────────────────────────
+        const VP_PAYOUTS = [
+            {name:'ロイヤルフラッシュ',  mult:800},
+            {name:'ストレートフラッシュ', mult:50},
+            {name:'フォーカード',         mult:25},
+            {name:'フルハウス',           mult:9},
+            {name:'フラッシュ',           mult:6},
+            {name:'ストレート',           mult:4},
+            {name:'スリーカード',         mult:3},
+            {name:'ツーペア',             mult:2},
+            {name:'J以上ワンペア',        mult:1},
+        ];
+        const VP_SUITS = [
+            {kind:'triangle',color:'#cc7700',label:'▲'},
+            {kind:'square',  color:'#cc1133',label:'■'},
+            {kind:'pentagon',color:'#8833cc',label:'⬠'},
+            {kind:'hexagon', color:'#3388cc',label:'⬡'},
+        ];
+        const VP_RANKS = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+        const VP_RANK_VAL = {A:1,'2':2,'3':3,'4':4,'5':5,'6':6,'7':7,'8':8,'9':9,'10':10,J:11,Q:12,K:13};
+        const VP_PIP_DEFS = {
+            '2':[[50,14],[50,86]],'3':[[50,12],[50,50],[50,88]],
+            '4':[[27,20],[73,20],[27,80],[73,80]],'5':[[27,18],[73,18],[50,50],[27,82],[73,82]],
+            '6':[[27,17],[73,17],[27,50],[73,50],[27,83],[73,83]],
+            '7':[[27,15],[73,15],[50,32],[27,52],[73,52],[27,85],[73,85]],
+            '8':[[27,14],[73,14],[50,30],[27,49],[73,49],[50,68],[27,84],[73,84]],
+            '9':[[27,13],[73,13],[27,36],[73,36],[50,50],[27,64],[73,64],[27,87],[73,87]],
+            '10':[[27,12],[73,12],[50,28],[27,42],[73,42],[27,58],[73,58],[50,72],[27,88],[73,88]],
+        };
+
+        let vpBet=10, vpPhase='idle', vpDeck=[], vpHand=[], vpHeld=[false,false,false,false,false];
+
+        function vpMakeDeck() {
+            const d=[];
+            VP_SUITS.forEach(s=>VP_RANKS.forEach(r=>d.push({rank:r,suit:s})));
+            for(let i=d.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[d[i],d[j]]=[d[j],d[i]];}
+            return d;
+        }
+
+        function vpBuildCardFront(card) {
+            const color=card.suit.color,isFace=['J','Q','K'].includes(card.rank),isAce=card.rank==='A';
+            const rv=VP_RANK_VAL[card.rank]||0,pipSize=rv<=3?17:rv<=6?14:11;
+            const corner=`<div class="hl-c-corner hl-c-tl" style="color:${color}"><span style="font-size:8px">${card.rank}</span>${gemSVG(card.suit.kind,8,true)}</div><div class="hl-c-corner hl-c-br" style="color:${color}"><span style="font-size:8px">${card.rank}</span>${gemSVG(card.suit.kind,8,true)}</div>`;
+            let center='';
+            if(isAce){
+                center=`<div class="hl-c-pips"><div class="hl-c-pip" style="left:50%;top:50%">${gemSVG(card.suit.kind,36,true)}</div></div>`;
+            } else if(isFace){
+                center=`<div class="hl-c-face-inner" style="border:1px solid ${color}44"><div style="font-size:11px;font-weight:900;color:${color}">${card.rank}</div>${gemSVG(card.suit.kind,28,true)}</div>`;
+            } else {
+                const ax=8,ay=14,aw=42,ah=54;
+                const pipEls=(VP_PIP_DEFS[card.rank]||[]).map(([px,py])=>{
+                    const x=ax+(px/100)*aw,y=ay+(py/100)*ah,rot=py>55?'rotate(180deg)':'';
+                    return `<div class="hl-c-pip" style="left:${x}px;top:${y}px;transform:translate(-50%,-50%) ${rot}">${gemSVG(card.suit.kind,pipSize,true)}</div>`;
+                }).join('');
+                center=`<div class="hl-c-pips">${pipEls}</div>`;
+            }
+            return corner+center;
+        }
+
+        function vpEvalHand(hand) {
+            const vals=hand.map(c=>VP_RANK_VAL[c.rank]).sort((a,b)=>a-b);
+            const suits=hand.map(c=>c.suit.kind);
+            const isFlush=suits.every(s=>s===suits[0]);
+            const counts={};
+            vals.forEach(v=>counts[v]=(counts[v]||0)+1);
+            const groups=Object.values(counts).sort((a,b)=>b-a);
+            const isStraight=(()=>{
+                if(new Set(vals).size!==5) return false;
+                if(vals[4]-vals[0]===4) return true;
+                return JSON.stringify(vals)===JSON.stringify([1,2,3,4,5]);
+            })();
+            if(isFlush&&isStraight&&vals[0]===10) return {idx:0,name:'ロイヤルフラッシュ', mult:800};
+            if(isFlush&&isStraight)                return {idx:1,name:'ストレートフラッシュ',mult:50};
+            if(groups[0]===4)                      return {idx:2,name:'フォーカード',        mult:25};
+            if(groups[0]===3&&groups[1]===2)       return {idx:3,name:'フルハウス',          mult:9};
+            if(isFlush)                            return {idx:4,name:'フラッシュ',          mult:6};
+            if(isStraight)                         return {idx:5,name:'ストレート',          mult:4};
+            if(groups[0]===3)                      return {idx:6,name:'スリーカード',        mult:3};
+            if(groups[0]===2&&groups[1]===2)       return {idx:7,name:'ツーペア',            mult:2};
+            if(groups[0]===2){
+                const pv=parseInt(Object.keys(counts).find(k=>counts[k]===2));
+                if(pv>=11) return {idx:8,name:'J以上ワンペア',mult:1};
+            }
+            return null;
+        }
+
+        function vpBuildCardRow() {
+            const row=document.getElementById('vp-card-row');
+            if(!row) return;
+            row.innerHTML='';
+            for(let i=0;i<5;i++){
+                const slot=document.createElement('div');
+                slot.className='vp-card-slot';
+                slot.onclick=()=>vpToggleHold(i);
+                slot.innerHTML=`<div class="vp-card-wrap"><div class="vp-card" id="vp-c-${i}"><div class="vp-card-front" id="vp-f-${i}"></div><div class="vp-card-back">🎴</div></div></div><div class="vp-hold-badge" id="vp-h-${i}">HOLD</div>`;
+                row.appendChild(slot);
+                // 初期は裏向き
+                document.getElementById(`vp-c-${i}`).classList.add('flip');
+            }
+        }
+
+        function vpToggleHold(i) {
+            if(vpPhase!=='hold') return;
+            vpHeld[i]=!vpHeld[i];
+            document.getElementById(`vp-c-${i}`).classList.toggle('held',vpHeld[i]);
+            document.getElementById(`vp-h-${i}`).classList.toggle('show',vpHeld[i]);
+        }
+
+        function vpShowCard(i,card,flip) {
+            document.getElementById(`vp-f-${i}`).innerHTML=vpBuildCardFront(card);
+            const el=document.getElementById(`vp-c-${i}`);
+            if(flip){el.classList.add('flip');setTimeout(()=>el.classList.remove('flip'),350);}
+            el.classList.remove('held');
+            document.getElementById(`vp-h-${i}`).classList.remove('show');
+        }
+
+        function vpSetResult(text,color) {
+            const el=document.getElementById('vp-result');
+            if(el){el.textContent=text;el.style.color=color||'#aaa';}
+        }
+
+        function vpHighlightPaytable(idx) {
+            VP_PAYOUTS.forEach((_,i)=>{
+                document.getElementById(`vp-pt-${i}`)?.classList.toggle('active',i===idx);
+            });
+        }
+
+        function vpBuildPaytable() {
+            const c=document.getElementById('vp-paytable-rows');
+            if(!c) return;
+            c.innerHTML=VP_PAYOUTS.map((p,i)=>
+                `<div class="vp-pt-row" id="vp-pt-${i}"><span class="vp-pt-name">${p.name}</span><span class="vp-pt-pay">${p.mult*vpBet}</span></div>`
+            ).join('');
+        }
+
+        window.vpAction = function() {
+            if(vpPhase==='idle'||vpPhase==='result') vpDeal();
+            else if(vpPhase==='hold') vpDraw();
+        };
+
+        function vpDeal() {
+            if(cChips<vpBet){vpSetResult('チップが足りません','#ff4466');return;}
+            cChips-=vpBet; cUpdateChips();
+            vpDeck=vpMakeDeck();
+            vpHand=vpDeck.splice(0,5);
+            vpHeld=[false,false,false,false,false];
+            vpHand.forEach((c,i)=>vpShowCard(i,c,true));
+            vpSetResult('残したいカードをタップ → DRAW');
+            vpHighlightPaytable(null);
+            const btn=document.getElementById('vp-action-btn');
+            if(btn){btn.textContent='DRAW ✨';btn.style.background='linear-gradient(135deg,#3388ff,#66ccff)';}
+            vpPhase='hold';
+        }
+
+        function vpDraw() {
+            const drawIdx=[];
+            vpHeld.forEach((h,i)=>{if(!h){vpHand[i]=vpDeck.splice(0,1)[0];drawIdx.push(i);}});
+            vpPhase='result';
+            let done=0;
+            if(drawIdx.length===0){vpShowResult();return;}
+            drawIdx.forEach((i,n)=>{
+                setTimeout(()=>{
+                    vpShowCard(i,vpHand[i],true);
+                    done++;
+                    if(done===drawIdx.length) vpShowResult();
+                },n*120);
+            });
+        }
+
+        function vpShowResult() {
+            const result=vpEvalHand(vpHand);
+            vpHighlightPaytable(result?result.idx:null);
+            if(result){
+                const gain=vpBet*result.mult;
+                cChips+=gain; cUpdateChips();
+                vpSetResult(`🎉 ${result.name}！ +${gain} chips`,'#ffd700');
+            } else {
+                vpSetResult('役なし…','#ff4466');
+            }
+            const btn=document.getElementById('vp-action-btn');
+            if(btn){btn.textContent='DEAL 🎴';btn.style.background='linear-gradient(135deg,#ffd700,#ffaa00)';}
+        }
+
+        window.vpSetBet = function(val, el) {
+            vpBet=val;
+            document.querySelectorAll('.vp-bet-btn').forEach(b=>{
+                b.style.background='#1a1a2e';b.style.borderColor='#2a2a4a';b.style.color='#ccc';
+            });
+            el.style.background='#2a2a4a';el.style.borderColor='#4a4a7a';el.style.color='#fff';
+            vpBuildPaytable();
         };
 
         // DOM準備後に実行
