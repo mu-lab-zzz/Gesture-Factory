@@ -199,6 +199,29 @@
         .vp-pt-row:last-child { border-bottom:none; }
         .vp-pt-row.active { background:#ffd70022;border-radius:4px;padding:3px 4px; }
         .vp-pt-row.active .vp-pt-name { color:#ffd700; }
+        /* 虚無生物 */
+        #void-scene { position:relative;width:280px;height:280px;display:flex;align-items:center;justify-content:center;margin:0 auto; }
+        #void-creature { position:relative;width:80px;height:80px;transition:width 1s ease,height 1s ease; }
+        #void-core { position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 40% 35%,#6644ff,#000);box-shadow:0 0 20px #6644ff88;transition:all 1s ease;animation:void-pulse 2s ease-in-out infinite; }
+        @keyframes void-pulse { 0%,100%{transform:scale(1);}50%{transform:scale(1.06);} }
+        .void-aura-ring { position:absolute;border-radius:50%;border:1px solid;animation:void-ring-expand 2s ease-out infinite;opacity:0; }
+        @keyframes void-ring-expand { 0%{transform:scale(0.8);opacity:0.6;}100%{transform:scale(1.8);opacity:0;} }
+        .void-eye { position:absolute;border-radius:50%;background:#fff;opacity:0;transition:opacity 0.5s; }
+        .void-eye.show { opacity:1; }
+        .void-tentacle { position:absolute;bottom:50%;left:50%;border-radius:2px;opacity:0.7; }
+        #void-stage-name { font-size:1.05rem;font-weight:bold;color:#aa88ff;transition:color 1s;text-shadow:0 0 10px currentColor;min-height:1.4rem;text-align:center; }
+        #void-flavor { font-size:0.75rem;color:#666;margin-top:4px;font-style:italic;transition:color 1s;text-align:center;min-height:1rem; }
+        #void-absorbed { font-size:0.78rem;color:#555;margin-top:6px;text-align:center; }
+        #void-stage-bar { display:flex;gap:3px;justify-content:center;margin-top:8px; }
+        .void-pip { width:16px;height:5px;border-radius:3px;background:#222;border:1px solid #333;transition:background 0.5s,box-shadow 0.5s; }
+        .void-pip.filled { background:#6600cc;box-shadow:0 0 6px #9933ff; }
+        #void-feed-btn { width:100%;padding:12px;border:1px solid #9933ff;border-radius:30px;background:linear-gradient(135deg,#330066,#660099);color:#cc99ff;font-size:0.95rem;font-weight:bold;cursor:pointer;letter-spacing:1px;box-shadow:0 0 15px #6600cc44;transition:all 0.2s;margin-top:10px;-webkit-user-select:none;user-select:none; }
+        #void-feed-btn:hover { background:linear-gradient(135deg,#440088,#8800cc);box-shadow:0 0 25px #9933ff88; }
+        #void-feed-btn:active { transform:scale(0.96); }
+        #void-invasion { position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at center,transparent 30%,#110022 100%);opacity:0;transition:opacity 2s;z-index:0;display:none; }
+        .void-absorb-particle { position:absolute;border-radius:50%;width:6px;height:6px;background:#ffd700;pointer-events:none;animation:void-absorb 0.6s ease-in forwards; }
+        @keyframes void-absorb { 0%{opacity:1;transform:translate(var(--tx),var(--ty)) scale(1);}100%{opacity:0;transform:translate(0,0) scale(0);} }
+        @keyframes void-shake { 0%,100%{transform:translate(0,0);}20%{transform:translate(-4px,2px);}40%{transform:translate(4px,-2px);}60%{transform:translate(-3px,3px);}80%{transform:translate(3px,-1px);} }
         .vp-pt-name { color:#ccc; }
         .vp-pt-pay { color:#ffd700;font-weight:bold; }
         #casino-slot-machine.fever #casino-tension-bar { background:linear-gradient(90deg,#ff44aa,#ff88ff,#fff) !important; box-shadow:0 0 8px #ff88ffaa; }
@@ -1777,6 +1800,7 @@
             <button class="casino-game-btn active" id="casino-gbtn-slot" onclick="casinoSwitchGame('slot')"><span style="font-size:1.4rem;">🎰</span><span data-i18n="casino_slot">スロット</span></button>
             <button class="casino-game-btn" id="casino-gbtn-hilow" onclick="casinoSwitchGame('hilow')"><span style="font-size:1.4rem;">🃏</span><span data-i18n="casino_hilow">ハイアンドロー</span></button>
             <button class="casino-game-btn" id="casino-gbtn-poker" onclick="casinoSwitchGame('poker')"><span style="font-size:1.4rem;">🎴</span><span data-i18n="casino_poker">ポーカー</span></button>
+            <button class="casino-game-btn" id="casino-gbtn-void" onclick="casinoSwitchGame('void')"><span style="font-size:1.4rem;">🌑</span><span data-i18n="casino_void">虚無</span></button>
         </div>
         <!-- スロットパネル -->
         <div id="casino-panel-slot">
@@ -1879,6 +1903,27 @@
                 <div id="vp-paytable-rows"></div>
             </div>
         </div><!-- /#casino-panel-poker -->
+
+        <!-- 虚無生物パネル -->
+        <div id="casino-panel-void" style="display:none;">
+            <div style="background:linear-gradient(160deg,#0a0015,#050008);border:2px solid #330055;border-radius:20px;padding:16px 12px;box-shadow:0 0 30px #66009933;display:flex;flex-direction:column;align-items:center;gap:8px;">
+                <div id="void-scene">
+                    <div id="void-creature" style="position:relative;z-index:1;">
+                        <div id="void-core"></div>
+                        <div id="void-eyes-container"></div>
+                        <div id="void-tentacles-container"></div>
+                    </div>
+                    <canvas id="void-crack-canvas" style="position:absolute;inset:0;pointer-events:none;z-index:0;" width="280" height="280"></canvas>
+                    <div id="void-absorb-fx" style="position:absolute;width:100%;height:100%;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:3;"></div>
+                </div>
+                <div id="void-stage-name">ちいさなゆがみ</div>
+                <div id="void-flavor">まだ、なにかがいる気配はない。</div>
+                <div id="void-absorbed">🌑 0 chips 吸収済み</div>
+                <div id="void-stage-bar"></div>
+                <button id="void-feed-btn" data-i18n="casino_void_feed">🪙 チップを投入</button>
+            </div>
+        </div><!-- /#casino-panel-void -->
+        <div id="void-invasion"></div>
 
         <!-- 変換パネル（共通） -->
         <div style="background:#1a1a2e;border:1px solid #333;border-radius:16px;padding:16px;margin-top:16px;">
@@ -2193,6 +2238,9 @@
                 casino_vp_tk: 'スリーカード',
                 casino_vp_tp: 'ツーペア',
                 casino_vp_jp: 'J以上ワンペア',
+                casino_void: '虚無',
+                casino_void_feed: '🪙 チップを投入',
+                casino_void_absorbed: (n) => `🌑 ${n.toLocaleString()} chips 吸収済み`,
             },
             en: {
                 settings_title: 'Settings', sfx: '🔊 Sound Effects', bgm: '🎵 BGM',
@@ -2311,6 +2359,9 @@
                 casino_vp_tk: 'Three of a Kind',
                 casino_vp_tp: 'Two Pair',
                 casino_vp_jp: 'Jacks or Better',
+                casino_void: 'Void',
+                casino_void_feed: '🪙 Feed Chip',
+                casino_void_absorbed: (n) => `🌑 ${n.toLocaleString()} chips absorbed`,
                 debug_genesis_clear: 'Instant Genesis Clear',
             }
         };
@@ -6606,6 +6657,7 @@
             cUpdateTension();
             vpBuildCardRow();
             vpBuildPaytable();
+            voidInit();
         }
 
         // ─── BGM ──────────────────────────────────────────────────────────────────
@@ -6629,10 +6681,13 @@
             document.getElementById('casino-panel-slot').style.display    = game === 'slot'  ? '' : 'none';
             document.getElementById('casino-panel-hilow').style.display   = game === 'hilow' ? '' : 'none';
             document.getElementById('casino-panel-poker').style.display   = game === 'poker' ? '' : 'none';
+            document.getElementById('casino-panel-void').style.display    = game === 'void'  ? '' : 'none';
             document.getElementById('casino-paytable-slot').style.display = game === 'slot'  ? '' : 'none';
-            document.getElementById('casino-gbtn-slot').classList.toggle('active',  game === 'slot');
-            document.getElementById('casino-gbtn-hilow').classList.toggle('active', game === 'hilow');
-            document.getElementById('casino-gbtn-poker').classList.toggle('active', game === 'poker');
+            ['slot','hilow','poker','void'].forEach(g =>
+                document.getElementById('casino-gbtn-'+g).classList.toggle('active', game === g));
+            const inv = document.getElementById('void-invasion');
+            if (game === 'void') { inv.style.display = ''; setTimeout(() => voidApplyInvasion(), 50); }
+            else { inv.style.opacity = '0'; setTimeout(() => { inv.style.display = 'none'; }, 2000); }
         };
 
         // ─── ハイアンドロー ────────────────────────────────────────────────────────
@@ -7028,6 +7083,195 @@
             el.style.background='#2a2a4a';el.style.borderColor='#4a4a7a';el.style.color='#fff';
             vpBuildPaytable();
         };
+
+        // ─── 虚無生物 ─────────────────────────────────────────────────────────────
+        const VOID_STAGES = [
+            { name:'ちいさなゆがみ',     nameEn:'A Small Distortion',    flavor:'まだ、なにかがいる気配はない。',                  flavorEn:'No sign of anything yet.',
+              chips:0,       size:70,  core:'#6644ff,#000',     aura:'#6644ff', rings:1, eyes:0,  tent:0,  glow:20,  inv:0 },
+            { name:'もやもや',           nameEn:'Haze',                   flavor:'よく見ると、ゆっくりと呼吸している…？',           flavorEn:'On closer look — is it breathing...?',
+              chips:100,     size:84,  core:'#5533ee,#110011',  aura:'#8855ff', rings:2, eyes:0,  tent:0,  glow:25,  inv:0.05 },
+            { name:'名もなき飢え',       nameEn:'Nameless Hunger',        flavor:'光を吸い込んでいる。間違いなく。',                flavorEn:'It is absorbing light. No doubt.',
+              chips:500,     size:100, core:'#3311cc,#1a0033',  aura:'#aa66ff', rings:2, eyes:1,  tent:2,  glow:30,  inv:0.1 },
+            { name:'暗黒の胃袋',         nameEn:'Dark Stomach',           flavor:'触れてはいけない気がする。',                      flavorEn:'Something says: do not touch.',
+              chips:2000,    size:118, core:'#220099,#22003a',  aura:'#cc44ff', rings:3, eyes:2,  tent:4,  glow:40,  inv:0.18 },
+            { name:'貪食者',             nameEn:'Devourer',               flavor:'腹が減っている。ずっと、ずっと。',                flavorEn:'It is hungry. Always hungry.',
+              chips:8000,    size:138, core:'#110077,#2d0044',  aura:'#dd22ff', rings:3, eyes:3,  tent:6,  glow:55,  inv:0.28 },
+            { name:'深淵の眼',           nameEn:'Eye of the Abyss',       flavor:'こちらを——見ている。',                            flavorEn:'It is watching——you.',
+              chips:25000,   size:158, core:'#0d0055,#380055',  aura:'#ee00ff', rings:4, eyes:5,  tent:8,  glow:70,  inv:0.4 },
+            { name:'万眼の渇望',         nameEn:'Thousand-Eyed Craving',  flavor:'何個の目があるのか、もう数えられない。',           flavorEn:'Too many eyes to count now.',
+              chips:80000,   size:180, core:'#0a0044,#440066',  aura:'#ff00ee', rings:4, eyes:8,  tent:10, glow:90,  inv:0.55 },
+            { name:'宇宙の裂け目',       nameEn:'Rift in Space',          flavor:'この部屋ごと飲み込もうとしている。',              flavorEn:'It is trying to swallow this room.',
+              chips:200000,  size:205, core:'#080033,#550077',  aura:'#ff00cc', rings:5, eyes:10, tent:12, glow:110, inv:0.68 },
+            { name:'終焉の胎動',         nameEn:'Pulse of the End',       flavor:'…もう止められない。',                            flavorEn:'...It cannot be stopped.',
+              chips:450000,  size:232, core:'#050022,#660088',  aura:'#ff0099', rings:5, eyes:13, tent:14, glow:140, inv:0.82 },
+            { name:'絶対零域　虚無の王', nameEn:'Void King — Absolute Zero', flavor:'全ては、ここに還る。',                        flavorEn:'All things return here.',
+              chips:1000000, size:262, core:'#030011,#880099',  aura:'#ff0066', rings:6, eyes:16, tent:16, glow:180, inv:0.95 },
+        ];
+
+        let voidAbsorbed = parseInt(localStorage.getItem('gf_void_absorbed') || '0');
+        let voidStageIdx = 0;
+        let voidHoldTimer = null, voidHoldInterval = null, voidHoldDuration = 0;
+
+        function voidCurrentStage() {
+            let idx = 0;
+            VOID_STAGES.forEach((s, i) => { if (voidAbsorbed >= s.chips) idx = i; });
+            return idx;
+        }
+
+        function voidFeed() {
+            if (cChips < 1) { return; }
+            cChips -= 1; cUpdateChips();
+            voidAbsorbed += 1;
+            localStorage.setItem('gf_void_absorbed', voidAbsorbed);
+            document.getElementById('void-absorbed').textContent = t('casino_void_absorbed', voidAbsorbed);
+            voidSpawnParticles();
+            const newIdx = voidCurrentStage();
+            if (newIdx !== voidStageIdx) {
+                voidStageIdx = newIdx;
+                voidApplyStage(true);
+                const scene = document.getElementById('void-scene');
+                if (scene) { scene.style.animation = 'void-shake 0.4s ease'; setTimeout(() => scene.style.animation = '', 400); }
+            }
+        }
+
+        function voidApplyStage(showShake) {
+            const s = VOID_STAGES[voidStageIdx];
+            document.querySelectorAll('.void-pip').forEach((p, i) => p.classList.toggle('filled', i <= voidStageIdx));
+            const name = currentLang === 'en' ? s.nameEn : s.name;
+            const flavor = currentLang === 'en' ? s.flavorEn : s.flavor;
+            document.getElementById('void-stage-name').textContent = name;
+            document.getElementById('void-stage-name').style.color = s.aura;
+            document.getElementById('void-flavor').textContent = flavor;
+            document.getElementById('void-flavor').style.color = voidStageIdx >= 7 ? '#cc44ff' : '#666';
+            const c = document.getElementById('void-creature');
+            if (c) { c.style.width = s.size + 'px'; c.style.height = s.size + 'px'; }
+            const core = document.getElementById('void-core');
+            if (core) {
+                core.style.background = `radial-gradient(circle at 40% 35%, ${s.core})`;
+                core.style.boxShadow = `0 0 ${s.glow}px ${s.aura}88, 0 0 ${s.glow*2}px ${s.aura}22`;
+            }
+            voidBuildRings(s); voidBuildEyes(s); voidBuildTentacles(s);
+            voidApplyInvasion();
+            if (voidStageIdx >= 6) voidDrawCracks();
+        }
+
+        function voidApplyInvasion() {
+            const s = VOID_STAGES[voidStageIdx];
+            const inv = document.getElementById('void-invasion');
+            if (inv && document.getElementById('casino-panel-void').style.display !== 'none') {
+                inv.style.opacity = s.inv;
+            }
+        }
+
+        function voidBuildRings(s) {
+            document.querySelectorAll('.void-aura-ring').forEach(e => e.remove());
+            for (let i = 0; i < s.rings; i++) {
+                const r = document.createElement('div');
+                r.className = 'void-aura-ring';
+                r.style.cssText = `inset:-10px;border-color:${s.aura}44;animation-delay:${i*0.65}s;animation-duration:${1.8+i*0.3}s;`;
+                document.getElementById('void-creature').appendChild(r);
+            }
+        }
+
+        function voidBuildEyes(s) {
+            const cont = document.getElementById('void-eyes-container');
+            if (!cont) return;
+            cont.innerHTML = '';
+            const sz = Math.max(5, 13 - voidStageIdx);
+            for (let i = 0; i < s.eyes; i++) {
+                const angle = (i / s.eyes) * Math.PI * 2;
+                const r = s.size * 0.3;
+                const x = 50 + Math.cos(angle) * r, y = 50 + Math.sin(angle) * r;
+                const e = document.createElement('div');
+                e.className = 'void-eye show';
+                e.style.cssText = `width:${sz}px;height:${sz}px;left:${x}%;top:${y}%;transform:translate(-50%,-50%);animation:void-pulse ${1.2+Math.random()}s ease-in-out infinite;animation-delay:${Math.random()*2}s;`;
+                const ps = sz * 0.55;
+                e.innerHTML = `<div style="position:absolute;border-radius:50%;background:#ff0033;width:${ps}px;height:${ps}px;left:50%;top:50%;transform:translate(-50%,-50%);"></div>`;
+                cont.appendChild(e);
+            }
+        }
+
+        function voidBuildTentacles(s) {
+            const cont = document.getElementById('void-tentacles-container');
+            if (!cont) return;
+            cont.innerHTML = '';
+            for (let i = 0; i < s.tent; i++) {
+                const angle = (i / s.tent) * 360;
+                const len = s.size * (0.35 + (i % 3) * 0.08);
+                const t = document.createElement('div');
+                t.className = 'void-tentacle';
+                t.style.cssText = `width:${2+voidStageIdx*0.25}px;height:${len}px;transform-origin:bottom center;transform:rotate(${angle}deg);background:linear-gradient(to top,${s.aura}cc,transparent);animation:void-pulse ${1.5+Math.random()}s ease-in-out infinite;animation-delay:${Math.random()*2}s;`;
+                cont.appendChild(t);
+            }
+        }
+
+        function voidDrawCracks() {
+            const canvas = document.getElementById('void-crack-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, 280, 280);
+            const s = VOID_STAGES[voidStageIdx];
+            const cx = 140, cy = 140, num = (voidStageIdx - 5) * 3;
+            ctx.strokeStyle = s.aura + '55'; ctx.lineWidth = 1;
+            for (let i = 0; i < num; i++) {
+                const ang = Math.random() * Math.PI * 2;
+                let x = cx + Math.cos(ang) * s.size * 0.5, y = cy + Math.sin(ang) * s.size * 0.5;
+                ctx.beginPath(); ctx.moveTo(x, y);
+                for (let j = 0; j < 4; j++) {
+                    const da = (Math.random() - 0.5) * 0.8, dr = 12 + Math.random() * 18;
+                    x += Math.cos(ang + da) * dr; y += Math.sin(ang + da) * dr;
+                    ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+            }
+        }
+
+        function voidSpawnParticles() {
+            const fx = document.getElementById('void-absorb-fx');
+            if (!fx) return;
+            for (let i = 0; i < 5; i++) {
+                const p = document.createElement('div');
+                p.className = 'void-absorb-particle';
+                const angle = Math.random() * Math.PI * 2, dist = 50 + Math.random() * 70;
+                const tx = Math.cos(angle) * dist, ty = Math.sin(angle) * dist;
+                p.style.cssText = `--tx:${tx}px;--ty:${ty}px;left:calc(50% + ${tx}px);top:calc(50% + ${ty}px);animation-delay:${Math.random()*0.12}s;`;
+                fx.appendChild(p);
+                setTimeout(() => p.remove(), 800);
+            }
+        }
+
+        function voidInit() {
+            const bar = document.getElementById('void-stage-bar');
+            if (!bar) return;
+            bar.innerHTML = VOID_STAGES.map((_, i) => `<div class="void-pip" id="void-pip-${i}"></div>`).join('');
+            document.getElementById('void-absorbed').textContent = t('casino_void_absorbed', voidAbsorbed);
+            voidStageIdx = voidCurrentStage();
+            voidApplyStage(false);
+
+            const btn = document.getElementById('void-feed-btn');
+            if (!btn) return;
+            btn.addEventListener('mousedown', voidStartHold);
+            btn.addEventListener('touchstart', e => { e.preventDefault(); voidStartHold(); }, { passive: false });
+            document.addEventListener('mouseup', voidStopHold);
+            document.addEventListener('touchend', voidStopHold);
+        }
+
+        function voidStartHold() {
+            voidFeed();
+            voidHoldDuration = 0;
+            voidHoldTimer = setTimeout(() => {
+                voidHoldInterval = setInterval(() => {
+                    voidHoldDuration += 80;
+                    const amt = voidHoldDuration > 3000 ? 100 : voidHoldDuration > 1500 ? 10 : 1;
+                    for (let i = 0; i < amt; i++) voidFeed();
+                }, 80);
+            }, 400);
+        }
+
+        function voidStopHold() {
+            clearTimeout(voidHoldTimer); clearInterval(voidHoldInterval);
+            voidHoldTimer = null; voidHoldInterval = null; voidHoldDuration = 0;
+        }
 
         // DOM準備後に実行
         if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', casinoInit);
