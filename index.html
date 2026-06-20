@@ -2508,7 +2508,12 @@
             if (typeof updateStorageUI === 'function') updateStorageUI();
             const hlRuleEl = document.getElementById('casino-hl-rule-text');
             if (hlRuleEl) hlRuleEl.textContent = t('casino_hl_rule');
-            if (typeof vpBuildPaytable === 'function') vpBuildPaytable();
+            if (typeof window.vpBuildPaytable === 'function') window.vpBuildPaytable();
+            if (typeof window.voidApplyStage === 'function') window.voidApplyStage(false);
+            const voidAbsEl = document.getElementById('void-absorbed');
+            if (voidAbsEl) voidAbsEl.textContent = t('casino_void_absorbed', parseInt(localStorage.getItem('gf_void_absorbed')||'0'));
+            const voidFeedBtn = document.getElementById('void-feed-btn');
+            if (voidFeedBtn) voidFeedBtn.lastChild.textContent = ' ' + t('casino_void_feed').replace('🪙 ','');
         }
         let sfxEnabled = true;
         let bgmEnabled = true;
@@ -6459,7 +6464,7 @@
         ];
 
         // ── 状態 ─────────────────────────────────────────────────────────────
-        let cChips = 0, cTension = 0, cFeverLeft = 0, cSpinning = false;
+        let cChips = parseInt(localStorage.getItem('gf_casino_chips') || '0'), cTension = 0, cFeverLeft = 0, cSpinning = false;
 
         // ── チップSVG ─────────────────────────────────────────────────────────
         function chipSVG(size) {
@@ -6601,7 +6606,7 @@
             el.textContent = msg;
             el.style.color = cls==='win'?'#ffd700':cls==='push'?'#88aaff':'#ff6666';
         }
-        function cUpdateChips() { document.getElementById('casino-chip-count').textContent = cChips; }
+        function cUpdateChips() { document.getElementById('casino-chip-count').textContent = cChips; localStorage.setItem('gf_casino_chips', cChips); }
         function cFlashLine() {
             const b = document.getElementById('casino-win-line-border');
             b.style.transition='none'; b.style.boxShadow='0 0 24px #fff,0 0 24px #ffd700';
@@ -7029,6 +7034,7 @@
                 `<div class="vp-pt-row" id="vp-pt-${i}"><span class="vp-pt-name">${t(p.key)}</span><span class="vp-pt-pay">${p.mult*vpBet}</span></div>`
             ).join('');
         }
+        window.vpBuildPaytable = vpBuildPaytable;
 
         window.vpAction = function() {
             if(vpPhase==='idle'||vpPhase==='result') vpDeal();
@@ -7157,6 +7163,7 @@
             voidApplyInvasion();
             if (voidStageIdx >= 6) voidDrawCracks();
         }
+        window.voidApplyStage = voidApplyStage;
 
         function voidApplyInvasion() {
             const s = VOID_STAGES[voidStageIdx];
