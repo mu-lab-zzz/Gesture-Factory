@@ -1921,7 +1921,7 @@
                 tab_factory: '⚙️ 工房', tab_automation: '🏭 工場',
                 tab_storage: '📦 倉庫', tab_tier: '🏆 ティア', tab_trophy: '🎖 実績',
                 mode_factory: '⚙️ 製造モード', mode_craft: '🔧 クラフトモード',
-                feedback_default: 'ラインを引くか、ジェスチャーをどうぞ',
+                feedback_default: 'キャンバスをタップorスワイプ',
                 craft_hint_full: '✅ 完成！',
                 craft_hint_slots: (n) => `残り ${n} スロット　↓ 材料をスワイプ↑ or タップ`,
                 predict: (p) => `予測検知: ${p}`,
@@ -2352,49 +2352,49 @@
         const TIER_CONFIGS = [
             {
                 name: "1-1: 線のテクノロジー解放",
-                desc: "「点」を合計100個納品して、直線の生産能力をアンロックします。手持ちの在庫（上限20）からいつでも分割納品可能です！",
+                desc: "「点」を合計100個納品して、直線をアンロック",
                 unlocked: ["point"],
                 reqs: { point: 100 }
             },
             {
-                name: "1-2: 三角形の幾何学解放",
-                desc: "点と線をそれぞれ合計200個ずつ納品し、多角形合成システム（三角形）をアンロックします。",
+                name: "1-2: 三角形の解放",
+                desc: "点と線をそれぞれ合計200個ずつ納品し、三角形をアンロック",
                 unlocked: ["point", "line"],
                 reqs: { point: 200, line: 200 }
             },
             {
-                name: "1-3: 四角形の安定構造解放",
-                desc: "三角形を合計5個納品し、四角形の自動加工をアンロックします。倉庫拡張（四角形が6個必要）も利用可能になります。",
+                name: "1-3: 四角形の解放",
+                desc: "三角形を合計5個納品し、四角形をアンロック　倉庫拡張（四角形が6個必要）も利用可能になります。",
                 unlocked: ["point", "line", "triangle"],
                 reqs: { triangle: 5 }
             },
             {
-                name: "1-4: 五角形の複合合成解放",
-                desc: "四角形を合計5個納品し、五角形の加工テクノロジーをアンロックします。",
+                name: "1-4: 五角形の解放",
+                desc: "四角形を合計5個納品し、五角形をアンロック",
                 unlocked: ["point", "line", "triangle", "square"],
                 reqs: { square: 5 }
             },
             {
                 name: "1-5: 六角形の結晶構造解放",
-                desc: "五角形を合計5個納品し、最終テクノロジーである六角形の加工をアンロックします。",
+                desc: "五角形を合計5個納品し、六角形の加工をアンロック",
                 unlocked: ["point", "line", "triangle", "square", "pentagon"],
                 reqs: { pentagon: 5 }
             },
             {
                 name: "1-Complete: ティア1完全制覇",
-                desc: "六角形を合計5個納品して、ティア1のすべての製品ラインを完成させましょう！",
+                desc: "六角形を合計5個納品して、ティア1のすべての製品ラインを完成させましょう",
                 unlocked: ["point", "line", "triangle", "square", "pentagon", "hexagon", "crossBelt"],
                 reqs: { hexagon: 5 }
             },
             {
                 name: "2-1: 点の自動化設備解放",
-                desc: "点と四角形を納品し、毎秒0.2の「点」を自動生産するラインをアンロックします。",
+                desc: "点と四角形を納品し、毎秒0.2の「点」を自動生産するラインをアンロック",
                 unlocked: ["point", "line", "triangle", "square", "pentagon", "hexagon"],
                 reqs: { point: 100, square: 10 }
             },
             {
                 name: "2-2: 線の自動化設備解放",
-                desc: "線と五角形を納品し、毎秒0.2の「線」を自動生産するラインをアンロックします。",
+                desc: "線と五角形を納品し、毎秒0.2の「線」を自動生産するラインをアンロック",
                 unlocked: ["point", "line", "triangle", "square", "pentagon", "hexagon", "autoPoint"],
                 reqs: { line: 100, pentagon: 10 }
             },
@@ -2412,25 +2412,25 @@
             },
             {
                 name: "3-2: 高速インサーターの解放",
-                desc: "六角形50個・三角形50個を納品し、2マス先から掴める高速インサーターをアンロックします。",
+                desc: "六角形50個・三角形50個を納品し、2マス先から掴める高速インサーターをアンロック。",
                 unlocked: ["point", "line", "triangle", "square", "pentagon", "hexagon", "autoPoint", "autoLine", "crossBelt", "doubleBelt", "fastBelt", "fastCrossBelt"],
                 reqs: { hexagon: 50, triangle: 50 }
             },
             {
                 name: "3-3: 高速組立機の解放",
-                desc: "六角形100個・四角形50個を納品し、製造速度2倍の高速組立機をアンロックします。",
+                desc: "六角形100個・四角形50個を納品し、製造速度2倍の高速組立機をアンロック",
                 unlocked: ["point", "line", "triangle", "square", "pentagon", "hexagon", "autoPoint", "autoLine", "crossBelt", "doubleBelt", "fastBelt", "fastCrossBelt", "fastInserter"],
                 reqs: { hexagon: 100, square: 50 }
             },
             {
                 name: "3-4: 分岐機＆合流機の解放",
-                desc: "五角形・六角形を各30個納品し、ラインを2方向に分岐させる分岐機と2ラインを1本に合流させる合流機をアンロックします。",
+                desc: "五角形・六角形を各30個納品し、ラインを2方向に分岐させる分岐機と2ラインを1本に合流させる合流機をアンロック",
                 unlocked: ["point", "line", "triangle", "square", "pentagon", "hexagon", "autoPoint", "autoLine", "crossBelt", "doubleBelt", "fastBelt", "fastCrossBelt", "fastInserter", "fastAssembler"],
                 reqs: { pentagon: 30, hexagon: 30 }
             },
             {
                 name: "3-5: ロングアームインサーターの解放",
-                desc: "六角形50個・四角形30個を納品し、2マス先からアイテムを搬送できるロングアームインサーターをアンロックします。",
+                desc: "六角形50個・四角形30個を納品し、2マス先からアイテムを搬送できるロングアームインサーターをアンロック",
                 unlocked: ["point", "line", "triangle", "square", "pentagon", "hexagon", "autoPoint", "autoLine", "crossBelt", "doubleBelt", "fastBelt", "fastCrossBelt", "fastInserter", "fastAssembler", "splitter", "merger"],
                 reqs: { hexagon: 50, square: 30 }
             },
@@ -2442,7 +2442,7 @@
             },
             {
                 name: "4-1: 部品工場の解放",
-                desc: "六角形100個・五角形100個を納品し、部品を自動生産できる「部品工場」をアンロックします。",
+                desc: "六角形100個・五角形100個を納品し、部品を自動生産できる「部品工場」をアンロック",
                 unlocked: ["point", "line", "triangle", "square", "pentagon", "hexagon", "autoPoint", "autoLine", "crossBelt", "doubleBelt", "fastBelt", "fastCrossBelt", "fastInserter", "fastAssembler", "splitter", "merger", "longInserter"],
                 reqs: { hexagon: 100, pentagon: 100 }
             },
