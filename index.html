@@ -66,6 +66,35 @@
             pointer-events: none;
         }
 
+        /* 統計モーダル */
+        #stats-modal {
+            display: none; position: fixed; inset: 0; z-index: 8500;
+            background: rgba(0,0,0,0.82); align-items: center; justify-content: center;
+        }
+        #stats-modal.open { display: flex; }
+        #stats-inner {
+            background: #13131e; border: 1.5px solid #333355; border-radius: 14px;
+            padding: 20px; width: 92%; max-width: 460px; max-height: 88vh;
+            display: flex; flex-direction: column; overflow-y: auto;
+        }
+        #stats-inner h2 { font-size: 16px; color: #fff; margin: 0 0 16px; }
+        .stats-section { margin-bottom: 18px; }
+        .stats-section h3 {
+            font-size: 12px; color: #60a5fa; text-transform: uppercase;
+            letter-spacing: 0.08em; margin: 0 0 8px;
+            padding-bottom: 4px; border-bottom: 1px solid #222;
+        }
+        .stats-row {
+            display: flex; justify-content: space-between;
+            font-size: 13px; color: #ccc; padding: 3px 0;
+        }
+        .stats-row span:last-child { color: #fff; font-weight: bold; }
+        #stats-close {
+            margin-top: 8px; width: 100%; padding: 10px;
+            background: none; border: 1.5px solid #444; border-radius: 8px;
+            color: #aaa; font-size: 13px; cursor: pointer; flex-shrink: 0;
+        }
+
         /* パーツストア */
         #parts-store-modal {
             display: none; position: fixed; inset: 0; z-index: 8500;
@@ -1446,6 +1475,39 @@
 </head>
 <body>
 
+<!-- 統計モーダル -->
+<div id="stats-modal">
+    <div id="stats-inner">
+        <h2>📊 統計</h2>
+        <div class="stats-section">
+            <h3>生産</h3>
+            <div class="stats-row"><span>● 点</span><span id="stat-pt">0</span></div>
+            <div class="stats-row"><span>─ 線</span><span id="stat-ln">0</span></div>
+            <div class="stats-row"><span>▲ 三角</span><span id="stat-tri">0</span></div>
+            <div class="stats-row"><span>■ 四角</span><span id="stat-sq">0</span></div>
+            <div class="stats-row"><span>⬠ 五角</span><span id="stat-pent">0</span></div>
+            <div class="stats-row"><span>⬡ 六角</span><span id="stat-hex">0</span></div>
+        </div>
+        <div class="stats-section">
+            <h3>クラフト</h3>
+            <div id="stat-craft-rows"></div>
+        </div>
+        <div class="stats-section">
+            <h3>進行</h3>
+            <div class="stats-row"><span>転生回数</span><span id="stat-reinc">0</span></div>
+            <div class="stats-row"><span>セクター解放数</span><span id="stat-sectors">0</span></div>
+            <div class="stats-row"><span>ティア進行</span><span id="stat-tier">0</span></div>
+        </div>
+        <div class="stats-section">
+            <h3>コイン</h3>
+            <div class="stats-row"><span>広告視聴（累計）</span><span id="stat-ads">0</span></div>
+            <div class="stats-row"><span>獲得コイン（累計）</span><span id="stat-coins-earn">0</span></div>
+            <div class="stats-row"><span>消費コイン（累計）</span><span id="stat-coins-spend">0</span></div>
+        </div>
+        <button id="stats-close" onclick="closeStats()">閉じる</button>
+    </div>
+</div>
+
 <!-- パーツストアモーダル -->
 <div id="parts-store-modal">
     <div id="parts-store-inner">
@@ -1545,6 +1607,7 @@
                     </div>
                 </div>
             </details>
+            <button onclick="closeSettings(); openStats();" style="width:100%; margin-bottom:8px; padding:10px; background:none; border:1.5px solid #334; border-radius:10px; color:#aaa; font-size:14px; cursor:pointer;">📊 統計を見る</button>
             <a href="https://ko-fi.com/mulabs" target="_blank" style="display:block; width:100%; margin-top:16px; padding:10px; background:#ff5e5b; border:none; border-radius:10px; color:#fff; font-size:13px; font-weight:bold; text-align:center; text-decoration:none; box-sizing:border-box;">☕ Ko-fiで開発を支援する</a>
             <button onclick="closeSettings()" style="width:100%; margin-top:8px; padding:11px; background:none; border:1.5px solid #444; border-radius:10px; color:#aaa; font-size:14px; cursor:pointer;" data-i18n="close">閉じる</button>
         </div>
@@ -2202,6 +2265,12 @@
         let coins = 0;
         let adWatchedCount = 0;   // 今日見た広告回数
         let adLastDate = '';       // 最後に広告を見た日付 (YYYY-MM-DD)
+        let totalAdWatched = 0;   // 累計広告視聴回数
+        let totalCoinsEarned = 0; // 累計獲得コイン
+        let totalCoinsSpent = 0;  // 累計消費コイン
+        let lifetimeCrafted = { belt:0, inserter:0, assembler:0, storageSource:0, storageSink:0,
+            fastBelt:0, fastInserter:0, fastAssembler:0, splitter:0, merger:0,
+            longInserter:0, doubleBelt:0, crossBelt:0, fastCrossBelt:0, factory:0 };
 
         // トロフィーシステム
         const TROPHIES = [
@@ -5246,6 +5315,7 @@
             if (remaining === 0) {
                 // 完成！
                 parts[currentCraftTarget]++;
+                if (lifetimeCrafted[currentCraftTarget] !== undefined) lifetimeCrafted[currentCraftTarget]++;
                 const panel = document.getElementById('craft-panel');
                 if (panel) {
                     panel.classList.add('craft-complete-flash');
@@ -5516,10 +5586,57 @@
             adWatchedCount++;
             adLastDate = today;
             coins += 5;
+            totalAdWatched++;
+            totalCoinsEarned += 5;
             updateCoinDisplay();
             saveGame();
             closeAdModal();
             setFeedback('🪙 ×5 獲得！（今日残り ' + (3 - adWatchedCount) + ' 回）');
+        }
+
+        // ── 統計 ──────────────────────────────────────────────────────────────
+        function openStats() {
+            renderStats();
+            document.getElementById('stats-modal').classList.add('open');
+        }
+        function closeStats() {
+            document.getElementById('stats-modal').classList.remove('open');
+        }
+        function renderStats() {
+            // 生産
+            document.getElementById('stat-pt').textContent   = (lifetimeProduced.point   || 0).toLocaleString();
+            document.getElementById('stat-ln').textContent   = (lifetimeProduced.line     || 0).toLocaleString();
+            document.getElementById('stat-tri').textContent  = (lifetimeProduced.triangle || 0).toLocaleString();
+            document.getElementById('stat-sq').textContent   = (lifetimeProduced.square   || 0).toLocaleString();
+            document.getElementById('stat-pent').textContent = (lifetimeProduced.pentagon || 0).toLocaleString();
+            document.getElementById('stat-hex').textContent  = (lifetimeProduced.hexagon  || 0).toLocaleString();
+            // クラフト
+            const craftEl = document.getElementById('stat-craft-rows');
+            craftEl.innerHTML = '';
+            const nameMap = { belt:'ベルト', inserter:'インサーター', assembler:'組立機',
+                storageSource:'材料ST', storageSink:'完成品ST',
+                fastBelt:'高速ベルト', fastInserter:'高速インサーター',
+                fastAssembler:'高速組立機', splitter:'分岐機', merger:'合流機',
+                longInserter:'ロングアーム', doubleBelt:'デュアルベルト',
+                crossBelt:'交差ベルト', fastCrossBelt:'高速交差ベルト', factory:'部品工場' };
+            Object.entries(lifetimeCrafted).forEach(([key, val]) => {
+                if (!isUnlocked(key)) return;
+                const row = document.createElement('div');
+                row.className = 'stats-row';
+                row.innerHTML = `<span>${nameMap[key] || key}</span><span>${val.toLocaleString()}</span>`;
+                craftEl.appendChild(row);
+            });
+            if (!craftEl.children.length) {
+                craftEl.innerHTML = '<div class="stats-row"><span style="color:#555">まだクラフトしていません</span></div>';
+            }
+            // 進行
+            document.getElementById('stat-reinc').textContent   = reincarnationCount;
+            document.getElementById('stat-sectors').textContent = unlockedSectors.size;
+            document.getElementById('stat-tier').textContent    = currentTierIndex + ' / ' + TIER_CONFIGS.length;
+            // コイン
+            document.getElementById('stat-ads').textContent         = totalAdWatched.toLocaleString();
+            document.getElementById('stat-coins-earn').textContent  = totalCoinsEarned.toLocaleString();
+            document.getElementById('stat-coins-spend').textContent = totalCoinsSpent.toLocaleString();
         }
 
         // ── パーツストア ──────────────────────────────────────────────────────
@@ -5587,6 +5704,7 @@
             if (!cfg) return;
             const price = qty === 1 ? cfg.price1 : cfg.price5;
             if (coins < price) return;
+            totalCoinsSpent += price;
             coins -= price;
             parts[key] = (parts[key] || 0) + qty;
             updatePartsDisplay();
@@ -5602,6 +5720,7 @@
 
         function coinUnlockSector() {
             if (coins < 25) return;
+            totalCoinsSpent += 25;
             const nextId = currentSectorId + 1;
             if (nextId >= TOTAL_SECTORS) return;
             if (unlockedSectors.has(nextId)) return;
@@ -5617,6 +5736,7 @@
 
         function coinRefill(type) {
             if (coins < 3) return;
+            totalCoinsSpent += 3;
             coins -= 3;
             resources[type] = (resources[type] || 0) + 100;
             updateCoinDisplay();
@@ -5627,6 +5747,7 @@
 
         function coinUpgradeStorage(type) {
             if (coins < 15) return;
+            totalCoinsSpent += 15;
             coins -= 15;
             maxStorage[type] = (maxStorage[type] || 20) + 50;
             updateCoinDisplay();
@@ -5800,6 +5921,10 @@
                     coins,
                     adWatchedCount,
                     adLastDate,
+                    totalAdWatched,
+                    totalCoinsEarned,
+                    totalCoinsSpent,
+                    lifetimeCrafted,
                     trophies,
                     lifetimeProduced,
                     placedObjects,
@@ -5849,6 +5974,10 @@
                 if (data.coins !== undefined) coins = data.coins;
                 if (data.adWatchedCount !== undefined) adWatchedCount = data.adWatchedCount;
                 if (data.adLastDate !== undefined) adLastDate = data.adLastDate;
+                if (data.totalAdWatched !== undefined) totalAdWatched = data.totalAdWatched;
+                if (data.totalCoinsEarned !== undefined) totalCoinsEarned = data.totalCoinsEarned;
+                if (data.totalCoinsSpent !== undefined) totalCoinsSpent = data.totalCoinsSpent;
+                if (data.lifetimeCrafted !== undefined) Object.assign(lifetimeCrafted, data.lifetimeCrafted);
                 if (data.trophies) Object.assign(trophies, data.trophies);
                 if (data.lifetimeProduced) Object.assign(lifetimeProduced, data.lifetimeProduced);
                 if (data.placedObjects) Object.assign(placedObjects, data.placedObjects);
