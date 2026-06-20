@@ -219,7 +219,7 @@
         #void-feed-btn:hover { background:linear-gradient(135deg,#440088,#8800cc);box-shadow:0 0 25px #9933ff88; }
         #void-feed-btn:active { transform:scale(0.96); }
         #void-invasion { position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at center,transparent 30%,#110022 100%);opacity:0;transition:opacity 2s;z-index:0;display:none; }
-        .void-absorb-particle { position:absolute;border-radius:50%;width:6px;height:6px;background:#ffd700;pointer-events:none;animation:void-absorb 0.6s ease-in forwards; }
+        .void-absorb-particle { position:absolute;width:14px;height:14px;pointer-events:none;animation:void-absorb 0.6s ease-in forwards; }
         @keyframes void-absorb { 0%{opacity:1;transform:translate(var(--tx),var(--ty)) scale(1);}100%{opacity:0;transform:translate(0,0) scale(0);} }
         @keyframes void-shake { 0%,100%{transform:translate(0,0);}20%{transform:translate(-4px,2px);}40%{transform:translate(4px,-2px);}60%{transform:translate(-3px,3px);}80%{transform:translate(3px,-1px);} }
         .vp-pt-name { color:#ccc; }
@@ -7232,6 +7232,7 @@
             for (let i = 0; i < 5; i++) {
                 const p = document.createElement('div');
                 p.className = 'void-absorb-particle';
+                p.innerHTML = chipSVG(14);
                 const angle = Math.random() * Math.PI * 2, dist = 50 + Math.random() * 70;
                 const tx = Math.cos(angle) * dist, ty = Math.sin(angle) * dist;
                 p.style.cssText = `--tx:${tx}px;--ty:${ty}px;left:calc(50% + ${tx}px);top:calc(50% + ${ty}px);animation-delay:${Math.random()*0.12}s;`;
@@ -7250,6 +7251,7 @@
 
             const btn = document.getElementById('void-feed-btn');
             if (!btn) return;
+            btn.innerHTML = `${chipSVG(18)} ${t('casino_void_feed').replace('🪙 ','')}`;
             btn.addEventListener('mousedown', voidStartHold);
             btn.addEventListener('touchstart', e => { e.preventDefault(); voidStartHold(); }, { passive: false });
             document.addEventListener('mouseup', voidStopHold);
