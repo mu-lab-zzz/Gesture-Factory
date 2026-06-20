@@ -2797,7 +2797,9 @@
             } else if (tabName === 'casino') {
                 document.getElementById('content-casino').style.display = 'block';
                 casinoUpdateExchange();
+                casinoBgmPlay();
             }
+            if (tabName !== 'casino') casinoBgmPause();
         }
 
         // 自動化ツールバーイベント
@@ -6498,6 +6500,13 @@
             cUpdateChips();
             cUpdateTension();
         }
+
+        // ─── BGM ──────────────────────────────────────────────────────────────────
+        const casinoBgm = new Audio('The_Unspoken_Guest.mp3');
+        casinoBgm.loop = true;
+        casinoBgm.volume = 0.5;
+        window.casinoBgmPlay  = function() { casinoBgm.paused && casinoBgm.play().catch(()=>{}); };
+        window.casinoBgmPause = function() { casinoBgm.pause(); };
 
         // ─── ゲーム切り替え ────────────────────────────────────────────────────────
         window.casinoSwitchGame = function(game) {
