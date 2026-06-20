@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GESTURE&FACTORY — ジェスチャーで動く工場ゲーム</title>
+    <meta name="description" content="指でジェスチャーを描いて図形を生産し、工場ラインを自動化するカジュアルゲーム。">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: #0e0e14;
+            color: #e2e2e9;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.7;
+        }
+
+        /* ヘッダー */
+        header {
+            background: linear-gradient(160deg, #1a1a2e 0%, #0e0e14 100%);
+            text-align: center;
+            padding: 60px 20px 50px;
+            border-bottom: 1px solid #222;
+        }
+        header h1 {
+            font-size: 36px;
+            font-weight: bold;
+            letter-spacing: 0.05em;
+            background: linear-gradient(90deg, #00ffcc, #00a2ff, #af40ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 12px;
+        }
+        header p {
+            font-size: 15px;
+            color: #999;
+            max-width: 480px;
+            margin: 0 auto 28px;
+        }
+        .btn-play {
+            display: inline-block;
+            padding: 14px 36px;
+            background: linear-gradient(135deg, #3b82f6, #6d28d9);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 30px;
+            font-size: 15px;
+            font-weight: bold;
+            letter-spacing: 0.05em;
+        }
+
+        /* 言語切替 */
+        .lang-bar {
+            text-align: center;
+            padding: 16px;
+            background: #111118;
+            border-bottom: 1px solid #1e1e2a;
+        }
+        .lang-bar button {
+            padding: 5px 16px;
+            border-radius: 20px;
+            border: 1px solid #444;
+            background: transparent;
+            color: #aaa;
+            cursor: pointer;
+            font-size: 13px;
+            margin: 0 4px;
+        }
+        .lang-bar button.active {
+            background: #3b82f6;
+            border-color: #3b82f6;
+            color: #fff;
+        }
+
+        /* コンテンツ */
+        .content { max-width: 780px; margin: 0 auto; padding: 48px 20px 80px; }
+
+        .section { margin-bottom: 52px; }
+        .section h2 {
+            font-size: 18px;
+            color: #fff;
+            margin-bottom: 16px;
+            padding-left: 12px;
+            border-left: 3px solid #3b82f6;
+        }
+        .section p, .section li {
+            font-size: 14px;
+            color: #bbb;
+        }
+        .section ul { padding-left: 20px; }
+        .section li { margin-bottom: 6px; }
+
+        /* 特徴カード */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+        .feature-card {
+            background: #1a1a24;
+            border: 1px solid #2a2a3a;
+            border-radius: 10px;
+            padding: 20px 16px;
+            text-align: center;
+        }
+        .feature-card .icon { font-size: 28px; margin-bottom: 10px; }
+        .feature-card h3 { font-size: 14px; color: #eee; margin-bottom: 6px; }
+        .feature-card p { font-size: 12px; color: #888; }
+
+        /* リンク */
+        .links { display: flex; gap: 12px; flex-wrap: wrap; }
+        .link-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            border: 1px solid #444;
+            border-radius: 8px;
+            color: #aaa;
+            text-decoration: none;
+            font-size: 13px;
+            transition: border-color 0.2s, color 0.2s;
+        }
+        .link-btn:hover { border-color: #60a5fa; color: #60a5fa; }
+        .link-btn.primary {
+            background: #1e3a5f;
+            border-color: #3b82f6;
+            color: #60a5fa;
+        }
+
+        footer {
+            text-align: center;
+            padding: 24px;
+            font-size: 12px;
+            color: #555;
+            border-top: 1px solid #1e1e2a;
+        }
+
+        .lang-section { display: none; }
+        .lang-section.visible { display: block; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>GESTURE&amp;FACTORY</h1>
+    <p id="header-desc">指でジェスチャーを描いて図形を生産し、工場ラインを自動化するカジュアルゲーム</p>
+    <a class="btn-play" href="https://mu-lab-zzz.github.io/Gesture-Factory/" target="_blank">▶ ゲームをプレイ</a>
+</header>
+
+<div class="lang-bar">
+    <button class="active" onclick="showLang('ja', this)">日本語</button>
+    <button onclick="showLang('en', this)">English</button>
+</div>
+
+<div class="content">
+
+    <!-- 日本語 -->
+    <div class="lang-section visible" id="lang-ja">
+
+        <div class="section">
+            <h2>ゲームの特徴</h2>
+            <div class="features">
+                <div class="feature-card">
+                    <div class="icon">✍️</div>
+                    <h3>ジェスチャー操作</h3>
+                    <p>指で図形を描くだけで素材を生産。直感的な操作感。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">🏭</div>
+                    <h3>工場ライン構築</h3>
+                    <p>ベルト・インサーター・組立機を配置して自動生産ラインを組む。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">🏆</div>
+                    <h3>ティア解放</h3>
+                    <p>図形を納品して新しい設備・レシピを段階的にアンロック。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">🌐</div>
+                    <h3>ダイソンスフィア</h3>
+                    <p>究極目標：大量の素材を集めて恒星を包む球体を建設。</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>遊び方</h2>
+            <ul>
+                <li>タップで「点」を生産</li>
+                <li>まっすぐ引いて離すと「線」を生産</li>
+                <li>ドラッグで多角形（三角・四角・五角・六角形）を合成</li>
+                <li>生産した素材でパーツをクラフトし、工場タブに配置</li>
+                <li>自動化ラインが稼働したらティアを上げて次のステージへ</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>開発者情報</h2>
+            <p>開発者：mu-lab-zzz<br>
+            お問い合わせ：<a href="https://github.com/mu-lab-zzz/Gesture-Factory/issues" style="color:#60a5fa;">GitHub Issues</a></p>
+        </div>
+
+        <div class="section">
+            <h2>リンク</h2>
+            <div class="links">
+                <a class="link-btn primary" href="https://mu-lab-zzz.github.io/Gesture-Factory/" target="_blank">▶ ゲームをプレイ</a>
+                <a class="link-btn" href="./privacy.html">プライバシーポリシー</a>
+                <a class="link-btn" href="https://github.com/mu-lab-zzz/Gesture-Factory" target="_blank">GitHub</a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- English -->
+    <div class="lang-section" id="lang-en">
+
+        <div class="section">
+            <h2>Features</h2>
+            <div class="features">
+                <div class="feature-card">
+                    <div class="icon">✍️</div>
+                    <h3>Gesture Controls</h3>
+                    <p>Draw shapes with your finger to produce materials. Fully intuitive.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">🏭</div>
+                    <h3>Factory Building</h3>
+                    <p>Place belts, inserters, and assemblers to build automated production lines.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">🏆</div>
+                    <h3>Tier Unlocks</h3>
+                    <p>Submit shapes to progressively unlock new equipment and recipes.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">🌐</div>
+                    <h3>Dyson Sphere</h3>
+                    <p>Ultimate goal: collect massive resources to build a sphere around a star.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>How to Play</h2>
+            <ul>
+                <li>Tap to produce a Point</li>
+                <li>Drag straight and release to produce a Line</li>
+                <li>Draw polygons (triangle, square, pentagon, hexagon) with gestures</li>
+                <li>Craft parts from materials and place them in the Factory tab</li>
+                <li>Once your automated line is running, advance to the next tier</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Developer Info</h2>
+            <p>Developer: mu-lab-zzz<br>
+            Contact: <a href="https://github.com/mu-lab-zzz/Gesture-Factory/issues" style="color:#60a5fa;">GitHub Issues</a></p>
+        </div>
+
+        <div class="section">
+            <h2>Links</h2>
+            <div class="links">
+                <a class="link-btn primary" href="https://mu-lab-zzz.github.io/Gesture-Factory/" target="_blank">▶ Play Game</a>
+                <a class="link-btn" href="./privacy.html">Privacy Policy</a>
+                <a class="link-btn" href="https://github.com/mu-lab-zzz/Gesture-Factory" target="_blank">GitHub</a>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<footer>
+    &copy; 2026 mu-lab-zzz — GESTURE&amp;FACTORY
+</footer>
+
+<script>
+    function showLang(lang, btn) {
+        document.querySelectorAll('.lang-section').forEach(s => s.classList.remove('visible'));
+        document.getElementById('lang-' + lang).classList.add('visible');
+        document.querySelectorAll('.lang-bar button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('header-desc').textContent = lang === 'ja'
+            ? '指でジェスチャーを描いて図形を生産し、工場ラインを自動化するカジュアルゲーム'
+            : 'A casual game where you draw gestures to produce shapes and automate factory lines';
+        document.querySelector('.btn-play').textContent = lang === 'ja' ? '▶ ゲームをプレイ' : '▶ Play Game';
+    }
+</script>
+</body>
+</html>
