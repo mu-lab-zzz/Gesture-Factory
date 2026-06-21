@@ -305,7 +305,6 @@
             font-family: 'Helvetica Neue', Arial, sans-serif;
             margin: 0;
             padding: 12px 16px;
-            overscroll-behavior-y: none;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -1671,7 +1670,7 @@
         <img id="opening-logo" src="opening.png" alt="GESTURE&FACTORY">
         <button id="opening-start-btn" onclick="startGame()">TAP TO START</button>
     </div>
-    <div id="opening-version">Ver 1.14</div>
+    <div id="opening-version">Ver 1.15</div>
     <audio id="bgm" src="Thousandth_Rotation.mp3" loop></audio>
 </div>
 
@@ -4177,6 +4176,17 @@
             window._gridScale = scale;
         }
         window.addEventListener('resize', fitGrid);
+
+        // プルトゥリフレッシュ防止（ページ最上部からの下スワイプのみブロック）
+        let _ptrTouchStartY = 0;
+        document.addEventListener('touchstart', (e) => {
+            _ptrTouchStartY = e.touches[0].clientY;
+        }, { passive: true });
+        document.addEventListener('touchmove', (e) => {
+            const dy = e.touches[0].clientY - _ptrTouchStartY;
+            const atTop = (window.scrollY || document.documentElement.scrollTop) === 0;
+            if (dy > 0 && atTop) e.preventDefault();
+        }, { passive: false });
 
         function renderAll() {
             const currentGrid = sectors[currentSectorId];
