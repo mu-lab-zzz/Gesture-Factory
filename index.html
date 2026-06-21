@@ -1685,7 +1685,7 @@
         <img id="opening-logo" src="opening.png" alt="GESTURE&FACTORY">
         <button id="opening-start-btn" onclick="startGame()">TAP TO START</button>
     </div>
-    <div id="opening-version">Ver 1.33</div>
+    <div id="opening-version">Ver 1.34</div>
     <audio id="bgm" src="Thousandth_Rotation.mp3" loop></audio>
 </div>
 
@@ -5035,6 +5035,21 @@
                 .replace(/[⬡⬢]/gu, gem('hexagon'));
         }
 
+        const craftPartToolMap = {
+            belt:'belt', inserter:'inserter', assembler:'assembler',
+            storageSource:'storage-source', storageSink:'storage-sink',
+            fastBelt:'fast-belt', fastInserter:'fast-inserter', fastAssembler:'fast-assembler',
+            splitter:'splitter', merger:'merger', longInserter:'long-inserter',
+            doubleBelt:'double-belt', crossBelt:'cross-belt', fastCrossBelt:'fast-cross-belt',
+            factory:'factory'
+        };
+        function getToolbarIcon(partKey, size) {
+            const toolKey = craftPartToolMap[partKey];
+            const toolBtn = toolKey ? document.querySelector(`[data-tool="${toolKey}"]`) : null;
+            if (toolBtn) return toolBtn.innerHTML;
+            return `<span style="display:inline-flex;align-items:center;vertical-align:middle;">${partSVG(partKey, size)}</span>`;
+        }
+
         function initIcons() {
             const kindMap = k => k === 'point' ? 'raw' : k;
 
@@ -5049,29 +5064,19 @@
             };
 
             // クラフトチップ（ツールバーSVGを流用）
-            const craftPartToolMap = {
-                belt:'belt', inserter:'inserter', assembler:'assembler',
-                storageSource:'storage-source', storageSink:'storage-sink',
-                fastBelt:'fast-belt', fastInserter:'fast-inserter', fastAssembler:'fast-assembler',
-                splitter:'splitter', merger:'merger', longInserter:'long-inserter',
-                doubleBelt:'double-belt', crossBelt:'cross-belt', fastCrossBelt:'fast-cross-belt',
-                factory:'factory'
-            };
             document.querySelectorAll('.craft-part-btn').forEach(btn => {
                 const pk = btn.getAttribute('onclick').match(/selectCraftTarget\('(\w+)'\)/)?.[1];
                 if (!pk) return;
                 const countEl = btn.querySelector('.part-count');
                 const countId = countEl ? countEl.id : `parts-${pk}-count`;
                 const countVal = countEl ? countEl.textContent : '×0';
-                const toolKey = craftPartToolMap[pk];
-                const toolBtn = toolKey ? document.querySelector(`[data-tool="${toolKey}"]`) : null;
-                const iconHtml = toolBtn ? toolBtn.innerHTML : `<span>${partSVG(pk,20)}</span>`;
+                const iconHtml = getToolbarIcon(pk, 20);
                 btn.innerHTML = `<span style="display:inline-flex;align-items:center;vertical-align:middle;width:28px;height:28px;">${iconHtml}</span><span class="part-count" id="${countId}">${countVal}</span>`;
             });
 
             // クラフト選択中ラベル初期値
             const cLabel = document.getElementById('craft-selected-label');
-            if (cLabel) cLabel.innerHTML = `<span style="display:inline-flex;align-items:center;vertical-align:middle;">${partSVG('belt',24)}</span>&nbsp;ベルト`;
+            if (cLabel) cLabel.innerHTML = `<span style="display:inline-flex;align-items:center;vertical-align:middle;width:32px;height:32px;">${getToolbarIcon('belt',24)}</span>&nbsp;ベルト`;
 
             // パーツ在庫表示（トップバー）
             document.querySelectorAll('#parts-display .part-label').forEach(label => {
@@ -5876,7 +5881,7 @@
             };
             const labelEl = document.getElementById('craft-selected-label');
             const countEl = document.getElementById('craft-selected-count');
-            if (labelEl) labelEl.innerHTML = `<span style="display:inline-flex;align-items:center;vertical-align:middle;">${partSVG(partType,24)}</span>&nbsp;${labelNameMap[partType]||partType}`;
+            if (labelEl) labelEl.innerHTML = `<span style="display:inline-flex;align-items:center;vertical-align:middle;width:32px;height:32px;">${getToolbarIcon(partType,24)}</span>&nbsp;${labelNameMap[partType]||partType}`;
             if (countEl) countEl.textContent = '×' + (parts[partType] ?? 0);
 
             // スロット初期化
