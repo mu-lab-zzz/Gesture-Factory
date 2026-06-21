@@ -662,6 +662,29 @@
             gap: 6px;
             width: 100%;
         }
+        #inventory-panel {
+            overflow: hidden;
+            max-height: 120px;
+            transition: max-height 0.25s ease;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+        #inventory-panel.collapsed {
+            max-height: 0;
+        }
+        #inventory-toggle {
+            background: none;
+            border: none;
+            color: #556;
+            font-size: 11px;
+            cursor: pointer;
+            padding: 0 4px;
+            line-height: 1;
+            flex-shrink: 0;
+        }
         #auto-main {
             display: flex;
             flex-direction: column;
@@ -2060,6 +2083,7 @@
     <div id="content-automation" style="display: none;">
         <!-- トップバー：在庫チップ＋セクター選択 -->
         <div id="auto-top-bar">
+            <div id="inventory-panel">
             <div class="parts-inventory" id="parts-display">
                 <span><span class="part-label"><svg width="20" height="16" viewBox="0 0 60 60" fill="none"><circle cx="14" cy="30" r="8" stroke="#888780" stroke-width="2" fill="none"/><circle cx="46" cy="30" r="8" stroke="#888780" stroke-width="2" fill="none"/><line x1="14" y1="22" x2="46" y2="22" stroke="#888780" stroke-width="2"/><line x1="14" y1="38" x2="46" y2="38" stroke="#888780" stroke-width="2"/><circle cx="14" cy="30" r="3" fill="#5F5E5A"/><circle cx="46" cy="30" r="3" fill="#5F5E5A"/><polygon points="38,25 46,30 38,35" fill="#5F5E5A"/></svg></span><span class="part-num zero" id="disp-parts-belt">0</span></span>
                 <span><span class="part-label"><svg width="20" height="16" viewBox="0 0 60 60" fill="none"><rect x="22" y="50" width="16" height="5" rx="2.5" fill="#444441"/><ellipse cx="30" cy="50" rx="8" ry="3" fill="#5F5E5A"/><circle cx="30" cy="46" r="4.5" fill="#5F5E5A" stroke="#444441" stroke-width="1.5"/><line x1="30" y1="46" x2="20" y2="32" stroke="#5F5E5A" stroke-width="5" stroke-linecap="round"/><circle cx="20" cy="32" r="4" fill="#5F5E5A" stroke="#444441" stroke-width="1.5"/><line x1="20" y1="32" x2="44" y2="22" stroke="#5F5E5A" stroke-width="3.5" stroke-linecap="round"/><circle cx="44" cy="22" r="3" fill="#5F5E5A" stroke="#444441" stroke-width="1"/><line x1="44" y1="22" x2="51" y2="15" stroke="#639922" stroke-width="2.5" stroke-linecap="round"/><line x1="51" y1="15" x2="58" y2="18" stroke="#639922" stroke-width="2.5" stroke-linecap="round"/><line x1="44" y1="22" x2="51" y2="29" stroke="#639922" stroke-width="2.5" stroke-linecap="round"/><line x1="51" y1="29" x2="58" y2="26" stroke="#639922" stroke-width="2.5" stroke-linecap="round"/></svg></span><span class="part-num zero" id="disp-parts-inserter">0</span></span>
@@ -2080,11 +2104,13 @@
             <div style="padding:2px 4px;">
                 <button id="coin-parts-btn" onclick="openPartsStore()" style="padding:4px 10px;border-radius:6px;border:1px solid #554400;background:#1a1500;color:#ffd700;font-size:11px;cursor:pointer;white-space:nowrap;">🏪 <span data-i18n="parts_store_btn">パーツストア</span></button>
             </div>
+            </div><!-- /#inventory-panel -->
             <div id="sector-selector">
                 <button id="btn-prev-sector">◀</button>
                 <div id="sector-display">SECTOR 00</div>
                 <button id="btn-next-sector">▶</button>
                 <button id="coin-sector-btn" onclick="coinUnlockSector()" title="🪙×25でセクター解放" style="padding:3px 7px;border-radius:6px;border:1px solid #554400;background:#1a1500;color:#ffd700;font-size:11px;cursor:pointer;white-space:nowrap;display:none;">🪙×25</button>
+                <button id="inventory-toggle" onclick="toggleInventoryPanel()" title="在庫を折りたたむ">▲</button>
             </div>
         </div>
 
@@ -2880,6 +2906,20 @@
         let effects = []; 
 
         // ===== オープニング =====
+        function toggleInventoryPanel() {
+            const panel = document.getElementById('inventory-panel');
+            const btn = document.getElementById('inventory-toggle');
+            const collapsed = panel.classList.toggle('collapsed');
+            btn.textContent = collapsed ? '▼' : '▲';
+            localStorage.setItem('inventoryCollapsed', collapsed ? '1' : '0');
+        }
+        function initInventoryPanel() {
+            if (localStorage.getItem('inventoryCollapsed') === '1') {
+                document.getElementById('inventory-panel').classList.add('collapsed');
+                document.getElementById('inventory-toggle').textContent = '▼';
+            }
+        }
+
         function openSettings() {
             document.getElementById('settings-modal').style.display = 'flex';
         }
@@ -2987,6 +3027,7 @@
             bgm.play().catch(() => {});
             screen.classList.add('fade-out');
             setTimeout(() => { screen.style.display = 'none'; }, 850);
+            initInventoryPanel();
         }
 
         // タイトルクリックハンドラー
