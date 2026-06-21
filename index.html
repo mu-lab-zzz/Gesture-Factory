@@ -1658,7 +1658,7 @@
         <img id="opening-logo" src="opening.png" alt="GESTURE&FACTORY">
         <button id="opening-start-btn" onclick="startGame()">TAP TO START</button>
     </div>
-    <div id="opening-version">Ver 1.06</div>
+    <div id="opening-version">Ver 1.07</div>
     <audio id="bgm" src="Thousandth_Rotation.mp3" loop></audio>
 </div>
 
@@ -3157,7 +3157,6 @@
                 toolbar.classList.remove('open');
                 _toolbarOpenTab = null;
                 document.querySelectorAll('.tool-tab-btn[data-tab]').forEach(b => b.classList.remove('active-tab'));
-                setTimeout(fitGrid, 250);
                 return;
             }
             _toolbarOpenTab = tab;
@@ -3174,13 +3173,11 @@
                 b.style.display = (inTab && unlocked) ? '' : 'none';
             });
             toolbar.classList.add('open');
-            setTimeout(fitGrid, 250);
         }
         function closeToolbar() {
             const toolbar = document.getElementById('toolbar');
             toolbar.classList.remove('open');
             _toolbarOpenTab = null;
-            setTimeout(fitGrid, 250);
         }
 
         function selectTool(tool, activeBtn) {
@@ -3211,10 +3208,6 @@
             closeToolbar();
         });
 
-        // グリッドタップでツールバーを閉じる
-        document.getElementById('grid').addEventListener('pointerdown', () => {
-            closeToolbar();
-        }, { capture: true, passive: true });
 
         // マウスドラッグで横スクロール
         let toolbarDragging = false, toolbarStartX = 0, toolbarScrollStart = 0, toolbarDragMoved = false;
@@ -4160,15 +4153,12 @@
             if (!stage || !wrap || !stage.offsetParent) return;
             const availW = stage.clientWidth || stage.parentElement.clientWidth || window.innerWidth;
             const stageTop = stage.getBoundingClientRect().top;
-            // ツールバーはタブ行のみ常時表示（ツールパネルは展開時のみ）
             const toolbarH = tabBar ? tabBar.offsetHeight + 8 : 52;
             const scale = availW / GRID_NATURAL_W;
             wrap.style.zoom = scale;
             const stageH = window.innerHeight - stageTop - toolbarH - 4;
             stage.style.height = Math.max(stageH, 150) + 'px';
-            // スクロール不要ならoverflow-y:hidden
-            const gridH = Math.round(GRID_NATURAL_H * scale);
-            stage.style.overflowY = gridH <= stageH ? 'hidden' : 'auto';
+            stage.style.overflowY = 'hidden';
             window._gridScale = scale;
         }
         window.addEventListener('resize', fitGrid);
