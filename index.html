@@ -1658,7 +1658,7 @@
         <img id="opening-logo" src="opening.png" alt="GESTURE&FACTORY">
         <button id="opening-start-btn" onclick="startGame()">TAP TO START</button>
     </div>
-    <div id="opening-version">Ver 1.08</div>
+    <div id="opening-version">Ver 1.09</div>
     <audio id="bgm" src="Thousandth_Rotation.mp3" loop></audio>
 </div>
 
@@ -3149,19 +3149,21 @@
             return null;
         }
 
-        function switchToolTab(tab) {
-            currentTab = tab;
-            // タブボタンのactive-tab更新
+        function refreshToolbarButtons(tab) {
+            // ツールボタンの表示切替のみ（開閉しない）
             document.querySelectorAll('.tool-tab-btn[data-tab]').forEach(b => {
                 b.classList.toggle('active-tab', b.dataset.tab === tab);
             });
-            // ツールボタンの表示切替（解放済みのものだけ表示）
             toolbarEl.querySelectorAll('button[data-tab-group]').forEach(b => {
                 const inTab = b.dataset.tabGroup === tab;
                 const unlockKey = b.dataset.unlock;
                 const unlocked = !unlockKey || isUnlocked(unlockKey);
                 b.style.display = (inTab && unlocked) ? '' : 'none';
             });
+        }
+        function switchToolTab(tab) {
+            currentTab = tab;
+            refreshToolbarButtons(tab);
             document.getElementById('toolbar').classList.add('open');
         }
         function closeToolbar() {
@@ -5856,7 +5858,7 @@
                 });
             });
             // ツールタブを再適用してunlock済みボタンの表示を正しく制御
-            switchToolTab(currentTab);
+            refreshToolbarButtons(currentTab);
         }
 
         // ── セーブ＆ロードシステム ──────────────────────────
