@@ -1685,7 +1685,7 @@
         <img id="opening-logo" src="opening.png" alt="GESTURE&FACTORY">
         <button id="opening-start-btn" onclick="startGame()">TAP TO START</button>
     </div>
-    <div id="opening-version">Ver 1.27</div>
+    <div id="opening-version">Ver 1.28</div>
     <audio id="bgm" src="Thousandth_Rotation.mp3" loop></audio>
 </div>
 
@@ -6648,6 +6648,7 @@
                 if (data.unlockedSectors) unlockedSectors = new Set(data.unlockedSectors);
                 
                 if (data.sectors) {
+                    let maxItemId = 0;
                     for (let s = 0; s < TOTAL_SECTORS; s++) {
                         if (!data.sectors[s]) continue;
                         for (let y = 0; y < ROWS; y++) {
@@ -6680,9 +6681,11 @@
                                 sectors[s][y][x].dir = savedCell.dir;
                                 sectors[s][y][x].items = savedCell.items || [];
                                 sectors[s][y][x].work = savedCell.work;
+                                (savedCell.items || []).forEach(item => { if (item.id > maxItemId) maxItemId = item.id; });
                             }
                         }
                     }
+                    itemIdCounter = maxItemId;
                 }
             } catch (e) {
                 console.error("セーブデータの読み込みに失敗しました", e);
