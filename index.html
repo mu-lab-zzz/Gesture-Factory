@@ -1670,7 +1670,7 @@
         <img id="opening-logo" src="opening.png" alt="GESTURE&FACTORY">
         <button id="opening-start-btn" onclick="startGame()">TAP TO START</button>
     </div>
-    <div id="opening-version">Ver 1.15</div>
+    <div id="opening-version">Ver 1.16</div>
     <audio id="bgm" src="Thousandth_Rotation.mp3" loop></audio>
 </div>
 
@@ -6213,8 +6213,9 @@
                 splitter:'分岐機', merger:'合流機', longInserter:'ロングアーム',
                 factory:'部品工場'
             };
+            const alwaysAvailable = new Set(['belt','inserter','assembler','storageSource','storageSink']);
             PART_STORE_CONFIG.forEach(cfg => {
-                if (!isUnlocked(cfg.key)) return;
+                if (!alwaysAvailable.has(cfg.key) && !isUnlocked(cfg.key)) return;
                 const stock = parts[cfg.key] || 0;
                 const card = document.createElement('div');
                 card.className = 'store-card';
