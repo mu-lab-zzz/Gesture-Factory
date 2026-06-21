@@ -798,6 +798,7 @@
             overflow-x: hidden;
             width: 100%;
             -webkit-overflow-scrolling: touch;
+            touch-action: pan-y;
         }
         #grid {
             display: grid;
@@ -3110,13 +3111,15 @@
                     div.dataset.y = y;
                     
                     div.addEventListener('pointerdown', onCellPointerDown);
-                    div.addEventListener('pointerup', onCellPointerUp);
                     
                     gridEl.appendChild(div);
                     sectors[currentSectorId][y][x].el = div;
                 }
             }
         }
+
+        // pointerup をdocumentレベルで受け取り（指がセル外に出ても動作するように）
+        document.addEventListener('pointerup', onCellPointerUp);
 
         // カーブベルト2軸ドラッグ検出（gridEl レベルで捕捉）
         gridEl.addEventListener('pointermove', (e) => {
@@ -3142,17 +3145,14 @@
         });
 
         function onCellPointerDown(e) {
-            e.preventDefault();
             startX = e.clientX;
             startY = e.clientY;
             startCellX = parseInt(e.currentTarget.dataset.x, 10);
             startCellY = parseInt(e.currentTarget.dataset.y, 10);
             if (['belt','fast-belt','double-belt','curve-belt'].includes(currentTool)) curveDrag = { phase: 1, dir1: null, dir2: null };
-            e.currentTarget.setPointerCapture(e.pointerId);
         }
 
         function onCellPointerUp(e) {
-            e.preventDefault();
             if (startCellX === null || startCellY === null) return;
 
             const x = startCellX;
