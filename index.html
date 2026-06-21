@@ -2047,8 +2047,10 @@
         <!-- メインエリア：グリッド＋ツールバー -->
         <div id="auto-main">
             <div id="stage-container">
-                <div id="grid"></div>
-                <div id="item-layer" class="item-layer"></div>
+                <div id="grid-wrap" style="position:relative;display:inline-block;transform-origin:top left;">
+                    <div id="grid"></div>
+                    <div id="item-layer" class="item-layer"></div>
+                </div>
             </div>
 
             <div id="toolbar-wrap">
@@ -3952,18 +3954,16 @@
         const GRID_NATURAL_H = 337; // 10*32 + 9*1gap + 2*4pad
         function fitGrid() {
             const stage = document.getElementById('stage-container');
+            const wrap = document.getElementById('grid-wrap');
             const toolbarWrap = document.getElementById('toolbar-wrap');
-            if (!stage || !stage.offsetParent) return;
+            if (!stage || !wrap || !stage.offsetParent) return;
             const availW = stage.parentElement.clientWidth || window.innerWidth;
             const stageTop = stage.getBoundingClientRect().top;
             const toolbarH = toolbarWrap ? toolbarWrap.offsetHeight : 130;
             const availH = window.innerHeight - stageTop - toolbarH - 8;
             const scale = Math.min(availW / GRID_NATURAL_W, availH / GRID_NATURAL_H, 1);
+            wrap.style.zoom = scale;
             stage.style.height = Math.round(GRID_NATURAL_H * scale) + 'px';
-            ['grid', 'item-layer'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) { el.style.transform = `scale(${scale})`; el.style.transformOrigin = 'top left'; }
-            });
             window._gridScale = scale;
         }
         window.addEventListener('resize', fitGrid);
