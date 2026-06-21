@@ -1685,7 +1685,7 @@
         <img id="opening-logo" src="opening.png" alt="GESTURE&FACTORY">
         <button id="opening-start-btn" onclick="startGame()">TAP TO START</button>
     </div>
-    <div id="opening-version">Ver 1.25</div>
+    <div id="opening-version">Ver 1.26</div>
     <audio id="bgm" src="Thousandth_Rotation.mp3" loop></audio>
 </div>
 
@@ -6896,7 +6896,7 @@
             const container = document.getElementById('casino-gem-rows');
             container.innerHTML = '';
             C_GEMS.forEach(g => {
-                const stock = (typeof resources !== 'undefined' ? resources[g.kind] : 0) || 0;
+                const stock = Math.floor((typeof resources !== 'undefined' ? resources[g.kind] : 0) || 0);
                 const row = document.createElement('div');
                 row.style.cssText = 'display:flex;align-items:center;gap:6px;margin-bottom:7px;';
                 row.innerHTML = `
@@ -6920,7 +6920,7 @@
             cUpdateChips();
             updateUI();
             const el = document.getElementById('casino-stock-'+kind);
-            if (el) el.textContent = resources[kind];
+            if (el) el.textContent = Math.floor(resources[kind]);
         };
 
         // ── ペイテーブル ──────────────────────────────────────────────────────
