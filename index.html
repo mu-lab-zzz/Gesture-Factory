@@ -1685,7 +1685,7 @@
         <img id="opening-logo" src="opening.png" alt="GESTURE&FACTORY">
         <button id="opening-start-btn" onclick="startGame()">TAP TO START</button>
     </div>
-    <div id="opening-version">Ver 1.32</div>
+    <div id="opening-version">Ver 1.33</div>
     <audio id="bgm" src="Thousandth_Rotation.mp3" loop></audio>
 </div>
 
@@ -5048,15 +5048,25 @@
                 'fast-curve-belt':'fastCurveBelt','double-curve-belt':'doubleCurveBelt'
             };
 
-            // クラフトチップ
-            const craftKeys = ['belt','inserter','assembler','storageSource','storageSink','fastBelt','fastInserter','fastAssembler','splitter','merger','longInserter','factory'];
-            document.querySelectorAll('.craft-part-btn').forEach((btn, i) => {
-                if (i >= craftKeys.length) return;
-                const pk = craftKeys[i];
+            // クラフトチップ（ツールバーSVGを流用）
+            const craftPartToolMap = {
+                belt:'belt', inserter:'inserter', assembler:'assembler',
+                storageSource:'storage-source', storageSink:'storage-sink',
+                fastBelt:'fast-belt', fastInserter:'fast-inserter', fastAssembler:'fast-assembler',
+                splitter:'splitter', merger:'merger', longInserter:'long-inserter',
+                doubleBelt:'double-belt', crossBelt:'cross-belt', fastCrossBelt:'fast-cross-belt',
+                factory:'factory'
+            };
+            document.querySelectorAll('.craft-part-btn').forEach(btn => {
+                const pk = btn.getAttribute('onclick').match(/selectCraftTarget\('(\w+)'\)/)?.[1];
+                if (!pk) return;
                 const countEl = btn.querySelector('.part-count');
                 const countId = countEl ? countEl.id : `parts-${pk}-count`;
                 const countVal = countEl ? countEl.textContent : '×0';
-                btn.innerHTML = `<span style="display:inline-flex;align-items:center;vertical-align:middle;">${partSVG(pk,20)}</span> <span class="part-count" id="${countId}">${countVal}</span>`;
+                const toolKey = craftPartToolMap[pk];
+                const toolBtn = toolKey ? document.querySelector(`[data-tool="${toolKey}"]`) : null;
+                const iconHtml = toolBtn ? toolBtn.innerHTML : `<span>${partSVG(pk,20)}</span>`;
+                btn.innerHTML = `<span style="display:inline-flex;align-items:center;vertical-align:middle;width:28px;height:28px;">${iconHtml}</span><span class="part-count" id="${countId}">${countVal}</span>`;
             });
 
             // クラフト選択中ラベル初期値
