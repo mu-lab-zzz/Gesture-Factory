@@ -1685,7 +1685,7 @@
         <img id="opening-logo" src="opening.png" alt="GESTURE&FACTORY">
         <button id="opening-start-btn" onclick="startGame()">TAP TO START</button>
     </div>
-    <div id="opening-version">Ver 1.31</div>
+    <div id="opening-version">Ver 1.32</div>
     <audio id="bgm" src="Thousandth_Rotation.mp3" loop></audio>
 </div>
 
@@ -1828,7 +1828,7 @@
             <button class="coin-btn" id="coin-storage-point" onclick="coinUpgradeStorage('point')" disabled>🪙 ×15 倉庫拡張 +50</button>
             <button class="upgrade-btn" id="up-point" onclick="upgradeStorage('point')" data-i18n-storage-expand="6" style="margin-bottom: 5px;">📦 倉庫拡張 (■×6)</button>
             <button class="upgrade-btn" id="prod-point" onclick="upgradeProduction('point')" data-i18n-prod-boost="10" style="margin-bottom: 5px;">⚡ 生産量強化 (🔺×10)</button>
-            <button class="upgrade-btn" id="auto-prod-point" onclick="upgradeAutoProduction('point')" data-i18n="auto_prod_btn_pt">🤖 自動生産強化 (🔺×5, ■×5)</button>
+            <button class="upgrade-btn" id="auto-prod-point" onclick="upgradeAutoProduction('point')" data-i18n-sym="auto_prod_btn_pt">🤖 自動生産強化 (🔺×5, ■×5)</button>
         </div>
         <div class="resource-card line locked" id="card-line">
             <div class="resource-name">線 (Lines) <span style="font-size:10px;color:#ff3366;">[未解放]</span></div>
@@ -1837,7 +1837,7 @@
             <button class="coin-btn" id="coin-storage-line" onclick="coinUpgradeStorage('line')" disabled>🪙 ×15 倉庫拡張 +50</button>
             <button class="upgrade-btn" id="up-line" onclick="upgradeStorage('line')" data-i18n-storage-expand="6" disabled style="margin-bottom: 5px;">📦 倉庫拡張 (■×6)</button>
             <button class="upgrade-btn" id="prod-line" onclick="upgradeProduction('line')" data-i18n-prod-boost="15" disabled style="margin-bottom: 5px;">⚡ 生産量強化 (🔺×15)</button>
-            <button class="upgrade-btn" id="auto-prod-line" onclick="upgradeAutoProduction('line')" data-i18n="auto_prod_btn_ln" disabled>🤖 自動生産強化 (⬠×5, ⬢×5)</button>
+            <button class="upgrade-btn" id="auto-prod-line" onclick="upgradeAutoProduction('line')" data-i18n-sym="auto_prod_btn_ln" disabled>🤖 自動生産強化 (⬠×5, ⬢×5)</button>
         </div>
         <div class="resource-card triangle locked" id="card-triangle">
             <div class="resource-name">三角形 (Triangles) <span style="font-size:10px;color:#ff3366;">[未解放]</span></div>
@@ -2654,7 +2654,7 @@
                 el.textContent = t('storage_expand_btn', el.dataset.i18nStorageExpand);
             });
             document.querySelectorAll('[data-i18n-prod-boost]').forEach(el => {
-                el.textContent = t('prod_boost_btn', el.dataset.i18nProdBoost);
+                el.innerHTML = replaceSymbols(t('prod_boost_btn', el.dataset.i18nProdBoost));
             });
             document.querySelectorAll('[data-i18n-html]').forEach(el => {
                 el.innerHTML = t(el.dataset.i18nHtml);
