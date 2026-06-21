@@ -1645,7 +1645,7 @@
         <img id="opening-logo" src="opening.png" alt="GESTURE&FACTORY">
         <button id="opening-start-btn" onclick="startGame()">TAP TO START</button>
     </div>
-    <div id="opening-version">Ver 1.04</div>
+    <div id="opening-version">Ver 1.05</div>
     <audio id="bgm" src="Thousandth_Rotation.mp3" loop></audio>
 </div>
 
@@ -2112,9 +2112,6 @@
                 <span data-unlock="fastCrossBelt" style="display:none"><span class="part-label"><svg width="20" height="16" viewBox="0 0 60 60" fill="none"><circle cx="10" cy="12" r="6" stroke="#378ADD" stroke-width="2" fill="none"/><circle cx="50" cy="48" r="6" stroke="#378ADD" stroke-width="2" fill="none"/><line x1="14" y1="7" x2="54" y2="43" stroke="#378ADD" stroke-width="2"/><line x1="6" y1="17" x2="46" y2="53" stroke="#378ADD" stroke-width="2"/><circle cx="50" cy="12" r="6" stroke="#378ADD" stroke-width="2" fill="none"/><circle cx="10" cy="48" r="6" stroke="#378ADD" stroke-width="2" fill="none"/><rect x="24" y="24" width="12" height="12" fill="#1f2933"/><line x1="46" y1="7" x2="6" y2="43" stroke="#378ADD" stroke-width="2"/><line x1="54" y1="17" x2="14" y2="53" stroke="#378ADD" stroke-width="2"/><polygon points="43,43 51,49 45,54" fill="#378ADD"/><polygon points="17,43 9,49 15,54" fill="#378ADD"/></svg></span><span class="part-num zero" id="disp-parts-fastCrossBelt">0</span></span>
                 <span data-unlock="factory" style="display:none"><span class="part-label">🏭</span><span class="part-num zero" id="disp-parts-factory">0</span></span>
             </div>
-            <div style="padding:2px 4px;">
-                <button id="coin-parts-btn" onclick="openPartsStore()" style="padding:4px 10px;border-radius:6px;border:1px solid #554400;background:#1a1500;color:#ffd700;font-size:11px;cursor:pointer;white-space:nowrap;">🏪 <span data-i18n="parts_store_btn">パーツストア</span></button>
-            </div>
             </div><!-- /#inventory-panel -->
             <div id="sector-selector">
                 <button id="btn-prev-sector">◀</button>
@@ -2143,6 +2140,7 @@
                 <button class="tool-tab-btn" data-tab="machine"><svg width="22" height="22" viewBox="0 0 60 60" fill="none"><rect x="14" y="14" width="32" height="32" rx="3" stroke="#7F77DD" stroke-width="2" fill="none"/><circle cx="30" cy="30" r="7" stroke="#7F77DD" stroke-width="2" fill="none"/><circle cx="30" cy="30" r="2.5" fill="#7F77DD"/></svg></button>
                 <button class="tool-tab-btn" data-tab="storage"><svg width="22" height="22" viewBox="0 0 60 60" fill="none"><rect x="6" y="12" width="36" height="36" rx="3" stroke="#B4B2A9" stroke-width="2" fill="none"/><line x1="6" y1="24" x2="42" y2="24" stroke="#B4B2A9" stroke-width="1.5"/><line x1="24" y1="12" x2="24" y2="48" stroke="#B4B2A9" stroke-width="1.5"/></svg></button>
                 <button class="tool-tab-btn" data-tab="branch"><svg width="22" height="22" viewBox="0 0 60 60" fill="none"><line x1="4" y1="30" x2="22" y2="30" stroke="#B4B2A9" stroke-width="2"/><rect x="20" y="22" width="16" height="16" rx="2" stroke="#BA7517" stroke-width="2" fill="none"/><line x1="36" y1="30" x2="46" y2="18" stroke="#BA7517" stroke-width="2"/><line x1="36" y1="30" x2="46" y2="42" stroke="#BA7517" stroke-width="2"/><polygon points="42,13 52,18 44,22" fill="#BA7517"/><polygon points="42,47 52,42 44,38" fill="#BA7517"/></svg></button>
+                <button id="coin-parts-btn" onclick="openPartsStore()" style="padding:4px 8px;border-radius:6px;border:1px solid #554400;background:#1a1500;color:#ffd700;font-size:11px;cursor:pointer;white-space:nowrap;flex-shrink:0;">🏪</button>
             </div>
             <!-- ツールパネル -->
             <div id="toolbar">
