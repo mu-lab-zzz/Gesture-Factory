@@ -1,5 +1,11 @@
 # Shape Gesture Factory - 開発メモ
 
+## ⚠️ バージョン管理ルール（必須・例外なし）
+- 現在のバージョン: **Ver 1.04**
+- **修正・更新・追加を行うたびに Ver を 0.01 ずつ上げる**
+- バージョンは `index.html` の `#opening-version` div内のテキスト (`Ver X.XX`) を更新する
+- コミット前に必ずバージョンを上げること
+
 ## ファイル構成
 - `index.html` 1ファイルのみ（約3200行）
 - タブ: 工場(Canvas) / 自動化ライン(Grid) / 倉庫(Inventory) / ティア(Progress)
