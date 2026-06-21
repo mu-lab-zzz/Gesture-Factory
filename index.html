@@ -1669,7 +1669,7 @@
         <img id="opening-logo" src="opening.png" alt="GESTURE&FACTORY">
         <button id="opening-start-btn" onclick="startGame()">TAP TO START</button>
     </div>
-    <div id="opening-version">Ver 1.11</div>
+    <div id="opening-version">Ver 1.12</div>
     <audio id="bgm" src="Thousandth_Rotation.mp3" loop></audio>
 </div>
 
@@ -3112,9 +3112,20 @@
             const btn = document.getElementById('tab-' + tabName);
             if (btn) btn.classList.add('active');
 
-            // mini-inventory: 工場タブのみ非表示
+            // mini-inventory: 工場タブのみ非表示、コイン・設定を移動
             const mini = document.querySelector('.mini-inventory');
             if (mini) mini.style.display = tabName === 'automation' ? 'none' : '';
+            const coinEl = document.getElementById('coin-display');
+            const settingsEl = document.getElementById('settings-btn');
+            const sectorSel = document.getElementById('sector-selector');
+            const miniResGroup = document.querySelector('.mini-res-group');
+            if (tabName === 'automation' && sectorSel && coinEl && settingsEl) {
+                sectorSel.insertBefore(coinEl, sectorSel.firstChild);
+                sectorSel.appendChild(settingsEl);
+            } else if (mini && miniResGroup && coinEl && settingsEl) {
+                mini.insertBefore(coinEl, mini.firstChild);
+                mini.appendChild(settingsEl);
+            }
 
             if (tabName === 'factory') {
                 document.getElementById('content-factory').style.display = 'flex';
