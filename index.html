@@ -703,12 +703,18 @@
 
         /* ツールバーラッパー（グリッドと同幅） */
         #toolbar-wrap {
-            width: 0;
-            min-width: 100%;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 200;
+            background: #12121e;
+            border-top: 1px solid #2d2d3d;
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
             gap: 4px;
+            padding-bottom: env(safe-area-inset-bottom, 0px);
         }
 
         /* タブ行 */
@@ -788,9 +794,10 @@
 
         #stage-container {
             position: relative;
-            overflow: hidden;
+            overflow-y: auto;
+            overflow-x: hidden;
             width: 100%;
-            flex-shrink: 0;
+            -webkit-overflow-scrolling: touch;
         }
         #grid {
             display: grid;
@@ -3957,13 +3964,15 @@
             const wrap = document.getElementById('grid-wrap');
             const toolbarWrap = document.getElementById('toolbar-wrap');
             if (!stage || !wrap || !stage.offsetParent) return;
-            const availW = stage.parentElement.clientWidth || window.innerWidth;
+            const availW = stage.clientWidth || stage.parentElement.clientWidth || window.innerWidth;
             const stageTop = stage.getBoundingClientRect().top;
-            const toolbarH = toolbarWrap ? toolbarWrap.offsetHeight : 130;
-            const availH = window.innerHeight - stageTop - toolbarH - 8;
-            const scale = Math.min(availW / GRID_NATURAL_W, availH / GRID_NATURAL_H, 1);
+            const toolbarH = toolbarWrap ? toolbarWrap.offsetHeight : 120;
+            // 横幅いっぱいに拡大（1倍以上も許可）、縦はスクロール
+            const scale = availW / GRID_NATURAL_W;
             wrap.style.zoom = scale;
-            stage.style.height = Math.round(GRID_NATURAL_H * scale) + 'px';
+            // ステージ高さ = ビューポートから上部UI+ツールバー分を引いた残り
+            const stageH = window.innerHeight - stageTop - toolbarH - 4;
+            stage.style.height = Math.max(stageH, 150) + 'px';
             window._gridScale = scale;
         }
         window.addEventListener('resize', fitGrid);
