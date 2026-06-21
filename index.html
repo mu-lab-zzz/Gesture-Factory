@@ -1670,7 +1670,7 @@
         <img id="opening-logo" src="opening.png" alt="GESTURE&FACTORY">
         <button id="opening-start-btn" onclick="startGame()">TAP TO START</button>
     </div>
-    <div id="opening-version">Ver 1.17</div>
+    <div id="opening-version">Ver 1.18</div>
     <audio id="bgm" src="Thousandth_Rotation.mp3" loop></audio>
 </div>
 
@@ -4184,17 +4184,22 @@
         }, { passive: true });
         document.addEventListener('touchmove', (e) => {
             const dy = e.touches[0].clientY - _ptrTouchStartY;
-            const atTop = (window.scrollY || document.documentElement.scrollTop) === 0;
-            if (!(dy > 0 && atTop)) return;
-            // タッチ起点がスクロール可能な要素の内側なら通す
+            if (dy <= 0) return;
+            // タッチ起点の祖先にスクロール可能要素があるか確認
             let el = e.target;
             while (el && el !== document.body) {
                 const style = getComputedStyle(el);
                 const overflowY = style.overflowY;
-                if ((overflowY === 'auto' || overflowY === 'scroll') && el.scrollHeight > el.clientHeight) return;
+                if ((overflowY === 'auto' || overflowY === 'scroll') && el.scrollHeight > el.clientHeight) {
+                    // スクロール可能要素の中でも最上部なら更新をブロック
+                    if (el.scrollTop === 0) e.preventDefault();
+                    return;
+                }
                 el = el.parentElement;
             }
-            e.preventDefault();
+            // ページ自体が最上部なら更新をブロック
+            const atTop = (window.scrollY || document.documentElement.scrollTop) === 0;
+            if (atTop) e.preventDefault();
         }, { passive: false });
 
         function renderAll() {
