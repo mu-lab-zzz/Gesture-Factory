@@ -1658,7 +1658,7 @@
         <img id="opening-logo" src="opening.png" alt="GESTURE&FACTORY">
         <button id="opening-start-btn" onclick="startGame()">TAP TO START</button>
     </div>
-    <div id="opening-version">Ver 1.07</div>
+    <div id="opening-version">Ver 1.08</div>
     <audio id="bgm" src="Thousandth_Rotation.mp3" loop></audio>
 </div>
 
@@ -3149,17 +3149,7 @@
             return null;
         }
 
-        let _toolbarOpenTab = null;
         function switchToolTab(tab) {
-            const toolbar = document.getElementById('toolbar');
-            if (_toolbarOpenTab === tab && toolbar.classList.contains('open')) {
-                // 同じタブ再タップで閉じる
-                toolbar.classList.remove('open');
-                _toolbarOpenTab = null;
-                document.querySelectorAll('.tool-tab-btn[data-tab]').forEach(b => b.classList.remove('active-tab'));
-                return;
-            }
-            _toolbarOpenTab = tab;
             currentTab = tab;
             // タブボタンのactive-tab更新
             document.querySelectorAll('.tool-tab-btn[data-tab]').forEach(b => {
@@ -3172,12 +3162,10 @@
                 const unlocked = !unlockKey || isUnlocked(unlockKey);
                 b.style.display = (inTab && unlocked) ? '' : 'none';
             });
-            toolbar.classList.add('open');
+            document.getElementById('toolbar').classList.add('open');
         }
         function closeToolbar() {
-            const toolbar = document.getElementById('toolbar');
-            toolbar.classList.remove('open');
-            _toolbarOpenTab = null;
+            document.getElementById('toolbar').classList.remove('open');
         }
 
         function selectTool(tool, activeBtn) {
