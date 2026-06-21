@@ -1686,6 +1686,30 @@
             </details>
             <button onclick="closeSettings(); openStats();" style="width:100%; margin-bottom:8px; padding:10px; background:none; border:1.5px solid #334; border-radius:10px; color:#aaa; font-size:14px; cursor:pointer;" data-i18n="stats_btn">📊 統計を見る</button>
             <a href="https://ko-fi.com/mulabs" target="_blank" style="display:block; width:100%; margin-top:16px; padding:10px; background:#ff5e5b; border:none; border-radius:10px; color:#fff; font-size:13px; font-weight:bold; text-align:center; text-decoration:none; box-sizing:border-box;" data-i18n="kofi_btn">☕ Ko-fiで開発を支援する</a>
+            <!-- デバッグパネル -->
+            <details id="debug-panel" style="margin-top:16px; color:#ccc;">
+                <summary style="cursor:pointer; font-size:12px; color:#555; list-style:none; text-align:center; padding:4px 0;">🛠 DEBUG</summary>
+                <div style="margin-top:10px; display:flex; flex-direction:column; gap:8px; font-size:13px;">
+                    <div style="color:#888; font-size:11px; text-align:center; letter-spacing:1px;">── 素材・パーツ追加 ──</div>
+                    <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                        <button onclick="dbgAddResources()" style="flex:1; padding:6px; background:#1a2a1a; border:1px solid #2d5a2d; border-radius:8px; color:#8f8; font-size:12px; cursor:pointer;">素材 +100</button>
+                        <button onclick="dbgAddParts()" style="flex:1; padding:6px; background:#1a1a2a; border:1px solid #2d2d5a; border-radius:8px; color:#88f; font-size:12px; cursor:pointer;">パーツ +10</button>
+                    </div>
+                    <div style="color:#888; font-size:11px; text-align:center; letter-spacing:1px;">── ティア ──</div>
+                    <div style="display:flex; gap:6px;">
+                        <button onclick="dbgTierUp()" style="flex:1; padding:6px; background:#2a1a0a; border:1px solid #5a3a0a; border-radius:8px; color:#fa8; font-size:12px; cursor:pointer;">ティア +1</button>
+                        <button onclick="dbgTierMax()" style="flex:1; padding:6px; background:#2a1a0a; border:1px solid #5a3a0a; border-radius:8px; color:#fa8; font-size:12px; cursor:pointer;">最終ティア</button>
+                    </div>
+                    <div style="color:#888; font-size:11px; text-align:center; letter-spacing:1px;">── ゲーム速度 ──</div>
+                    <div style="display:flex; gap:6px;" id="debug-speed-btns">
+                        <button onclick="dbgSetSpeed(1)" class="spd-btn spd-active" style="flex:1; padding:6px; background:#0d2a3d; border:1.5px solid #1a6a9a; border-radius:8px; color:#6cf; font-size:12px; cursor:pointer;">×1</button>
+                        <button onclick="dbgSetSpeed(2)" class="spd-btn" style="flex:1; padding:6px; background:#1a1a1a; border:1px solid #333; border-radius:8px; color:#aaa; font-size:12px; cursor:pointer;">×2</button>
+                        <button onclick="dbgSetSpeed(5)" class="spd-btn" style="flex:1; padding:6px; background:#1a1a1a; border:1px solid #333; border-radius:8px; color:#aaa; font-size:12px; cursor:pointer;">×5</button>
+                    </div>
+                    <div style="color:#888; font-size:11px; text-align:center; letter-spacing:1px;">── グリッド ──</div>
+                    <button onclick="dbgClearGrid()" style="padding:6px; background:#2a1515; border:1px solid #5a2020; border-radius:8px; color:#f88; font-size:12px; cursor:pointer;">現在のセクターをクリア</button>
+                </div>
+            </details>
             <button onclick="closeSettings()" style="width:100%; margin-top:8px; padding:11px; background:none; border:1.5px solid #444; border-radius:10px; color:#aaa; font-size:14px; cursor:pointer;" data-i18n="close">閉じる</button>
         </div>
     </div>
@@ -2880,6 +2904,51 @@
                 btn.disabled = false;
             }
         }
+        // ── デバッグ関数 ──
+        let _dbgTickInterval = null;
+        function dbgAddResources() {
+            ['point','line','triangle','square','pentagon','hexagon'].forEach(k => { resources[k] = (resources[k]||0) + 100; });
+            updateResourceDisplay();
+        }
+        function dbgAddParts() {
+            Object.keys(parts).forEach(k => { parts[k] = (parts[k]||0) + 10; });
+            updatePartsDisplay();
+        }
+        function dbgTierUp() {
+            if (currentTierIndex < TIER_CONFIGS.length - 1) {
+                currentTierIndex++;
+                updateTierUI();
+            }
+        }
+        function dbgTierMax() {
+            currentTierIndex = TIER_CONFIGS.length - 1;
+            updateTierUI();
+        }
+        function dbgSetSpeed(mult) {
+            if (_dbgTickInterval) clearInterval(_dbgTickInterval);
+            _dbgTickInterval = setInterval(tick, Math.round(TICK_MS / mult));
+            document.querySelectorAll('.spd-btn').forEach(b => {
+                const active = b.textContent === '×' + mult;
+                b.style.background = active ? '#0d2a3d' : '#1a1a1a';
+                b.style.borderColor = active ? '#1a6a9a' : '#333';
+                b.style.color = active ? '#6cf' : '#aaa';
+                b.style.borderWidth = active ? '1.5px' : '1px';
+            });
+        }
+        function dbgClearGrid() {
+            if (!confirm('現在のセクターをクリアしますか？')) return;
+            const grid = sectors[currentSectorId];
+            for (let y = 0; y < ROWS; y++)
+                for (let x = 0; x < COLS; x++) {
+                    grid[y][x].type = 'empty';
+                    grid[y][x].dir = 'right';
+                    grid[y][x].work = null;
+                    grid[y][x].item = null;
+                }
+            renderAll();
+        }
+        // ── デバッグ関数ここまで ──
+
         function toggleSFX() {
             sfxEnabled = !sfxEnabled;
             document.getElementById('sfx-toggle').classList.toggle('on', sfxEnabled);
