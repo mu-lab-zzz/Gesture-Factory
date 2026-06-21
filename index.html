@@ -1670,8 +1670,8 @@
 <!-- 広告視聴モーダル -->
 <div id="ad-modal">
     <div id="ad-modal-inner">
-        <h2>🪙 コインを獲得</h2>
-        <p id="ad-modal-desc">動画広告を視聴すると<br><strong style="color:#ffd700;">🪙 5枚</strong>獲得できます！<br><span id="ad-count-info" style="font-size:11px;color:#888;"></span></p>
+        <h2 id="ad-modal-title">🪙 コインを獲得</h2>
+        <p id="ad-modal-desc"></p>
         <div id="ad-progress-bar"><div id="ad-progress-fill"></div></div>
         <button id="ad-close-btn" onclick="finishAd()">🪙 ×5 受け取る</button>
         <button id="ad-skip-btn" onclick="closeAdModal()">閉じる</button>
@@ -1685,7 +1685,7 @@
         <img id="opening-logo" src="opening.png" alt="GESTURE&FACTORY">
         <button id="opening-start-btn" onclick="startGame()">TAP TO START</button>
     </div>
-    <div id="opening-version">Ver 1.29</div>
+    <div id="opening-version">Ver 1.30</div>
     <audio id="bgm" src="Thousandth_Rotation.mp3" loop></audio>
 </div>
 
@@ -2411,6 +2411,14 @@
                 casino_void: '虚無',
                 casino_void_feed: '🪙 チップを投入',
                 casino_void_absorbed: (n) => `🌑 ${n.toLocaleString()} chips 吸収済み`,
+                ad_modal_title: '🪙 コインを獲得',
+                ad_modal_desc: (n) => `動画広告を視聴すると<br><strong style="color:#ffd700;">🪙 5枚</strong>獲得できます！<br><span id="ad-count-info" style="font-size:11px;color:#888;">今日残り ${n} 回</span>`,
+                ad_modal_done: '今日の広告視聴は終了しました。<br><span style="color:#888;font-size:12px;">明日またどうぞ！</span>',
+                ad_close_btn: '🪙 ×5 受け取る',
+                ad_skip_btn: '閉じる',
+                coin_display_title: '広告を見てコインを獲得',
+                ad_remaining: (n) => `今日残り ${n} 回`,
+                parts_store_coin_title: '🪙 コインを獲得',
             },
             en: {
                 settings_title: 'Settings', sfx: '🔊 Sound Effects', bgm: '🎵 BGM',
@@ -2534,6 +2542,14 @@
                 casino_void_feed: '🪙 Feed Chip',
                 casino_void_absorbed: (n) => `🌑 ${n.toLocaleString()} chips absorbed`,
                 debug_genesis_clear: 'Instant Genesis Clear',
+                ad_modal_title: '🪙 Earn Coins',
+                ad_modal_desc: (n) => `Watch a video ad to earn<br><strong style="color:#ffd700;">🪙 5 coins</strong>!<br><span id="ad-count-info" style="font-size:11px;color:#888;">${n} left today</span>`,
+                ad_modal_done: 'No more ads available today.<br><span style="color:#888;font-size:12px;">Come back tomorrow!</span>',
+                ad_close_btn: '🪙 ×5 Collect',
+                ad_skip_btn: 'Close',
+                coin_display_title: 'Watch ads to earn coins',
+                ad_remaining: (n) => `${n} left today`,
+                parts_store_coin_title: '🪙 Earn Coins',
             }
         };
 
@@ -6182,6 +6198,8 @@
         function updateCoinDisplay() {
             const el = document.getElementById('coin-count');
             if (el) el.textContent = coins;
+            const cd = document.getElementById('coin-display');
+            if (cd) cd.title = t('coin_display_title');
             // コインボタンの有効/無効
             const types = ['point','line','triangle','square','pentagon','hexagon'];
             types.forEach(type => {
@@ -6203,18 +6221,21 @@
             const today = getTodayStr();
             if (adLastDate !== today) { adWatchedCount = 0; adLastDate = today; }
             const remaining = 3 - adWatchedCount;
-            const info = document.getElementById('ad-count-info');
-            if (info) info.textContent = '今日残り ' + remaining + ' 回';
+            const title = document.getElementById('ad-modal-title');
             const closeBtn = document.getElementById('ad-close-btn');
             const fill = document.getElementById('ad-progress-fill');
-            if (closeBtn) closeBtn.style.display = 'none';
+            if (title) title.textContent = t('ad_modal_title');
+            if (closeBtn) { closeBtn.style.display = 'none'; closeBtn.textContent = t('ad_close_btn'); }
+            document.getElementById('ad-skip-btn').textContent = t('ad_skip_btn');
             if (fill) fill.style.width = '0%';
             if (remaining <= 0) {
                 const desc = document.getElementById('ad-modal-desc');
-                if (desc) desc.innerHTML = '今日の広告視聴は終了しました。<br><span style="color:#888;font-size:12px;">明日またどうぞ！</span>';
+                if (desc) desc.innerHTML = t('ad_modal_done');
                 document.getElementById('ad-modal').classList.add('open');
                 return;
             }
+            const desc = document.getElementById('ad-modal-desc');
+            if (desc) desc.innerHTML = t('ad_modal_desc', remaining);
             document.getElementById('ad-modal').classList.add('open');
             // 広告シミュレーション（AdMob実装後はここをSDK呼び出しに置き換え）
             let progress = 0;
