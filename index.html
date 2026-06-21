@@ -1685,7 +1685,7 @@
         <img id="opening-logo" src="opening.png" alt="GESTURE&FACTORY">
         <button id="opening-start-btn" onclick="startGame()">TAP TO START</button>
     </div>
-    <div id="opening-version">Ver 1.24</div>
+    <div id="opening-version">Ver 1.25</div>
     <audio id="bgm" src="Thousandth_Rotation.mp3" loop></audio>
 </div>
 
@@ -6884,7 +6884,7 @@
             el.textContent = msg;
             el.style.color = cls==='win'?'#ffd700':cls==='push'?'#88aaff':'#ff6666';
         }
-        function cUpdateChips() { document.getElementById('casino-chip-count').textContent = cChips; localStorage.setItem('gf_casino_chips', cChips); }
+        function cUpdateChips() { cChips = Math.floor(cChips); document.getElementById('casino-chip-count').textContent = cChips; localStorage.setItem('gf_casino_chips', cChips); }
         function cFlashLine() {
             const b = document.getElementById('casino-win-line-border');
             b.style.transition='none'; b.style.boxShadow='0 0 24px #fff,0 0 24px #ffd700';
