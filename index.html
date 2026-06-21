@@ -1670,7 +1670,7 @@
         <img id="opening-logo" src="opening.png" alt="GESTURE&FACTORY">
         <button id="opening-start-btn" onclick="startGame()">TAP TO START</button>
     </div>
-    <div id="opening-version">Ver 1.16</div>
+    <div id="opening-version">Ver 1.17</div>
     <audio id="bgm" src="Thousandth_Rotation.mp3" loop></audio>
 </div>
 
@@ -4185,7 +4185,16 @@
         document.addEventListener('touchmove', (e) => {
             const dy = e.touches[0].clientY - _ptrTouchStartY;
             const atTop = (window.scrollY || document.documentElement.scrollTop) === 0;
-            if (dy > 0 && atTop) e.preventDefault();
+            if (!(dy > 0 && atTop)) return;
+            // タッチ起点がスクロール可能な要素の内側なら通す
+            let el = e.target;
+            while (el && el !== document.body) {
+                const style = getComputedStyle(el);
+                const overflowY = style.overflowY;
+                if ((overflowY === 'auto' || overflowY === 'scroll') && el.scrollHeight > el.clientHeight) return;
+                el = el.parentElement;
+            }
+            e.preventDefault();
         }, { passive: false });
 
         function renderAll() {
