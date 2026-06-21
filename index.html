@@ -124,7 +124,8 @@
             padding: 10px 8px; display: flex; flex-direction: column;
             align-items: center; gap: 4px;
         }
-        .store-card .store-icon { font-size: 22px; }
+        .store-card .store-icon { font-size: 22px; display:flex; align-items:center; justify-content:center; }
+        .store-card .store-icon svg { width:44px; height:40px; }
         .store-card .store-name { font-size: 11px; color: #ccc; text-align: center; line-height: 1.3; }
         .store-card .store-stock { font-size: 12px; color: #888; }
         .store-card .store-btns { display: flex; gap: 4px; margin-top: 4px; width: 100%; }
@@ -1670,7 +1671,7 @@
         <img id="opening-logo" src="opening.png" alt="GESTURE&FACTORY">
         <button id="opening-start-btn" onclick="startGame()">TAP TO START</button>
     </div>
-    <div id="opening-version">Ver 1.21</div>
+    <div id="opening-version">Ver 1.22</div>
     <audio id="bgm" src="Thousandth_Rotation.mp3" loop></audio>
 </div>
 
@@ -6227,15 +6228,26 @@
                 splitter:'分岐機', merger:'合流機', longInserter:'ロングアーム',
                 factory:'部品工場'
             };
+            const partKeyToTool = {
+                belt:'belt', inserter:'inserter', assembler:'assembler',
+                storageSource:'storage-source', storageSink:'storage-sink',
+                fastBelt:'fast-belt', fastInserter:'fast-inserter',
+                doubleBelt:'double-belt', crossBelt:'cross-belt',
+                fastAssembler:'fast-assembler', fastCrossBelt:'fast-cross-belt',
+                splitter:'splitter', merger:'merger',
+                longInserter:'long-inserter', factory:'factory'
+            };
             const alwaysAvailable = new Set(['belt','inserter','assembler','storageSource','storageSink']);
             PART_STORE_CONFIG.forEach(cfg => {
                 if (!alwaysAvailable.has(cfg.key) && !isUnlocked(cfg.key)) return;
                 const stock = parts[cfg.key] || 0;
+                const toolEl = document.querySelector(`[data-tool="${partKeyToTool[cfg.key]}"]`);
+                const iconHtml = toolEl ? toolEl.innerHTML : cfg.icon;
                 const card = document.createElement('div');
                 card.className = 'store-card';
                 card.id = 'store-card-' + cfg.key;
                 card.innerHTML = `
-                    <div class="store-icon">${cfg.icon}</div>
+                    <div class="store-icon">${iconHtml}</div>
                     <div class="store-name">${nameMap[cfg.key] || cfg.key}</div>
                     <div class="store-stock" id="store-stock-${cfg.key}">×${stock}</div>
                     <div class="store-btns">
