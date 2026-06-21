@@ -615,6 +615,17 @@
             border-radius: 20px;
             border: 1px solid #2d2d3d;
             box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            overflow: hidden;
+            max-height: 50px;
+            transition: max-height 0.25s ease, margin 0.25s ease, padding 0.25s ease, opacity 0.2s ease;
+        }
+        .mini-inventory.collapsed {
+            max-height: 0;
+            margin-bottom: 0;
+            padding-top: 0;
+            padding-bottom: 0;
+            opacity: 0;
+            border-color: transparent;
         }
 
         .mini-inventory span {
@@ -1634,7 +1645,7 @@
         <img id="opening-logo" src="opening.png" alt="GESTURE&FACTORY">
         <button id="opening-start-btn" onclick="startGame()">TAP TO START</button>
     </div>
-    <div id="opening-version">Ver 1.03</div>
+    <div id="opening-version">Ver 1.04</div>
     <audio id="bgm" src="Thousandth_Rotation.mp3" loop></audio>
 </div>
 
@@ -2908,14 +2919,20 @@
         // ===== オープニング =====
         function toggleInventoryPanel() {
             const panel = document.getElementById('inventory-panel');
+            const mini = document.querySelector('.mini-inventory');
             const btn = document.getElementById('inventory-toggle');
             const collapsed = panel.classList.toggle('collapsed');
+            if (mini) mini.classList.toggle('collapsed', collapsed);
             btn.textContent = collapsed ? '▼' : '▲';
             localStorage.setItem('inventoryCollapsed', collapsed ? '1' : '0');
+            setTimeout(fitGrid, 280);
         }
         function initInventoryPanel() {
-            if (localStorage.getItem('inventoryCollapsed') === '1') {
+            const collapsed = localStorage.getItem('inventoryCollapsed') === '1';
+            if (collapsed) {
                 document.getElementById('inventory-panel').classList.add('collapsed');
+                const mini = document.querySelector('.mini-inventory');
+                if (mini) mini.classList.add('collapsed');
                 document.getElementById('inventory-toggle').textContent = '▼';
             }
         }
