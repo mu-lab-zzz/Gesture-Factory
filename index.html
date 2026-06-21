@@ -1529,6 +1529,16 @@
         }
         #opening-start-btn:hover { transform: scale(1.06); }
         #opening-start-btn:active { transform: scale(0.97); }
+        #opening-version {
+            position: absolute;
+            bottom: 20px;
+            left: 0; right: 0;
+            text-align: center;
+            font-size: 12px;
+            color: rgba(255,255,255,0.35);
+            letter-spacing: 2px;
+            font-family: monospace;
+        }
         @keyframes btn-pulse {
             0%, 100% { box-shadow: 0 0 24px rgba(0,180,255,0.6), 0 0 60px rgba(124,58,237,0.3); }
             50% { box-shadow: 0 0 40px rgba(0,180,255,0.9), 0 0 90px rgba(124,58,237,0.5); }
@@ -1601,6 +1611,7 @@
         <img id="opening-logo" src="opening.png" alt="GESTURE&FACTORY">
         <button id="opening-start-btn" onclick="startGame()">TAP TO START</button>
     </div>
+    <div id="opening-version">Ver 1.00</div>
     <audio id="bgm" src="Thousandth_Rotation.mp3" loop></audio>
 </div>
 
@@ -1637,6 +1648,7 @@
                 </label>
             </div>
             <hr style="border:none; border-top:1px solid #333355; margin:0 0 20px;">
+            <button onclick="checkUpdate()" id="update-btn" style="width:100%; padding:11px; background:#0d2a3d; border:1.5px solid #1a6a9a; border-radius:10px; color:#6cf; font-size:14px; font-weight:bold; cursor:pointer; letter-spacing:1px;">🔄 最新バージョンに更新</button>
             <button onclick="confirmReset()" style="width:100%; padding:11px; background:#3d1515; border:1.5px solid #7a2020; border-radius:10px; color:#f88; font-size:14px; font-weight:bold; cursor:pointer; letter-spacing:1px;" data-i18n="reset_data">データをリセット</button>
             <hr style="border:none; border-top:1px solid #333355; margin:0 0 20px;">
             <details style="color:#ccc;">
@@ -2849,6 +2861,24 @@
         }
         function closeSettings() {
             document.getElementById('settings-modal').style.display = 'none';
+        }
+        async function checkUpdate() {
+            const btn = document.getElementById('update-btn');
+            btn.textContent = '⏳ 確認中...';
+            btn.disabled = true;
+            try {
+                if ('serviceWorker' in navigator) {
+                    const regs = await navigator.serviceWorker.getRegistrations();
+                    await Promise.all(regs.map(r => r.unregister()));
+                }
+                const keys = await caches.keys();
+                await Promise.all(keys.map(k => caches.delete(k)));
+                btn.textContent = '✅ 更新完了！再起動します...';
+                setTimeout(() => location.reload(true), 1200);
+            } catch(e) {
+                btn.textContent = '❌ エラー。手動でリロードしてください';
+                btn.disabled = false;
+            }
         }
         function toggleSFX() {
             sfxEnabled = !sfxEnabled;
