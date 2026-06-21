@@ -763,6 +763,20 @@
             padding-bottom: env(safe-area-inset-bottom, 0px);
         }
 
+        #toolbar-tool-label {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 3px 10px;
+            background: #0d0e18;
+            border-bottom: 1px solid #2d2d3d;
+            min-height: 24px;
+        }
+        #toolbar-tool-label .tl-icon { display:flex; align-items:center; flex-shrink:0; }
+        #toolbar-tool-label .tl-icon svg { width:22px; height:20px; }
+        #toolbar-tool-label .tl-name { color: #eee; font-size: 12px; }
+        #toolbar-tool-label .tl-badge { margin-left: auto; font-size: 10px; color: #639922; background: #1a2a10; border: 1px solid #3a5a20; border-radius: 4px; padding: 1px 6px; }
+
         /* タブ行 */
         #tool-tab-bar {
             display: flex;
@@ -1671,7 +1685,7 @@
         <img id="opening-logo" src="opening.png" alt="GESTURE&FACTORY">
         <button id="opening-start-btn" onclick="startGame()">TAP TO START</button>
     </div>
-    <div id="opening-version">Ver 1.23</div>
+    <div id="opening-version">Ver 1.24</div>
     <audio id="bgm" src="Thousandth_Rotation.mp3" loop></audio>
 </div>
 
@@ -2156,6 +2170,11 @@
             </div>
 
             <div id="toolbar-wrap">
+            <!-- 選択中ツールラベル -->
+            <div id="toolbar-tool-label">
+                <span class="tl-icon" id="tl-icon"></span>
+                <span class="tl-name" id="tl-name">消しゴム</span>
+            </div>
             <!-- タブ行 -->
             <div id="tool-tab-bar">
                 <button id="erase-btn" data-tool="erase" class="active tool-tab-btn" style="min-width:52px;"><svg width="28" height="28" viewBox="0 0 60 60" fill="none"><g transform="rotate(-40 30 30)"><rect x="8" y="16" width="14" height="26" rx="2" fill="white" stroke="#888780" stroke-width="2"/><rect x="20" y="16" width="32" height="26" rx="2" fill="currentColor" stroke="#888780" stroke-width="2" style="fill:#1f2933"/><rect x="20" y="28" width="32" height="10" fill="#5F5E5A"/></g></svg></button>
@@ -3195,10 +3214,26 @@
             document.getElementById('toolbar').classList.remove('open');
         }
 
+        const TOOL_NAME_MAP = {
+            'erase':'消しゴム','belt':'ベルト','fast-belt':'高速ベルト','double-belt':'デュアルベルト',
+            'cross-belt':'交差ベルト','fast-cross-belt':'高速交差ベルト',
+            'inserter':'インサーター','fast-inserter':'高速インサーター','long-inserter':'ロングアームインサーター',
+            'assembler':'組立機','fast-assembler':'高速組立機','factory':'部品工場',
+            'storage-source':'材料ST','storage-sink':'完成品ST','dyson-sink':'ダイソンST',
+            'splitter':'分岐機','merger':'合流機',
+        };
+        function updateToolLabel(tool, btn) {
+            const name = TOOL_NAME_MAP[tool] || tool;
+            document.getElementById('tl-name').textContent = name;
+            const iconEl = document.getElementById('tl-icon');
+            iconEl.innerHTML = btn ? btn.innerHTML : '';
+        }
+
         function selectTool(tool, activeBtn) {
             currentTool = tool;
             allToolBtns().forEach(b => b.classList.remove('active'));
             activeBtn.classList.add('active');
+            updateToolLabel(tool, activeBtn);
             // タブのhas-selectionドット更新
             document.querySelectorAll('.tool-tab-btn[data-tab]').forEach(b => {
                 const tab = b.dataset.tab;
@@ -3215,6 +3250,7 @@
         });
 
         eraseBtn.addEventListener('click', () => selectTool('erase', eraseBtn));
+        updateToolLabel('erase', eraseBtn);
 
         toolbarEl.addEventListener('click', (e) => {
             const btn = e.target.closest('button');
