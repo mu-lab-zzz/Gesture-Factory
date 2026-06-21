@@ -1041,10 +1041,10 @@
             position: absolute;
             width: 9px;
             height: 9px;
-            background: radial-gradient(circle at 38% 32%, #ffe060, #d97706);
+            background: radial-gradient(circle at 38% 32%, #a0d060, #639922);
             border-radius: 50%;
             z-index: 3;
-            box-shadow: 0 0 7px rgba(217,119,6,0.85);
+            box-shadow: 0 0 7px rgba(99,153,34,0.85);
         }
         .inserter-arm {
             position: absolute;
@@ -1100,9 +1100,9 @@
         .inserter.dir-down  .inserter-in { top: 1px;     left: 50%; transform: translateX(-50%); }
         .inserter.dir-up    .inserter-in { bottom: 1px;  left: 50%; transform: translateX(-50%); }
         /* 各種インサーターの矢印色 */
-        .inserter:not(.fast-inserter):not(.long-inserter) .inserter-out { color: #fbbf24; text-shadow: 0 0 5px rgba(251,191,36,0.9); }
-        .fast-inserter  .inserter-out { color: #40ff80; text-shadow: 0 0 5px rgba(64,255,128,0.9); }
-        .long-inserter  .inserter-out { color: #ff8040; text-shadow: 0 0 5px rgba(255,128,64,0.9); }
+        .inserter:not(.fast-inserter):not(.long-inserter) .inserter-out { color: #639922; text-shadow: 0 0 5px rgba(99,153,34,0.9); }
+        .fast-inserter  .inserter-out { color: #378ADD; text-shadow: 0 0 5px rgba(55,138,221,0.9); }
+        .long-inserter  .inserter-out { color: #E24B4A; text-shadow: 0 0 5px rgba(226,75,74,0.9); }
 
         /* ── 組立機（パルス発光 + プログレスバー） ── */
         .assembler {
@@ -1157,8 +1157,8 @@
             border: 1px solid #00802a;
         }
         .fast-inserter .inserter-hub {
-            background: radial-gradient(circle at 38% 32%, #60ff80, #00c040);
-            box-shadow: 0 0 7px rgba(0,192,64,0.85);
+            background: radial-gradient(circle at 38% 32%, #85B7EB, #378ADD);
+            box-shadow: 0 0 7px rgba(55,138,221,0.85);
         }
         .fast-inserter .inserter-arm {
             background: linear-gradient(to top, #0a2a50, #378ADD);
@@ -1170,8 +1170,8 @@
             border: 1px solid #c05000;
         }
         .long-inserter .inserter-hub {
-            background: radial-gradient(circle at 38% 32%, #ffa060, #c05000);
-            box-shadow: 0 0 7px rgba(200,80,0,0.85);
+            background: radial-gradient(circle at 38% 32%, #F09595, #E24B4A);
+            box-shadow: 0 0 7px rgba(226,75,74,0.85);
         }
         .long-inserter .inserter-arm {
             background: linear-gradient(to top, #500a0a, #E24B4A);
@@ -1670,7 +1670,7 @@
         <img id="opening-logo" src="opening.png" alt="GESTURE&FACTORY">
         <button id="opening-start-btn" onclick="startGame()">TAP TO START</button>
     </div>
-    <div id="opening-version">Ver 1.20</div>
+    <div id="opening-version">Ver 1.21</div>
     <audio id="bgm" src="Thousandth_Rotation.mp3" loop></audio>
 </div>
 
