@@ -794,8 +794,8 @@
         }
         #grid {
             display: grid;
-            grid-template-columns: repeat(16, 32px);
-            grid-template-rows: repeat(10, 32px);
+            grid-template-columns: repeat(10, 32px);
+            grid-template-rows: repeat(16, 32px);
             gap: 1px;
             background: #111118;
             padding: 4px;
@@ -822,8 +822,8 @@
             position: absolute;
             top: 4px;
             left: 4px;
-            width: calc(16 * 32px + 15px);
-            height: calc(10 * 32px + 9px);
+            width: calc(10 * 32px + 9px);
+            height: calc(16 * 32px + 15px);
             pointer-events: none;
             z-index: 10;
         }
@@ -2741,8 +2741,8 @@
         ];
 
         // 工場自動化システム用の個別定数・変数群
-        const COLS = 16;
-        const ROWS = 10;
+        const COLS = 10;
+        const ROWS = 16;
         const TICK_MS = 400;
 
         // 部品工場用レシピ（手動クラフトと同じ材料）
@@ -3950,8 +3950,8 @@
         }
 
         // グリッドを画面内に収めるスケール調整
-        const GRID_NATURAL_W = 535; // 16*32 + 15*1gap + 2*4pad
-        const GRID_NATURAL_H = 337; // 10*32 + 9*1gap + 2*4pad
+        const GRID_NATURAL_W = 337; // 10*32 + 9*1gap + 2*4pad
+        const GRID_NATURAL_H = 535; // 16*32 + 15*1gap + 2*4pad
         function fitGrid() {
             const stage = document.getElementById('stage-container');
             const wrap = document.getElementById('grid-wrap');
