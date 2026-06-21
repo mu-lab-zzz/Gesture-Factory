@@ -1685,7 +1685,7 @@
         <img id="opening-logo" src="opening.png" alt="GESTURE&FACTORY">
         <button id="opening-start-btn" onclick="startGame()">TAP TO START</button>
     </div>
-    <div id="opening-version">Ver 1.28</div>
+    <div id="opening-version">Ver 1.29</div>
     <audio id="bgm" src="Thousandth_Rotation.mp3" loop></audio>
 </div>
 
@@ -3128,6 +3128,7 @@
         }
         function executeReset() {
             localStorage.removeItem('shape_gesture_factory_v2_save');
+            localStorage.removeItem('gf_casino_chips');
             document.getElementById('reset-modal').style.display = 'none';
             document.getElementById('settings-modal').style.display = 'none';
             location.reload();
