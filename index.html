@@ -1685,7 +1685,7 @@
         <img id="opening-logo" src="opening.png" alt="GESTURE&FACTORY">
         <button id="opening-start-btn" onclick="startGame()">TAP TO START</button>
     </div>
-    <div id="opening-version">Ver 1.30</div>
+    <div id="opening-version">Ver 1.31</div>
     <audio id="bgm" src="Thousandth_Rotation.mp3" loop></audio>
 </div>
 
@@ -1800,8 +1800,8 @@
 
     <div class="tab-container">
         <button class="tab-btn active" id="tab-factory" onclick="switchTab('factory')" data-i18n="tab_factory">⚙️ 工房</button>
-        <button class="tab-btn" id="tab-automation" onclick="switchTab('automation')" data-i18n="tab_automation">🏭 工場</button>
-        <button class="tab-btn" id="tab-storage" onclick="switchTab('storage')" data-i18n="tab_storage">📦 倉庫</button>
+        <button class="tab-btn" id="tab-automation" onclick="switchTab('automation')"><span class="tab-icon">🏭</span><span class="tab-label"> 工場</span></button>
+        <button class="tab-btn" id="tab-storage" onclick="switchTab('storage')"><span class="tab-icon">📦</span><span class="tab-label"> 倉庫</span></button>
         <button class="tab-btn" id="tab-tier" onclick="switchTab('tier')" data-i18n="tab_tier">🏆 ティア</button>
         <button class="tab-btn" id="tab-trophy" onclick="switchTab('trophy')" data-i18n="tab_trophy">🎖 実績</button>
         <button class="tab-btn" id="tab-casino" onclick="switchTab('casino')" data-i18n="tab_casino">🎰 カジノ</button>
@@ -2672,6 +2672,12 @@
             const btnEn = document.getElementById('lang-btn-en');
             if (btnJp) { btnJp.style.opacity = currentLang === 'jp' ? '1' : '0.45'; btnJp.style.fontWeight = currentLang === 'jp' ? 'bold' : 'normal'; }
             if (btnEn) { btnEn.style.opacity = currentLang === 'en' ? '1' : '0.45'; btnEn.style.fontWeight = currentLang === 'en' ? 'bold' : 'normal'; }
+            // SVGアイコンを含むタブボタンはラベルspanのみ更新
+            const tabLabelMap = { 'tab-automation': 'tab_automation', 'tab-storage': 'tab_storage' };
+            Object.entries(tabLabelMap).forEach(([id, key]) => {
+                const label = document.querySelector(`#${id} .tab-label`);
+                if (label) label.textContent = ' ' + t(key).replace(/^\S+\s*/, '');
+            });
             if (typeof updateTierUI === 'function') updateTierUI();
             if (typeof renderTrophies === 'function') renderTrophies();
             if (typeof updateStorageUI === 'function') updateStorageUI();
@@ -5067,10 +5073,10 @@
             });
 
             // タブボタン
-            const tabAuto = document.getElementById('tab-automation');
-            if (tabAuto) tabAuto.innerHTML = tabAuto.innerHTML.replace('🏭', `<span style="display:inline-flex;align-items:center;vertical-align:middle;">${partSVG('factory',18)}</span>`);
-            const tabStorage = document.getElementById('tab-storage');
-            if (tabStorage) tabStorage.innerHTML = tabStorage.innerHTML.replace('📦', `<span style="display:inline-flex;align-items:center;vertical-align:middle;">${partSVG('storageSource',18)}</span>`);
+            const tabAutoIcon = document.querySelector('#tab-automation .tab-icon');
+            if (tabAutoIcon) tabAutoIcon.innerHTML = `<span style="display:inline-flex;align-items:center;vertical-align:middle;">${partSVG('factory',18)}</span>`;
+            const tabStorageIcon = document.querySelector('#tab-storage .tab-icon');
+            if (tabStorageIcon) tabStorageIcon.innerHTML = `<span style="display:inline-flex;align-items:center;vertical-align:middle;">${partSVG('storageSource',18)}</span>`;
 
             // アップグレードボタン（倉庫拡張）
             ['up-point','up-line','up-triangle','up-square','up-pentagon','up-hexagon'].forEach(id => {
