@@ -1685,7 +1685,7 @@
         <img id="opening-logo" src="opening.png" alt="GESTURE&FACTORY">
         <button id="opening-start-btn" onclick="startGame()">TAP TO START</button>
     </div>
-    <div id="opening-version">Ver 1.35</div>
+    <div id="opening-version">Ver 1.36</div>
     <audio id="bgm" src="Thousandth_Rotation.mp3" loop></audio>
 </div>
 
@@ -5026,6 +5026,12 @@
 
         // 初期設定
         // テキスト中の図形記号をgemSVGに変換するユーティリティ（uフラグで絵文字を正しく1文字扱い）
+        function shortNum(n) {
+            if (n >= 1000000) return (n / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+            if (n >= 1000) return (n / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
+            return String(n);
+        }
+
         function replaceSymbols(text, size = 14) {
             const gem = (kind) => `<span style="display:inline-flex;align-items:center;vertical-align:middle;">${gemSVG(kind, size)}</span>`;
             return String(text)
@@ -5715,7 +5721,7 @@
                 if (miniEl) {
                     if (unlocked) {
                         miniEl.classList.remove('locked-mini');
-                        miniEl.innerHTML = `<span style="display:inline-flex;align-items:center;vertical-align:middle;">${gemSVG(miniKindMap[type], 16)}</span><span style="margin-left:3px;">${Math.floor(resources[type])}</span>`;
+                        miniEl.innerHTML = `<span style="display:inline-flex;align-items:center;vertical-align:middle;">${gemSVG(miniKindMap[type], 16)}</span><span style="margin-left:3px;">${shortNum(Math.floor(resources[type]))}</span>`;
                     } else {
                         miniEl.classList.add('locked-mini');
                     }
