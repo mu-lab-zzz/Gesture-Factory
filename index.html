@@ -1685,7 +1685,7 @@
         <img id="opening-logo" src="opening.png" alt="GESTURE&FACTORY">
         <button id="opening-start-btn" onclick="startGame()">TAP TO START</button>
     </div>
-    <div id="opening-version">Ver 1.36</div>
+    <div id="opening-version">Ver 1.37</div>
     <audio id="bgm" src="Thousandth_Rotation.mp3" loop></audio>
 </div>
 
@@ -5454,27 +5454,27 @@
         // 倉庫拡張
         function upgradeStorage(type) {
             if (!isUnlocked(type)) return;
-            if (Math.floor(resources.square) >= 6) {
-                resources.square -= 6;
+            if (isDebugMode || Math.floor(resources.square) >= 6) {
+                if (!isDebugMode) resources.square -= 6;
                 maxStorage[type] += 10;
                 setFeedback(`📦 ストレージ拡張成功！最大容量が +10 されました`);
                 updateUI();
             }
         }
-        
+
         // 手動生産量アップグレード
         function upgradeProduction(type) {
             if (!isUnlocked(type)) return;
             if (type === 'point') {
-                if (Math.floor(resources.triangle) >= 10) {
-                    resources.triangle -= 10;
+                if (isDebugMode || Math.floor(resources.triangle) >= 10) {
+                    if (!isDebugMode) resources.triangle -= 10;
                     productionRates.point += 0.1;
                     setFeedback(`⚡ 点の手動生産量が +0.1 されました (現在: ${productionRates.point.toFixed(1)})`);
                     updateUI();
                 }
             } else if (type === 'line') {
-                if (Math.floor(resources.triangle) >= 15) {
-                    resources.triangle -= 15;
+                if (isDebugMode || Math.floor(resources.triangle) >= 15) {
+                    if (!isDebugMode) resources.triangle -= 15;
                     productionRates.line += 0.1;
                     setFeedback(`⚡ 線の手動生産量が +0.1 されました (現在: ${productionRates.line.toFixed(1)})`);
                     updateUI();
@@ -5485,17 +5485,15 @@
         // 自動生産量アップグレード
         function upgradeAutoProduction(type) {
             if (type === 'point') {
-                if (isUnlocked('autoPoint') && Math.floor(resources.triangle) >= 5 && Math.floor(resources.square) >= 5) {
-                    resources.triangle -= 5;
-                    resources.square -= 5;
+                if (isUnlocked('autoPoint') && (isDebugMode || (Math.floor(resources.triangle) >= 5 && Math.floor(resources.square) >= 5))) {
+                    if (!isDebugMode) { resources.triangle -= 5; resources.square -= 5; }
                     autoProductionRates.point += 0.2;
                     setFeedback(`🤖 点の自動生産量が +0.2 されました (現在: ${autoProductionRates.point.toFixed(1)}/s)`);
                     updateUI();
                 }
             } else if (type === 'line') {
-                if (isUnlocked('autoLine') && Math.floor(resources.pentagon) >= 5 && Math.floor(resources.hexagon) >= 5) {
-                    resources.pentagon -= 5;
-                    resources.hexagon -= 5;
+                if (isUnlocked('autoLine') && (isDebugMode || (Math.floor(resources.pentagon) >= 5 && Math.floor(resources.hexagon) >= 5))) {
+                    if (!isDebugMode) { resources.pentagon -= 5; resources.hexagon -= 5; }
                     autoProductionRates.line += 0.2;
                     setFeedback(`🤖 線の自動生産量が +0.2 されました (現在: ${autoProductionRates.line.toFixed(1)}/s)`);
                     updateUI();
