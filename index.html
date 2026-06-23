@@ -870,7 +870,20 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
         }
+        .tool-stock {
+            position: absolute;
+            bottom: 2px;
+            right: 3px;
+            font-size: 9px;
+            line-height: 1;
+            font-family: monospace;
+            font-weight: 700;
+            pointer-events: none;
+            color: #639922;
+        }
+        .tool-stock.zero { color: #444455; }
         #toolbar button svg, #erase-btn svg { display: block; }
         #toolbar button.active, #erase-btn.active {
             background: #3b82f6;
@@ -1139,6 +1152,25 @@
             flex-direction: column;
             line-height: 1.2;
             overflow: hidden;
+        }
+        .asm-overlay {
+            position: absolute;
+            z-index: 3;
+            pointer-events: none;
+        }
+        .asm-overlay .assembler {
+            width: 100% !important;
+            height: 100% !important;
+            border-radius: 4px;
+            display: flex;
+        }
+        .cell.assembler-ghost {
+            background: #0e0e16;
+            box-shadow: inset 0 0 0 1px #1a1a28;
+        }
+        .cell.assembler-anchor {
+            background: #0e0e16;
+            box-shadow: inset 0 0 0 1px #1a1a28;
         }
         @keyframes asm-pulse {
             0%,100% { box-shadow: 0 0 4px rgba(168,85,247,0.3), inset 0 0 4px rgba(168,85,247,0.07); border-color: #4a1870; }
@@ -1530,6 +1562,24 @@
             to   { box-shadow: inset 0 0 12px rgba(255,208,0,0.5); }
         }
 
+        .sector-link { border-color: #1D9E75 !important; }
+
+        #grid-toast {
+            position: fixed;
+            z-index: 200;
+            font-size: 12px;
+            font-weight: bold;
+            color: #ffd080;
+            background: rgba(30,15,0,0.92);
+            border: 1px solid #a06010;
+            padding: 6px 12px;
+            border-radius: 8px;
+            display: none;
+            pointer-events: none;
+            white-space: nowrap;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+        }
+
         /* ダイソンスフィア 納品口 */
         .dyson-sink {
             background: #050510;
@@ -1697,7 +1747,7 @@
         <img id="opening-logo" src="opening.png" alt="GESTURE&FACTORY">
         <button id="opening-start-btn" onclick="startGame()">TAP TO START</button>
     </div>
-    <div id="opening-version">Ver 1.38</div>
+    <div id="opening-version">Ver 1.53</div>
     <audio id="bgm" src="Thousandth_Rotation.mp3" loop></audio>
 </div>
 
@@ -2176,6 +2226,7 @@
 
         <!-- メインエリア：グリッド＋ツールバー -->
         <div id="auto-main">
+            <div id="grid-toast"></div>
             <div id="stage-container">
                 <div id="grid-wrap" style="position:relative;display:inline-block;transform-origin:top left;">
                     <div id="grid"></div>
@@ -2270,8 +2321,9 @@
                 <button data-tool="fast-assembler" data-unlock="fastAssembler" data-tab-group="machine" style="display:none"><svg width="48" height="44" viewBox="0 0 60 60" fill="none"><rect x="14" y="14" width="32" height="32" rx="3" stroke="#378ADD" stroke-width="2" fill="none"/><circle cx="30" cy="30" r="7" stroke="#378ADD" stroke-width="2" fill="none"/><circle cx="30" cy="30" r="2.5" fill="#378ADD"/><line x1="30" y1="14" x2="30" y2="18" stroke="#378ADD" stroke-width="2"/><line x1="30" y1="42" x2="30" y2="46" stroke="#378ADD" stroke-width="2"/><line x1="14" y1="30" x2="18" y2="30" stroke="#378ADD" stroke-width="2"/><line x1="42" y1="30" x2="46" y2="30" stroke="#378ADD" stroke-width="2"/><polygon points="6,27 2,30 6,33" fill="#888780"/><polygon points="54,27 58,30 54,33" fill="#378ADD"/><line x1="38" y1="10" x2="42" y2="6" stroke="#378ADD" stroke-width="1.5" stroke-linecap="round"/><line x1="43" y1="13" x2="48" y2="10" stroke="#378ADD" stroke-width="1.5" stroke-linecap="round"/></svg></button>
                 <button data-tool="factory" data-unlock="factory" data-tab-group="machine" style="display:none"><svg width="48" height="44" viewBox="0 0 60 60" fill="none"><rect x="10" y="26" width="40" height="26" rx="2" stroke="#639922" stroke-width="2"/><line x1="10" y1="38" x2="50" y2="38" stroke="#639922" stroke-width="1.2" opacity=".4"/><rect x="18" y="40" width="10" height="12" rx="1" fill="#1f2933" stroke="#639922" stroke-width="1.5"/><rect x="32" y="40" width="10" height="12" rx="1" fill="#1f2933" stroke="#639922" stroke-width="1.5"/><line x1="17" y1="26" x2="17" y2="14" stroke="#639922" stroke-width="3" stroke-linecap="round"/><line x1="35" y1="26" x2="35" y2="18" stroke="#639922" stroke-width="3" stroke-linecap="round"/><line x1="13" y1="14" x2="21" y2="14" stroke="#639922" stroke-width="2"/><line x1="31" y1="18" x2="39" y2="18" stroke="#639922" stroke-width="2"/><polygon points="3,34 7,30 7,38" fill="#888780"/><polygon points="57,34 53,30 53,38" fill="#639922"/></svg></button>
 
-                <button data-tool="storage-source" data-tab-group="storage" style="display:none"><svg width="48" height="44" viewBox="0 0 60 60" fill="none"><rect x="6" y="12" width="36" height="36" rx="3" stroke="#B4B2A9" stroke-width="2" fill="none"/><line x1="6" y1="24" x2="42" y2="24" stroke="#B4B2A9" stroke-width="1.2" opacity=".6"/><line x1="6" y1="36" x2="42" y2="36" stroke="#B4B2A9" stroke-width="1.2" opacity=".6"/><line x1="24" y1="12" x2="24" y2="48" stroke="#B4B2A9" stroke-width="1.2" opacity=".6"/><rect x="12" y="22" width="24" height="16" fill="#1f2933"/><text x="24" y="34" text-anchor="middle" font-size="11" font-weight="700" font-family="monospace" fill="#639922">OUT</text><line x1="42" y1="30" x2="55" y2="30" stroke="#639922" stroke-width="2.5" stroke-linecap="round"/><polygon points="51,25 59,30 51,35" fill="#639922"/></svg></button>
-                <button data-tool="storage-sink" data-tab-group="storage" style="display:none"><svg width="48" height="44" viewBox="0 0 60 60" fill="none"><rect x="18" y="12" width="36" height="36" rx="3" stroke="#B4B2A9" stroke-width="2" fill="none"/><line x1="18" y1="24" x2="54" y2="24" stroke="#B4B2A9" stroke-width="1.2" opacity=".6"/><line x1="18" y1="36" x2="54" y2="36" stroke="#B4B2A9" stroke-width="1.2" opacity=".6"/><line x1="36" y1="12" x2="36" y2="48" stroke="#B4B2A9" stroke-width="1.2" opacity=".6"/><rect x="24" y="22" width="24" height="16" fill="#1f2933"/><text x="36" y="34" text-anchor="middle" font-size="11" font-weight="700" font-family="monospace" fill="#378ADD">IN</text><line x1="1" y1="30" x2="14" y2="30" stroke="#378ADD" stroke-width="2.5" stroke-linecap="round"/><polygon points="10,25 18,30 10,35" fill="#378ADD"/></svg></button>
+                <button data-tool="storage-source" data-tab-group="storage" style="display:none"><svg width="48" height="44" viewBox="0 0 60 60" fill="none"><rect x="18" y="12" width="36" height="36" rx="3" stroke="#B4B2A9" stroke-width="2" fill="none"/><line x1="18" y1="24" x2="54" y2="24" stroke="#B4B2A9" stroke-width="1.2" opacity=".6"/><line x1="18" y1="36" x2="54" y2="36" stroke="#B4B2A9" stroke-width="1.2" opacity=".6"/><line x1="36" y1="12" x2="36" y2="48" stroke="#B4B2A9" stroke-width="1.2" opacity=".6"/><rect x="24" y="22" width="24" height="16" fill="#1f2933"/><text x="36" y="34" text-anchor="middle" font-size="11" font-weight="700" font-family="monospace" fill="#378ADD">IN</text><line x1="1" y1="30" x2="14" y2="30" stroke="#378ADD" stroke-width="2.5" stroke-linecap="round"/><polygon points="10,25 18,30 10,35" fill="#378ADD"/></svg></button>
+                <button data-tool="storage-sink" data-tab-group="storage" style="display:none"><svg width="48" height="44" viewBox="0 0 60 60" fill="none"><rect x="6" y="12" width="36" height="36" rx="3" stroke="#B4B2A9" stroke-width="2" fill="none"/><line x1="6" y1="24" x2="42" y2="24" stroke="#B4B2A9" stroke-width="1.2" opacity=".6"/><line x1="6" y1="36" x2="42" y2="36" stroke="#B4B2A9" stroke-width="1.2" opacity=".6"/><line x1="24" y1="12" x2="24" y2="48" stroke="#B4B2A9" stroke-width="1.2" opacity=".6"/><rect x="12" y="22" width="24" height="16" fill="#1f2933"/><text x="24" y="34" text-anchor="middle" font-size="11" font-weight="700" font-family="monospace" fill="#639922">OUT</text><line x1="42" y1="30" x2="55" y2="30" stroke="#639922" stroke-width="2.5" stroke-linecap="round"/><polygon points="51,25 59,30 51,35" fill="#639922"/></svg></button>
+                <button data-tool="sector-link" data-unlock="sectorLink" data-tab-group="storage" style="display:none"><svg width="48" height="44" viewBox="0 0 60 60" fill="none"><circle cx="14" cy="30" r="10" stroke="#1D9E75" stroke-width="2" fill="#1f2933"/><circle cx="14" cy="30" r="5" stroke="#1D9E75" stroke-width="1.5" fill="none" stroke-dasharray="3 2"/><circle cx="46" cy="30" r="10" stroke="#378ADD" stroke-width="2" fill="#1f2933"/><circle cx="46" cy="30" r="5" stroke="#378ADD" stroke-width="1.5" fill="none" stroke-dasharray="3 2"/><line x1="24" y1="30" x2="36" y2="30" stroke="#aaa" stroke-width="1.5" stroke-dasharray="3 2"/><polygon points="33,26 40,30 33,34" fill="#aaa"/></svg></button>
                 <button data-tool="dyson-sink" data-unlock="factory" data-tab-group="storage" style="display:none"><svg width="48" height="44" viewBox="0 0 60 60" fill="none"><rect x="18" y="12" width="36" height="36" rx="3" stroke="#B4B2A9" stroke-width="2"/><line x1="18" y1="24" x2="54" y2="24" stroke="#B4B2A9" stroke-width="1.2" opacity=".6"/><line x1="18" y1="36" x2="54" y2="36" stroke="#B4B2A9" stroke-width="1.2" opacity=".6"/><line x1="36" y1="12" x2="36" y2="48" stroke="#B4B2A9" stroke-width="1.2" opacity=".6"/><circle cx="36" cy="30" r="9" stroke="#1D9E75" stroke-width="2" fill="#1f2933"/><ellipse cx="36" cy="30" rx="9" ry="4" stroke="#1D9E75" stroke-width="1.2" opacity=".6"/><circle cx="36" cy="30" r="2.5" fill="#1D9E75"/><line x1="1" y1="30" x2="14" y2="30" stroke="#1D9E75" stroke-width="2.5" stroke-linecap="round"/><polygon points="10,25 18,30 10,35" fill="#1D9E75"/></svg></button>
 
                 <button data-tool="splitter" data-unlock="splitter" data-tab-group="branch" style="display:none"><svg width="48" height="44" viewBox="0 0 60 60" fill="none"><line x1="4" y1="30" x2="22" y2="30" stroke="#B4B2A9" stroke-width="2" stroke-linecap="round"/><rect x="20" y="22" width="16" height="16" rx="2" stroke="#BA7517" stroke-width="2" fill="none"/><line x1="36" y1="30" x2="46" y2="18" stroke="#BA7517" stroke-width="2" stroke-linecap="round"/><line x1="36" y1="30" x2="46" y2="42" stroke="#BA7517" stroke-width="2" stroke-linecap="round"/><polygon points="42,13 52,18 44,22" fill="#BA7517"/><polygon points="42,47 52,42 44,38" fill="#BA7517"/></svg></button>
@@ -2740,7 +2792,8 @@
         let titleClickTimer = null;
 
         // 部品インベントリ
-        let parts = { belt: 0, inserter: 0, assembler: 0, fastBelt: 0, fastInserter: 0, fastAssembler: 0, splitter: 0, merger: 0, storageSource: 0, storageSink: 0, longInserter: 0, factory: 0, crossBelt: 0, fastCrossBelt: 0, doubleBelt: 0 };
+        let parts = { belt: 0, inserter: 0, assembler: 0, fastBelt: 0, fastInserter: 0, fastAssembler: 0, splitter: 0, merger: 0, storageSource: 0, storageSink: 0, longInserter: 0, factory: 0, crossBelt: 0, fastCrossBelt: 0, doubleBelt: 0, sectorLink: 0 };
+        let interSectorBuffer = {}; // セクター間転送バッファ { 'N→M': [items] }
 
         // 転生システム
         let reincarnationCount = 0;
@@ -2829,11 +2882,11 @@
             factory:       { label: '部品工場', ingredients: [{ type: 'square', count: 5 }, { type: 'pentagon', count: 3 }, { type: 'hexagon', count: 2 }] },
             crossBelt:     { label: '交差ベルト',    ingredients: [{ type: 'square', count: 2 }, { type: 'triangle', count: 2 }] },
             fastCrossBelt: { label: '高速交差ベルト', ingredients: [{ type: 'square', count: 4 }, { type: 'pentagon', count: 2 }, { type: 'triangle', count: 2 }] },
-            doubleBelt:    { label: 'デュアルベルト',   ingredients: [{ type: 'square', count: 2 }, { type: 'triangle', count: 2 }] }
-
+            doubleBelt:    { label: 'デュアルベルト',   ingredients: [{ type: 'square', count: 2 }, { type: 'triangle', count: 2 }] },
+            sectorLink:    { label: 'セクターリンク', ingredients: [{ type: 'square', count: 4 }, { type: 'pentagon', count: 2 }, { type: 'hexagon', count: 2 }] }
         };
 
-        const PART_NAMES = { belt: 'ベルト', inserter: 'インサーター', assembler: '組立機', storageSource: '材料ストレージ', storageSink: '完成品ストレージ', fastBelt: '高速ベルト', fastInserter: '高速インサーター', fastAssembler: '高速組立機', splitter: '分岐機', merger: '合流機', longInserter: 'ロングアームインサーター', factory: '部品工場', crossBelt: '交差ベルト', fastCrossBelt: '高速交差ベルト', doubleBelt: 'デュアルベルト' };
+        const PART_NAMES = { belt: 'ベルト', inserter: 'インサーター', assembler: '組立機', storageSource: '材料ストレージ', storageSink: '完成品ストレージ', fastBelt: '高速ベルト', fastInserter: '高速インサーター', fastAssembler: '高速組立機', splitter: '分岐機', merger: '合流機', longInserter: 'ロングアームインサーター', factory: '部品工場', crossBelt: '交差ベルト', fastCrossBelt: '高速交差ベルト', doubleBelt: 'デュアルベルト', sectorLink: 'セクターリンク' };
 
         const CELL_TYPE_TO_PART_KEY = {
             'belt': 'belt', 'inserter': 'inserter', 'assembler': 'assembler',
@@ -2843,7 +2896,8 @@
             'long-inserter': 'longInserter', 'factory': 'factory',
             'cross-belt': 'crossBelt', 'fast-cross-belt': 'fastCrossBelt',
             'double-belt': 'doubleBelt', 'curve-belt': 'belt',
-            'fast-curve-belt': 'fastBelt', 'double-curve-belt': 'doubleBelt'
+            'fast-curve-belt': 'fastBelt', 'double-curve-belt': 'doubleBelt',
+            'sector-link': 'sectorLink'
         };
         const SHAPE_ICONS  = { point: '●', line: '─', triangle: '▲', square: '■', pentagon: '⬠', hexagon: '⬡' };
         const SHAPE_NAMES_JP = { point: '点', line: '線', triangle: '三角形', square: '四角形', pentagon: '五角形', hexagon: '六角形' };
@@ -2947,8 +3001,8 @@
             },
             {
                 name: "T4-Complete: ティア4完全制覇！",
-                desc: "部品工場が解放されました！ベルトやインサーターを自動生産ラインで量産できます！",
-                unlocked: ["point", "line", "triangle", "square", "pentagon", "hexagon", "autoPoint", "autoLine", "crossBelt", "doubleBelt", "fastBelt", "fastCrossBelt", "fastInserter", "fastAssembler", "splitter", "merger", "longInserter", "factory"],
+                desc: "部品工場が解放されました！ベルトやインサーターを自動生産ラインで量産できます！さらにセクターリンクでセクター間の物流も構築できます！",
+                unlocked: ["point", "line", "triangle", "square", "pentagon", "hexagon", "autoPoint", "autoLine", "crossBelt", "doubleBelt", "fastBelt", "fastCrossBelt", "fastInserter", "fastAssembler", "splitter", "merger", "longInserter", "factory", "sectorLink"],
                 reqs: {}
             }
         ];
@@ -3276,7 +3330,7 @@
             belt:     ['belt','fast-belt','double-belt','cross-belt','fast-cross-belt'],
             inserter: ['inserter','fast-inserter','long-inserter'],
             machine:  ['assembler','fast-assembler','factory'],
-            storage:  ['storage-source','storage-sink','dyson-sink'],
+            storage:  ['storage-source','storage-sink','dyson-sink','sector-link'],
             branch:   ['splitter','merger'],
         };
         let currentTab = 'belt';
@@ -3315,7 +3369,7 @@
             'inserter':'インサーター','fast-inserter':'高速インサーター','long-inserter':'ロングアームインサーター',
             'assembler':'組立機','fast-assembler':'高速組立機','factory':'部品工場',
             'storage-source':'材料ST','storage-sink':'完成品ST','dyson-sink':'ダイソンST',
-            'splitter':'分岐機','merger':'合流機',
+            'splitter':'分岐機','merger':'合流機','sector-link':'セクターリンク',
         };
         function updateToolLabel(tool, btn) {
             const name = TOOL_NAME_MAP[tool] || tool;
@@ -3497,37 +3551,41 @@
 
             const cell = sectors[currentSectorId][y][x];
 
-            if (cell.type === 'factory' && distance <= 8 && currentTool !== 'erase') {
+            if ((cell.type === 'factory' || cell.type === 'factory-ghost') && distance <= 8 && currentTool !== 'erase') {
+                const factCell = resolveCell(cell);
+                if (!factCell || factCell.type !== 'factory') { startCellX=null; startCellY=null; return; }
                 const items = FACTORY_RECIPES.map((r, i) => ({
                     value: i,
-                    current: i === (cell.work.recipeIdx || 0),
-                    label: `<span style="display:inline-flex;align-items:center;gap:4px;">${partSVG(r.id,22)}<span style="font-size:11px;">${r.label}</span></span><br><span style="font-size:10px;color:#888;display:flex;gap:4px;margin-top:2px;">${r.ingredients.map(g=>`<span style="display:inline-flex;align-items:center;">${gemSVG(g.kind,13)}<span>×${g.count}</span></span>`).join('')}</span>`
+                    current: i === (factCell.work.recipeIdx || 0),
+                    label: `<span style="display:inline-flex;align-items:center;gap:4px;"><span style="display:inline-flex;align-items:center;width:22px;height:22px;overflow:hidden;">${getToolbarIcon(r.id,22)}</span><span style="font-size:11px;">${r.label}</span></span><br><span style="font-size:10px;color:#888;display:flex;gap:4px;margin-top:2px;">${r.ingredients.map(g=>`<span style="display:inline-flex;align-items:center;">${gemSVG(g.kind,13)}<span>×${g.count}</span></span>`).join('')}</span>`
                 }));
-                showCellPopup(cell.el, '生産する部品を選択', items, idx => {
-                    cell.work.recipeIdx = idx;
-                    cell.work.producing = false;
-                    cell.work.progressTick = 0;
-                    cell.work.stored = {};
-                    renderCell(cell);
+                showCellPopup(factCell.el, '生産する部品を選択', items, idx => {
+                    factCell.work.recipeIdx = idx;
+                    factCell.work.producing = false;
+                    factCell.work.progressTick = 0;
+                    factCell.work.stored = {};
+                    renderCell(factCell);
                 });
                 startCellX = null; startCellY = null;
                 return;
             }
 
-            if ((cell.type === 'assembler' || cell.type === 'fast-assembler') && distance <= 8 && currentTool !== 'erase') {
+            if ((cell.type === 'assembler' || cell.type === 'fast-assembler' || cell.type === 'assembler-ghost') && distance <= 8 && currentTool !== 'erase') {
+                const asmCell = resolveCell(cell);
+                if (!asmCell || (asmCell.type !== 'assembler' && asmCell.type !== 'fast-assembler')) { startCellX=null; startCellY=null; return; }
                 const items = RECIPES
                     .map((r, i) => ({ r, i }))
                     .filter(({ r }) => isRecipeAvailable(r) && r.unlocksAt === undefined)
                     .map(({ r, i }) => ({
                         value: i,
-                        current: i === cell.work.recipeIdx,
+                        current: i === asmCell.work.recipeIdx,
                         label: `<span style="display:inline-flex;align-items:center;gap:4px;">${gemSVG(r.id,22)}<span style="font-size:11px;">${r.label}</span></span><br><span style="font-size:10px;color:#888;display:flex;gap:4px;margin-top:2px;">${r.ingredients.map(g=>`<span style="display:inline-flex;align-items:center;">${gemSVG(g.kind,13)}<span>×${g.count}</span></span>`).join('')}</span>`
                     }));
-                showCellPopup(cell.el, 'レシピを選択', items, idx => {
-                    cell.work.recipeIdx = idx;
-                    cell.work.progress = 0;
-                    cell.work.stored = {};
-                    renderCell(cell);
+                showCellPopup(asmCell.el, 'レシピを選択', items, idx => {
+                    asmCell.work.recipeIdx = idx;
+                    asmCell.work.progress = 0;
+                    asmCell.work.stored = {};
+                    renderCell(asmCell);
                 });
                 startCellX = null; startCellY = null;
                 return;
@@ -3553,10 +3611,17 @@
             };
 
             // 材料ストレージのタップ → 出力種類を切り替え（上書きブロックより前に処理、消しゴム時はスキップ）
+            if (cell.type === 'sector-link' && distance <= 8 && currentTool !== 'erase') {
+                const adj = cell.work?.adjSector;
+                const role = cell.work?.role === 'output' ? '送出→' : '←受取';
+                setFeedback(`🔗 ${role} SECTOR ${String(adj ?? '?').padStart(2,'0')} と接続中`);
+                startCellX = null; startCellY = null; return;
+            }
+
             if (cell.type === 'storage-source' && distance <= 8 && currentTool !== 'erase') {
-                const allKinds = ['raw', 'line', 'triangle', 'square', 'pentagon', 'hexagon'];
-                const unlockMap = { raw: 'point', line: 'line', triangle: 'triangle', square: 'square', pentagon: 'pentagon', hexagon: 'hexagon' };
-                const kindNames = { raw:'点', line:'線', triangle:'三角形', square:'四角形', pentagon:'五角形', hexagon:'六角形' };
+                const allKinds = ['raw', 'line']; // 材料STは点・線のみ供給可
+                const unlockMap = { raw: 'point', line: 'line' };
+                const kindNames = { raw:'点', line:'線' };
                 const available = allKinds.filter(k => isUnlocked(unlockMap[k]));
                 if (available.length > 0) {
                     if (!cell.work) cell.work = { kind: 'raw' };
@@ -3582,6 +3647,49 @@
             }
 
             if (currentTool === 'erase') {
+                // ゴーストセル消去 → アンカーに転送して4マス一括クリア
+                if (cell.type === 'assembler-ghost' || cell.type === 'factory-ghost') {
+                    const anc = resolveCell(cell);
+                    if (anc) {
+                        const ax = anc.x, ay = anc.y;
+                        const g = sectors[currentSectorId];
+                        const partKeyAnc = CELL_TYPE_TO_PART_KEY[anc.type];
+                        if (partKeyAnc && !isDebugMode) { parts[partKeyAnc]++; updatePartsDisplay(); }
+                        [[ay,ax],[ay,ax+1],[ay+1,ax],[ay+1,ax+1]].forEach(([gy,gx]) => {
+                            if (gy>=0&&gy<ROWS&&gx>=0&&gx<COLS) {
+                                const gc=g[gy][gx]; gc.type='empty'; gc.dir=null; gc.items=[]; gc.work=null; gc.anchor=undefined;
+                            }
+                        });
+                        startCellX=null; startCellY=null;
+                        renderAll(); saveGame(); return;
+                    }
+                }
+                // 通常の組立機・部品工場アンカー消去 → ゴーストも一緒にクリア
+                if (cell.type === 'assembler' || cell.type === 'fast-assembler' || cell.type === 'factory') {
+                    const ghostType = cell.type === 'factory' ? 'factory-ghost' : 'assembler-ghost';
+                    const g = sectors[currentSectorId];
+                    [[y,x+1],[y+1,x],[y+1,x+1]].forEach(([gy,gx]) => {
+                        if (gy<ROWS&&gx<COLS&&g[gy][gx].type===ghostType) {
+                            const gc=g[gy][gx]; gc.type='empty'; gc.dir=null; gc.items=[]; gc.work=null; gc.anchor=undefined;
+                        }
+                    });
+                    returnCellPart();
+                    cell.type = 'empty'; cell.dir = null; cell.items = []; cell.work = null;
+                    startCellX = null; startCellY = null;
+                    renderAll(); saveGame(); return;
+                }
+                // sector-link 消去 → 向こう側のミラーも削除
+                if (cell.type === 'sector-link') {
+                    const adj = cell.work?.adjSector;
+                    const edge = cell.work?.edge;
+                    if (adj !== null && adj !== undefined && sectors[adj]) {
+                        const mirrorX = edge === 'right' ? 0 : COLS - 1;
+                        const mirrorCell = sectors[adj][y][mirrorX];
+                        if (mirrorCell && mirrorCell.type === 'sector-link' && mirrorCell.work?.adjSector === currentSectorId) {
+                            mirrorCell.type = 'empty'; mirrorCell.dir = null; mirrorCell.items = []; mirrorCell.work = null;
+                        }
+                    }
+                }
                 returnCellPart();
                 cell.type = 'empty';
                 cell.dir = null;
@@ -3680,11 +3788,53 @@
                         cell.work = null;
                     }
                 } else if (currentTool === 'factory') {
+                    // 2×2スペースチェック
+                    if (x + 1 >= COLS || y + 1 >= ROWS) {
+                        setFeedback('⚠️ 部品工場を配置するスペースがありません（右・下に1マス必要）');
+                        startCellX = null; startCellY = null;
+                        if (!isDebugMode) { parts[partKey]++; updatePartsDisplay(); }
+                        return;
+                    }
+                    const gf = sectors[currentSectorId];
+                    const neighbors2x2f = [gf[y][x+1], gf[y+1][x], gf[y+1][x+1]];
+                    if (neighbors2x2f.some(c => c.type !== 'empty')) {
+                        setFeedback('⚠️ 部品工場には 2×2 のスペースが必要です');
+                        startCellX = null; startCellY = null;
+                        if (!isDebugMode) { parts[partKey]++; updatePartsDisplay(); }
+                        return;
+                    }
                     cell.type = 'factory'; cell.dir = null;
                     cell.work = { recipeIdx: 0, stored: {}, producing: false, progressTick: 0 };
+                    neighbors2x2f.forEach(gc => {
+                        gc.type = 'factory-ghost';
+                        gc.anchor = { r: y, c: x };
+                        gc.dir = null; gc.items = []; gc.work = null;
+                    });
                 } else if (currentTool === 'assembler' || currentTool === 'fast-assembler') {
+                    // 2×2スペースチェック
+                    if (x + 1 >= COLS || y + 1 >= ROWS) {
+                        setFeedback('⚠️ 組立機を配置するスペースがありません（右・下に1マス必要）');
+                        startCellX = null; startCellY = null;
+                        if (!isDebugMode) { parts[partKey]++; updatePartsDisplay(); }
+                        return;
+                    }
+                    const g2 = sectors[currentSectorId];
+                    const neighbors2x2 = [g2[y][x+1], g2[y+1][x], g2[y+1][x+1]];
+                    if (neighbors2x2.some(c => c.type !== 'empty')) {
+                        setFeedback('⚠️ 組立機には 2×2 のスペースが必要です');
+                        startCellX = null; startCellY = null;
+                        if (!isDebugMode) { parts[partKey]++; updatePartsDisplay(); }
+                        return;
+                    }
+                    // アンカーセル
                     cell.type = currentTool; cell.dir = 'right';
                     cell.work = { recipeIdx: 0, stored: {}, producing: false, progressTick: 0 };
+                    // ゴーストセル（残り3マス）
+                    neighbors2x2.forEach(gc => {
+                        gc.type = 'assembler-ghost';
+                        gc.anchor = { r: y, c: x };
+                        gc.dir = null; gc.items = []; gc.work = null;
+                    });
                 } else if (currentTool === 'splitter' || currentTool === 'merger') {
                     cell.type = currentTool; cell.dir = finalDir; cell.work = { toggle: false };
                 } else if (currentTool === 'cross-belt' || currentTool === 'fast-cross-belt') {
@@ -3693,6 +3843,35 @@
                     cell.type = 'storage-source'; cell.dir = null; cell.work = { kind: 'raw' };
                 } else if (currentTool === 'storage-sink') {
                     cell.type = 'storage-sink'; cell.dir = null; cell.work = null;
+                } else if (currentTool === 'sector-link') {
+                    if (x !== 0 && x !== COLS - 1) {
+                        setGridToast('⚠️ セクターリンクはグリッドの左端か右端にのみ設置できます', startX, startY);
+                        if (!isDebugMode) { parts[partKey]++; updatePartsDisplay(); }
+                        startCellX = null; startCellY = null; return;
+                    }
+                    const isRight = x === COLS - 1;
+                    const adjSector = isRight ? currentSectorId + 1 : currentSectorId - 1;
+                    if (!unlockedSectors.has(adjSector)) {
+                        setGridToast(`⚠️ 隣のセクター(${adjSector})が解放されていません`, startX, startY);
+                        if (!isDebugMode) { parts[partKey]++; updatePartsDisplay(); }
+                        startCellX = null; startCellY = null; return;
+                    }
+                    // 向こう側に自動設置（INPUT ミラー）
+                    const mirrorX = isRight ? 0 : COLS - 1;
+                    const mirrorCell = sectors[adjSector][y][mirrorX];
+                    if (mirrorCell.type !== 'empty') {
+                        setGridToast(`⚠️ 向こう側（SECTOR ${String(adjSector).padStart(2,'0')} の${isRight ? '左' : '右'}端）が塞がっています`, startX, startY);
+                        if (!isDebugMode) { parts[partKey]++; updatePartsDisplay(); }
+                        startCellX = null; startCellY = null; return;
+                    }
+                    cell.type = 'sector-link';
+                    cell.dir = isRight ? 'right' : 'left';
+                    cell.work = { edge: isRight ? 'right' : 'left', role: 'output', adjSector };
+                    cell.items = [];
+                    mirrorCell.type = 'sector-link';
+                    mirrorCell.dir = isRight ? 'left' : 'right';
+                    mirrorCell.work = { edge: isRight ? 'left' : 'right', role: 'input', adjSector: currentSectorId };
+                    mirrorCell.items = [];
                 }
 
                 // 設置記録 → トロフィーチェック
@@ -3709,7 +3888,12 @@
             startCellX = null;
             startCellY = null;
 
-            renderCell(cell);
+            // 2×2組立機・部品工場はオーバーレイ再生成が必要なのでrenderAll
+            if (cell.type === 'assembler' || cell.type === 'fast-assembler' || cell.type === 'factory') {
+                renderAll();
+            } else {
+                renderCell(cell);
+            }
             updateUI();
         }
 
@@ -3773,14 +3957,6 @@
                 }
                 el.appendChild(arm);
                 addInserterIndicators(el, cell.dir, false);
-
-            } else if (cell.type === 'fast-assembler') {
-                el.classList.add('building', 'assembler', 'fast-assembler');
-                const recipe = RECIPES[cell.work.recipeIdx];
-                if (cell.work.producing) el.classList.add('producing');
-                const effectiveTicks = Math.max(1, Math.ceil(recipe.ticks / 2));
-                const pctFA = cell.work.producing ? Math.min(1, cell.work.progressTick / effectiveTicks) : 0;
-                el.innerHTML = machineRingHTML('fastAssembler', gemSVG(recipe.id, 12), pctFA, '#5060e0');
 
             } else if (cell.type === 'splitter') {
                 el.classList.add('building', 'splitter');
@@ -3858,18 +4034,40 @@
                 addInserterIndicators(el, cell.dir, false);
 
             } else if (cell.type === 'factory') {
-                el.classList.add('building', 'factory');
-                const recipe = FACTORY_RECIPES[cell.work.recipeIdx || 0];
-                if (cell.work.producing) el.classList.add('producing');
-                const pctF = cell.work.producing ? Math.min(1, cell.work.progressTick / recipe.ticks) : 0;
-                el.innerHTML = machineRingHTML('factory', partSVG(recipe.id, 12), pctF, '#ffd080');
+                // 2×2部品工場：セル自体は非表示（オーバーレイで描画）
+                el.classList.add('assembler-anchor');
 
-            } else if (cell.type === 'assembler') {
-                el.classList.add('building', 'assembler');
-                const recipe = RECIPES[cell.work.recipeIdx];
-                if (cell.work.producing) el.classList.add('producing');
-                const pctA = cell.work.producing ? Math.min(1, cell.work.progressTick / recipe.ticks) : 0;
-                el.innerHTML = machineRingHTML('assembler', gemSVG(recipe.id, 12), pctA, '#9050e0');
+            } else if (cell.type === 'factory-ghost') {
+                el.classList.add('assembler-ghost');
+
+            } else if (cell.type === 'sector-link') {
+                el.classList.add('building', 'sector-link');
+                const edge = cell.work?.edge;
+                const role = cell.work?.role;
+                const adj  = cell.work?.adjSector;
+                const isOut = role === 'output';
+                const bufKey = isOut ? null : (adj !== undefined ? `${adj}→${currentSectorId}` : null);
+                const pending = bufKey && interSectorBuffer[bufKey] ? interSectorBuffer[bufKey].length : 0;
+                // 出力: 緑矢印（エッジ方向へ）、入力: 青矢印（内側へ）
+                const arrowOut = edge === 'right'
+                    ? `<svg width="20" height="16" viewBox="0 0 60 40" fill="none"><line x1="4" y1="20" x2="44" y2="20" stroke="#1D9E75" stroke-width="3" stroke-dasharray="5 3"/><polygon points="40,12 56,20 40,28" fill="#1D9E75"/><rect x="1" y="10" width="12" height="20" rx="3" fill="#1D9E75" opacity=".4"/></svg>`
+                    : `<svg width="20" height="16" viewBox="0 0 60 40" fill="none"><line x1="56" y1="20" x2="16" y2="20" stroke="#1D9E75" stroke-width="3" stroke-dasharray="5 3"/><polygon points="20,12 4,20 20,28" fill="#1D9E75"/><rect x="47" y="10" width="12" height="20" rx="3" fill="#1D9E75" opacity=".4"/></svg>`;
+                const arrowIn = edge === 'left'
+                    ? `<svg width="20" height="16" viewBox="0 0 60 40" fill="none"><line x1="56" y1="20" x2="16" y2="20" stroke="#378ADD" stroke-width="3" stroke-dasharray="5 3"/><polygon points="20,12 4,20 20,28" fill="#378ADD"/><rect x="47" y="10" width="12" height="20" rx="3" fill="#378ADD" opacity=".4"/></svg>`
+                    : `<svg width="20" height="16" viewBox="0 0 60 40" fill="none"><line x1="4" y1="20" x2="44" y2="20" stroke="#378ADD" stroke-width="3" stroke-dasharray="5 3"/><polygon points="40,12 56,20 40,28" fill="#378ADD"/><rect x="1" y="10" width="12" height="20" rx="3" fill="#378ADD" opacity=".4"/></svg>`;
+                const arrowSvg = isOut ? arrowOut : arrowIn;
+                el.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;gap:1px;">
+                    ${arrowSvg}
+                    <span style="font-size:8px;color:${isOut ? '#1D9E75' : '#378ADD'};line-height:1;">S${String(adj ?? '?').padStart(2,'0')}</span>
+                    ${pending > 0 ? `<span style="font-size:8px;color:#ffd080;line-height:1;">×${pending}</span>` : ''}
+                </div>`;
+
+            } else if (cell.type === 'assembler' || cell.type === 'fast-assembler') {
+                // 2×2組立機：セル自体は非表示（オーバーレイで描画）
+                el.classList.add('assembler-anchor');
+
+            } else if (cell.type === 'assembler-ghost') {
+                el.classList.add('assembler-ghost');
             }
         }
 
@@ -4350,6 +4548,11 @@
         function renderAll() {
             const currentGrid = sectors[currentSectorId];
             const cellsDOM = gridEl.querySelectorAll('.cell');
+            const gridWrap = document.getElementById('grid-wrap');
+
+            // 既存の組立機オーバーレイを削除
+            gridWrap.querySelectorAll('.asm-overlay').forEach(el => el.remove());
+
             let idx = 0;
             for (let y = 0; y < ROWS; y++) {
                 for (let x = 0; x < COLS; x++) {
@@ -4374,6 +4577,69 @@
                     idx++;
                 }
             }
+
+            // 2×2組立機・部品工場オーバーレイを生成
+            for (let y = 0; y < ROWS; y++) {
+                for (let x = 0; x < COLS; x++) {
+                    const cell = currentGrid[y][x];
+                    const isAsm = cell.type === 'assembler' || cell.type === 'fast-assembler';
+                    const isFact = cell.type === 'factory';
+                    if (!isAsm && !isFact) continue;
+                    const overlay = document.createElement('div');
+                    overlay.className = 'asm-overlay';
+                    overlay.style.left = (4 + x * 33) + 'px';
+                    overlay.style.top  = (4 + y * 33) + 'px';
+                    overlay.style.width  = '65px';
+                    overlay.style.height = '65px';
+                    const inner = document.createElement('div');
+                    inner.style.cssText = 'width:100%;height:100%;border-radius:4px;box-sizing:border-box;';
+                    if (isFact) {
+                        const recipe = FACTORY_RECIPES[cell.work.recipeIdx || 0];
+                        const pct = cell.work.producing ? Math.min(1, cell.work.progressTick / recipe.ticks) : 0;
+                        inner.className = 'cell building factory' + (cell.work.producing ? ' producing' : '');
+                        // 65×65 フル活用の大型ビジュアル
+                        const circ65 = 2 * Math.PI * 28;
+                        const dash65 = pct > 0 ? `${pct * circ65} ${circ65}` : `0 ${circ65}`;
+                        const ring65 = pct > 0 ? `<svg width="65" height="65" viewBox="0 0 65 65" style="position:absolute;top:0;left:0;pointer-events:none;" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="32.5" cy="32.5" r="28" fill="none" stroke="#ffd080" stroke-width="3" opacity="0.18"/>
+                            <circle cx="32.5" cy="32.5" r="28" fill="none" stroke="#ffd080" stroke-width="3" stroke-dasharray="${dash65}" transform="rotate(-90 32.5 32.5)" stroke-linecap="round" opacity="0.9"/>
+                        </svg>` : '';
+                        inner.style.cssText += 'position:relative;display:flex;align-items:center;justify-content:center;';
+                        inner.innerHTML = `<div style="position:relative;width:65px;height:65px;display:flex;align-items:center;justify-content:center;">
+                            ${partSVG('factory', 58)}
+                            <div style="position:absolute;bottom:6px;right:6px;background:rgba(0,0,0,0.55);border-radius:4px;padding:1px;display:flex;align-items:center;justify-content:center;">
+                                ${getToolbarIcon(recipe.id, 20)}
+                            </div>
+                            ${ring65}
+                        </div>`;
+                    } else {
+                        const recipe = RECIPES[cell.work.recipeIdx];
+                        const isFast = cell.type === 'fast-assembler';
+                        const effectiveTicks = isFast ? Math.max(1, Math.ceil(recipe.ticks / 2)) : recipe.ticks;
+                        const pct = cell.work.producing ? Math.min(1, cell.work.progressTick / effectiveTicks) : 0;
+                        const color = isFast ? '#5060e0' : '#9050e0';
+                        const kind = isFast ? 'fastAssembler' : 'assembler';
+                        inner.className = 'cell building assembler' + (isFast ? ' fast-assembler' : '') + (cell.work.producing ? ' producing' : '');
+                        const circ65a = 2 * Math.PI * 28;
+                        const dash65a = pct > 0 ? `${pct * circ65a} ${circ65a}` : `0 ${circ65a}`;
+                        const ring65a = pct > 0 ? `<svg width="65" height="65" viewBox="0 0 65 65" style="position:absolute;top:0;left:0;pointer-events:none;" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="32.5" cy="32.5" r="28" fill="none" stroke="${color}" stroke-width="3" opacity="0.18"/>
+                            <circle cx="32.5" cy="32.5" r="28" fill="none" stroke="${color}" stroke-width="3" stroke-dasharray="${dash65a}" transform="rotate(-90 32.5 32.5)" stroke-linecap="round" opacity="0.9"/>
+                        </svg>` : '';
+                        inner.style.cssText += 'position:relative;display:flex;align-items:center;justify-content:center;';
+                        inner.innerHTML = `<div style="position:relative;width:65px;height:65px;display:flex;align-items:center;justify-content:center;">
+                            ${partSVG(kind, 58)}
+                            <div style="position:absolute;bottom:6px;right:6px;background:rgba(0,0,0,0.55);border-radius:4px;padding:1px;display:flex;align-items:center;justify-content:center;">
+                                ${gemSVG(recipe.id, 20)}
+                            </div>
+                            ${ring65a}
+                        </div>`;
+                    }
+                    overlay.appendChild(inner);
+                    gridWrap.appendChild(overlay);
+                }
+            }
+
             updateItemLayer();
         }
 
@@ -4526,6 +4792,8 @@
         // ベルト系のアイテム移動先として有効かチェック
         function canBeltPushTo(fromDir, toCell, fromCellType) {
             if (!toCell) return false;
+            if (toCell.type === 'assembler-ghost' || toCell.type === 'factory-ghost') return false;
+            if (toCell.type === 'sector-link' && toCell.work?.role === 'output') return toCell.items.length === 0;
             const _isCross = toCell.type === 'cross-belt' || toCell.type === 'fast-cross-belt';
             const _isDouble = toCell.type === 'double-belt';
             if (!_isCross && !_isDouble && toCell.items.length > 0) return false;
@@ -4569,6 +4837,10 @@
             if (to.type === 'assembler' || to.type === 'fast-assembler') {
                 if (!to.work.stored) to.work.stored = {};
                 to.work.stored[itemToMove.kind] = (to.work.stored[itemToMove.kind] || 0) + 1;
+            } else if (to.type === 'sector-link' && to.work?.role === 'output') {
+                const key = `${currentSectorId}→${to.work.adjSector}`;
+                if (!interSectorBuffer[key]) interSectorBuffer[key] = [];
+                interSectorBuffer[key].push({ ...itemToMove, id: ++itemIdCounter });
             } else if (to.type === 'dyson-sink') {
                 recordDelivery(itemToMove.kind);
             } else if (to.type === 'storage-sink') {
@@ -4578,7 +4850,6 @@
                 } else {
                     addResource(itemToMove.kind, 1);
                 }
-                recordDelivery(itemToMove.kind);
             } else {
                 if (to.type === 'double-belt' && inserterCell) {
                     const lane = doubleBeltLane(getOppositeDir(inserterCell.dir), to.dir) || 'a';
@@ -4615,6 +4886,7 @@
                 return false;
             }
             if (to.type === 'dyson-sink') return true;
+            if (to.type === 'sector-link' && to.work?.role === 'output' && to.work?.adjSector !== null && to.work?.adjSector !== undefined) return true;
             if (to.type === 'storage-sink' && itemToMove.kind !== 'raw' && itemToMove.kind !== 'line') {
                 const kind = itemToMove.kind;
                 if (parts[kind] !== undefined) return true;
@@ -4625,6 +4897,15 @@
 
         // 搬出元からアイテムを取得（インサーター共通）
         function inserterPickup(from, inserterCell) {
+            if (from.type === 'sector-link') {
+                if (from.work?.role !== 'input') return null;
+                const adj = from.work?.adjSector;
+                if (adj === null || adj === undefined) return null;
+                const key = `${adj}→${currentSectorId}`;
+                const buf = interSectorBuffer[key];
+                if (buf && buf.length > 0) return { item: { ...buf[0] }, removeItem: buf[0], sectorBuf: key };
+                return null;
+            }
             if (from.type === 'storage-source') {
                 const outputKind = (from.work && from.work.kind) ? from.work.kind : 'raw';
                 const resKey = outputKind === 'raw' ? 'point' : outputKind;
@@ -4670,6 +4951,10 @@
                     let to = getNeighborInGrid(currentGrid, cell, cell.dir);
                     if (isLong && to) to = getNeighborInGrid(currentGrid, to, cell.dir);
 
+                    // 2×2組立機対応：ゴーストセルをアンカーに解決
+                    from = resolveCell(from);
+                    to   = resolveCell(to);
+
                     if (!from || !to) {
                         cell.work.state = 'idle'; cell.work.phase = 0; cell.work.heldItem = null; continue;
                     }
@@ -4680,7 +4965,8 @@
                         if (picked && inserterCanDrop(picked.item, to, reserved, cell)) {
                             if (picked.isSource) resources[picked.sourceKey] -= 1;
                             if (picked.shiftFrom) from.items.shift();
-                            if (picked.removeItem) { const _i = from.items.indexOf(picked.removeItem); if (_i !== -1) from.items.splice(_i, 1); }
+                            if (picked.sectorBuf) { const _b = interSectorBuffer[picked.sectorBuf]; if (_b) { const _i = _b.indexOf(picked.removeItem); if (_i !== -1) _b.splice(_i, 1); } }
+                            else if (picked.removeItem) { const _i = from.items.indexOf(picked.removeItem); if (_i !== -1) from.items.splice(_i, 1); }
                             inserterDrop(picked.item, to, cell);
                             reserved[to.y][to.x] = true;
                             cell.work.state = cell.work.state === 'grab' ? 'drop' : 'grab';
@@ -4740,6 +5026,56 @@
         }
 
         // ベルト移動パス（types に含まれるセルタイプを1ティック分移動）
+        function doSectorLinkPass(currentGrid) {
+            for (let y = 0; y < ROWS; y++) {
+                // 右端セクターリンク
+                const rc = currentGrid[y][COLS - 1];
+                if (rc.type === 'sector-link') {
+                    if (rc.work?.role === 'output' && rc.items.length > 0) {
+                        // OUTPUT: items → バッファへ転送
+                        const key = `${currentSectorId}→${rc.work.adjSector}`;
+                        if (!interSectorBuffer[key]) interSectorBuffer[key] = [];
+                        while (rc.items.length > 0) interSectorBuffer[key].push(rc.items.shift());
+                    } else if (rc.work?.role === 'input') {
+                        // INPUT: バッファ → items、左隣ベルトへ押し出し
+                        if (rc.items.length === 0) {
+                            const key = `${rc.work.adjSector}→${currentSectorId}`;
+                            if (interSectorBuffer[key]?.length > 0) rc.items.push(interSectorBuffer[key].shift());
+                        }
+                        if (rc.items.length > 0 && COLS > 1) {
+                            const prev = currentGrid[y][COLS - 2];
+                            if (prev && prev.items.length === 0 &&
+                                (prev.type === 'belt' || prev.type === 'fast-belt' || prev.type === 'curve-belt' || prev.type === 'fast-curve-belt')) {
+                                prev.items.push(rc.items.shift());
+                            }
+                        }
+                    }
+                }
+                // 左端セクターリンク
+                const lc = currentGrid[y][0];
+                if (lc.type === 'sector-link') {
+                    if (lc.work?.role === 'output' && lc.items.length > 0) {
+                        // OUTPUT: items → バッファへ転送
+                        const key = `${currentSectorId}→${lc.work.adjSector}`;
+                        if (!interSectorBuffer[key]) interSectorBuffer[key] = [];
+                        while (lc.items.length > 0) interSectorBuffer[key].push(lc.items.shift());
+                    } else if (lc.work?.role === 'input') {
+                        // INPUT: バッファ → items、右隣ベルトへ押し出し
+                        if (lc.items.length === 0) {
+                            const key = `${lc.work.adjSector}→${currentSectorId}`;
+                            if (interSectorBuffer[key]?.length > 0) lc.items.push(interSectorBuffer[key].shift());
+                        }
+                        if (lc.items.length > 0 && COLS > 1) {
+                            const next = currentGrid[y][1];
+                            if (next && canBeltPushTo('right', next, 'sector-link')) {
+                                next.items.push(lc.items.shift());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         function doBeltPass(currentGrid, reserved, types) {
             const moves = [];
             for (let y = ROWS - 1; y >= 0; y--) {
@@ -4938,6 +5274,9 @@
                 const currentGrid = sectors[s];
                 const reserved = Array.from({ length: ROWS }, () => Array(COLS).fill(false));
 
+                // 0. セクターリンク転送
+                doSectorLinkPass(currentGrid);
+
                 // 1. ベルト（通常）・高速ベルト・分岐機・合流機の移動
                 doBeltPass(currentGrid, reserved, ['belt', 'merger', 'curve-belt']);
                 doBeltPass(currentGrid, reserved, ['fast-belt', 'fast-curve-belt']); // 高速ベルト1回目
@@ -5043,6 +5382,15 @@
 
         // 初期設定
         // テキスト中の図形記号をgemSVGに変換するユーティリティ（uフラグで絵文字を正しく1文字扱い）
+        function resolveCell(cell) {
+            if (!cell) return cell;
+            if (cell.type === 'assembler-ghost' || cell.type === 'factory-ghost') {
+                const g = sectors[currentSectorId];
+                return g[cell.anchor.r][cell.anchor.c];
+            }
+            return cell;
+        }
+
         function shortNum(n) {
             if (n >= 1000000) return (n / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
             if (n >= 1000) return (n / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
@@ -5064,7 +5412,7 @@
             fastBelt:'fast-belt', fastInserter:'fast-inserter', fastAssembler:'fast-assembler',
             splitter:'splitter', merger:'merger', longInserter:'long-inserter',
             doubleBelt:'double-belt', crossBelt:'cross-belt', fastCrossBelt:'fast-cross-belt',
-            factory:'factory'
+            factory:'factory', sectorLink:'sector-link'
         };
         function getToolbarIcon(partKey, size) {
             const toolKey = craftPartToolMap[partKey];
@@ -5684,6 +6032,25 @@
             if (feedbackEl) feedbackEl.innerText = msg;
         }
 
+        let _gridToastTimer = null;
+        function setGridToast(msg, cx, cy) {
+            const el = document.getElementById('grid-toast');
+            if (!el) return;
+            el.textContent = msg;
+            el.style.display = 'block';
+            // 一度表示してサイズ計測
+            const w = el.offsetWidth;
+            const h = el.offsetHeight;
+            const vw = window.innerWidth;
+            const vh = window.innerHeight;
+            const x = Math.min(Math.max((cx ?? vw / 2) - w / 2, 4), vw - w - 4);
+            const y = Math.max((cy ?? vh / 2) - h - 12, 4);
+            el.style.left = x + 'px';
+            el.style.top  = y + 'px';
+            if (_gridToastTimer) clearTimeout(_gridToastTimer);
+            _gridToastTimer = setTimeout(() => { el.style.display = 'none'; }, 2500);
+        }
+
         // UI表示更新
         function updateUI() {
             const types = ['point', 'line', 'triangle', 'square', 'pentagon', 'hexagon'];
@@ -6046,7 +6413,7 @@
         }
 
         function updatePartsDisplay() {
-            const allParts = ['belt', 'inserter', 'assembler', 'storageSource', 'storageSink', 'fastBelt', 'fastInserter', 'fastAssembler', 'splitter', 'merger', 'longInserter', 'doubleBelt', 'crossBelt', 'fastCrossBelt', 'curveBelt', 'fastCurveBelt', 'doubleCurveBelt', 'factory'];
+            const allParts = ['belt', 'inserter', 'assembler', 'storageSource', 'storageSink', 'fastBelt', 'fastInserter', 'fastAssembler', 'splitter', 'merger', 'longInserter', 'doubleBelt', 'crossBelt', 'fastCrossBelt', 'curveBelt', 'fastCurveBelt', 'doubleCurveBelt', 'factory', 'sectorLink'];
             allParts.forEach(p => {
                 const countEl = document.getElementById(`parts-${p}-count`);
                 if (countEl) countEl.textContent = `×${parts[p]}`;
@@ -6062,7 +6429,7 @@
             if (selCount && currentCraftTarget) selCount.textContent = '×' + (parts[currentCraftTarget] ?? 0);
 
             // 解放状態に応じてT3/T4部品UI要素の表示切替
-            const t3Unlocks = ['fastBelt', 'fastInserter', 'fastAssembler', 'splitter', 'merger', 'longInserter', 'factory', 'crossBelt', 'fastCrossBelt', 'doubleBelt', 'curveBelt', 'fastCurveBelt', 'doubleCurveBelt'];
+            const t3Unlocks = ['fastBelt', 'fastInserter', 'fastAssembler', 'splitter', 'merger', 'longInserter', 'factory', 'crossBelt', 'fastCrossBelt', 'doubleBelt', 'curveBelt', 'fastCurveBelt', 'doubleCurveBelt', 'sectorLink'];
             t3Unlocks.forEach(key => {
                 const unlocked = isUnlocked(key);
                 document.querySelectorAll(`[data-unlock="${key}"]`).forEach(el => {
@@ -6072,6 +6439,21 @@
             });
             // ツールタブを再適用してunlock済みボタンの表示を正しく制御
             refreshToolbarButtons(currentTab);
+
+            // ツールバーボタンの在庫数バッジ更新
+            document.querySelectorAll('#toolbar [data-tool]').forEach(btn => {
+                const partKey = CELL_TYPE_TO_PART_KEY[btn.dataset.tool];
+                if (!partKey || parts[partKey] === undefined) return;
+                let badge = btn.querySelector('.tool-stock');
+                if (!badge) {
+                    badge = document.createElement('span');
+                    badge.className = 'tool-stock';
+                    btn.appendChild(badge);
+                }
+                const count = parts[partKey] ?? 0;
+                badge.textContent = shortNum(count);
+                badge.className = 'tool-stock' + (count === 0 ? ' zero' : '');
+            });
         }
 
         // ── セーブ＆ロードシステム ──────────────────────────
@@ -6089,16 +6471,21 @@
                 btn.onclick = () => { onSelect(item.value); closeCellPopup(); };
                 grid.appendChild(btn);
             });
+            // 先に表示して実際のサイズを取得してから位置を決定
+            popup.style.visibility = 'hidden';
             popup.style.display = 'block';
-            // 位置をアンカー要素の近くに（画面端補正）
             const rect = anchorEl.getBoundingClientRect();
-            const pw = 260, ph = 200;
+            const pr = popup.getBoundingClientRect();
+            const pw = pr.width, ph = pr.height;
             let top = rect.bottom + 4;
             let left = rect.left;
             if (left + pw > window.innerWidth) left = window.innerWidth - pw - 8;
+            if (left < 4) left = 4;
             if (top + ph > window.innerHeight) top = rect.top - ph - 4;
+            if (top < 4) top = 4;
             popup.style.top = top + 'px';
             popup.style.left = left + 'px';
+            popup.style.visibility = '';
             // 外タップで閉じる
             setTimeout(() => {
                 document.addEventListener('pointerdown', closeCellPopupOutside, { once: true });
@@ -6657,15 +7044,17 @@
                     lifetimeProduced,
                     placedObjects,
                     unlockedSectors: [...unlockedSectors],
-                    sectors: sectors.map(sector => 
-                        sector.map(row => 
+                    interSectorBuffer,
+                    sectors: sectors.map(sector =>
+                        sector.map(row =>
                             row.map(cell => ({
                                 type: cell.type,
                                 dir: cell.dir,
                                 items: cell.items,
                                 work: cell.work,
                                 x: cell.x,
-                                y: cell.y
+                                y: cell.y,
+                                anchor: cell.anchor
                             }))
                         )
                     )
@@ -6710,6 +7099,7 @@
                 if (data.lifetimeProduced) Object.assign(lifetimeProduced, data.lifetimeProduced);
                 if (data.placedObjects) Object.assign(placedObjects, data.placedObjects);
                 if (data.unlockedSectors) unlockedSectors = new Set(data.unlockedSectors);
+                if (data.interSectorBuffer) interSectorBuffer = data.interSectorBuffer;
                 
                 if (data.sectors) {
                     let maxItemId = 0;
@@ -6741,10 +7131,16 @@
                                     delete savedCell.work.storedDots;
                                     delete savedCell.work.storedLines;
                                 }
+                                // マイグレーション: 材料STの供給種類を点・線のみに制限
+                                if (savedCell.type === 'storage-source' && savedCell.work) {
+                                    const k = savedCell.work.kind;
+                                    if (k && k !== 'raw' && k !== 'line') savedCell.work.kind = 'raw';
+                                }
                                 sectors[s][y][x].type = savedCell.type || 'empty';
                                 sectors[s][y][x].dir = savedCell.dir;
                                 sectors[s][y][x].items = savedCell.items || [];
                                 sectors[s][y][x].work = savedCell.work;
+                                sectors[s][y][x].anchor = savedCell.anchor || undefined;
                                 (savedCell.items || []).forEach(item => { if (item.id > maxItemId) maxItemId = item.id; });
                             }
                         }
