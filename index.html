@@ -1747,7 +1747,7 @@
         <img id="opening-logo" src="opening.png" alt="GESTURE&FACTORY">
         <button id="opening-start-btn" onclick="startGame()">TAP TO START</button>
     </div>
-    <div id="opening-version">Ver 1.54</div>
+    <div id="opening-version">Ver 1.55</div>
     <audio id="bgm" src="Thousandth_Rotation.mp3" loop></audio>
 </div>
 
@@ -5026,20 +5026,18 @@
         }
 
         // ベルト移動パス（types に含まれるセルタイプを1ティック分移動）
-        function doSectorLinkPass(currentGrid) {
+        function doSectorLinkPass(currentGrid, sectorId) {
             for (let y = 0; y < ROWS; y++) {
                 // 右端セクターリンク
                 const rc = currentGrid[y][COLS - 1];
                 if (rc.type === 'sector-link') {
                     if (rc.work?.role === 'output' && rc.items.length > 0) {
-                        // OUTPUT: items → バッファへ転送
-                        const key = `${currentSectorId}→${rc.work.adjSector}`;
+                        const key = `${sectorId}→${rc.work.adjSector}`;
                         if (!interSectorBuffer[key]) interSectorBuffer[key] = [];
                         while (rc.items.length > 0) interSectorBuffer[key].push(rc.items.shift());
                     } else if (rc.work?.role === 'input') {
-                        // INPUT: バッファ → items、左隣ベルトへ押し出し
                         if (rc.items.length === 0) {
-                            const key = `${rc.work.adjSector}→${currentSectorId}`;
+                            const key = `${rc.work.adjSector}→${sectorId}`;
                             if (interSectorBuffer[key]?.length > 0) rc.items.push(interSectorBuffer[key].shift());
                         }
                         if (rc.items.length > 0 && COLS > 1) {
@@ -5055,14 +5053,12 @@
                 const lc = currentGrid[y][0];
                 if (lc.type === 'sector-link') {
                     if (lc.work?.role === 'output' && lc.items.length > 0) {
-                        // OUTPUT: items → バッファへ転送
-                        const key = `${currentSectorId}→${lc.work.adjSector}`;
+                        const key = `${sectorId}→${lc.work.adjSector}`;
                         if (!interSectorBuffer[key]) interSectorBuffer[key] = [];
                         while (lc.items.length > 0) interSectorBuffer[key].push(lc.items.shift());
                     } else if (lc.work?.role === 'input') {
-                        // INPUT: バッファ → items、右隣ベルトへ押し出し
                         if (lc.items.length === 0) {
-                            const key = `${lc.work.adjSector}→${currentSectorId}`;
+                            const key = `${lc.work.adjSector}→${sectorId}`;
                             if (interSectorBuffer[key]?.length > 0) lc.items.push(interSectorBuffer[key].shift());
                         }
                         if (lc.items.length > 0 && COLS > 1) {
@@ -5275,7 +5271,7 @@
                 const reserved = Array.from({ length: ROWS }, () => Array(COLS).fill(false));
 
                 // 0. セクターリンク転送
-                doSectorLinkPass(currentGrid);
+                doSectorLinkPass(currentGrid, s);
 
                 // 1. ベルト（通常）・高速ベルト・分岐機・合流機の移動
                 doBeltPass(currentGrid, reserved, ['belt', 'merger', 'curve-belt']);
