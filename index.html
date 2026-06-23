@@ -1751,7 +1751,7 @@
         <img id="opening-logo" src="opening.png" alt="GESTURE&FACTORY">
         <button id="opening-start-btn" onclick="startGame()">TAP TO START</button>
     </div>
-    <div id="opening-version">Ver 1.61</div>
+    <div id="opening-version">Ver 1.62</div>
     <audio id="bgm" src="Thousandth_Rotation.mp3" loop></audio>
 </div>
 
@@ -6808,7 +6808,7 @@
                     <div class="store-name">${nameMap[cfg.key] || cfg.key}</div>
                     <div class="store-stock" id="store-stock-${cfg.key}">×${stock}</div>
                     <div class="store-btns">
-                        <button class="store-buy-btn" onclick="adGrantPartsFromStore('${cfg.key}',5)">📺<br>+5</button>
+                        <button class="store-buy-btn" onclick="adGrantPartsFromStore('${cfg.key}',5)" id="store-ad-btn-${cfg.key}">${getRemainingAds() > 0 ? '📺 広告を見て+5' : '📺 本日の広告上限です'}</button>
                     </div>
                 `;
                 grid.appendChild(card);
@@ -6914,6 +6914,9 @@
                 if (stockEl) stockEl.textContent = '×' + parts[partKey];
                 const remainEl = document.getElementById('store-ad-remain');
                 if (remainEl) remainEl.textContent = getRemainingAds();
+                // 全ボタンのテキストを残り回数に応じて更新
+                const label = getRemainingAds() > 0 ? '📺 広告を見て+5' : '📺 本日の広告上限です';
+                document.querySelectorAll('[id^="store-ad-btn-"]').forEach(btn => btn.textContent = label);
                 setFeedback(`📺 広告視聴完了 → ${PART_NAMES[partKey]} +${count}個！`);
             });
         }
