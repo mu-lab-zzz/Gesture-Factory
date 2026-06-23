@@ -1751,7 +1751,7 @@
         <img id="opening-logo" src="opening.png" alt="GESTURE&FACTORY">
         <button id="opening-start-btn" onclick="startGame()">TAP TO START</button>
     </div>
-    <div id="opening-version">Ver 1.60</div>
+    <div id="opening-version">Ver 1.61</div>
     <audio id="bgm" src="Thousandth_Rotation.mp3" loop></audio>
 </div>
 
@@ -6808,8 +6808,7 @@
                     <div class="store-name">${nameMap[cfg.key] || cfg.key}</div>
                     <div class="store-stock" id="store-stock-${cfg.key}">×${stock}</div>
                     <div class="store-btns">
-                        <button class="store-buy-btn" onclick="buyPart('${cfg.key}',1)" ${coins < cfg.price1 ? 'disabled' : ''}>🪙${cfg.price1}<br>+1</button>
-                        <button class="store-buy-btn" onclick="buyPart('${cfg.key}',5)" ${coins < cfg.price5 ? 'disabled' : ''}>🪙${cfg.price5}<br>+5</button>
+                        <button class="store-buy-btn" onclick="adGrantPartsFromStore('${cfg.key}',5)">📺<br>+5</button>
                     </div>
                 `;
                 grid.appendChild(card);
@@ -6904,6 +6903,19 @@
             updatePartsDisplay();
             saveGame();
             setGridToast(`📺 広告視聴完了 → ${PART_NAMES[partKey]} +${count}個！`, null, null);
+        }
+
+        function adGrantPartsFromStore(partKey, count) {
+            showRewardedAd(() => {
+                parts[partKey] = (parts[partKey] || 0) + count;
+                updatePartsDisplay();
+                saveGame();
+                const stockEl = document.getElementById('store-stock-' + partKey);
+                if (stockEl) stockEl.textContent = '×' + parts[partKey];
+                const remainEl = document.getElementById('store-ad-remain');
+                if (remainEl) remainEl.textContent = getRemainingAds();
+                setFeedback(`📺 広告視聴完了 → ${PART_NAMES[partKey]} +${count}個！`);
+            });
         }
 
         function updateResourceDisplay() {
