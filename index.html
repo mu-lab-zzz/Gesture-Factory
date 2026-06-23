@@ -1753,7 +1753,7 @@
         <img id="opening-logo" src="opening.png" alt="GESTURE&FACTORY">
         <button id="opening-start-btn" onclick="startGame()">TAP TO START</button>
     </div>
-    <div id="opening-version">Ver 1.56</div>
+    <div id="opening-version">Ver 1.57</div>
     <audio id="bgm" src="Thousandth_Rotation.mp3" loop></audio>
 </div>
 
@@ -6856,9 +6856,31 @@
 
 
         // ── リワード広告スタブ ──────────────────────────────────────────────────
+        const AD_DAILY_LIMIT = 4;
+
+        function getAdCount() {
+            const today = new Date().toISOString().slice(0, 10);
+            const saved = JSON.parse(localStorage.getItem('gf_ad_count') || '{}');
+            if (saved.date !== today) return 0;
+            return saved.count || 0;
+        }
+
+        function incrementAdCount() {
+            const today = new Date().toISOString().slice(0, 10);
+            const count = getAdCount() + 1;
+            localStorage.setItem('gf_ad_count', JSON.stringify({ date: today, count }));
+        }
+
+        function getRemainingAds() { return Math.max(0, AD_DAILY_LIMIT - getAdCount()); }
+
         // TODO: ここに実際の広告SDK（AdMobなど）を差し込む
         // onRewarded は広告視聴完了後に呼ぶコールバック
         function showRewardedAd(onRewarded) {
+            if (getAdCount() >= AD_DAILY_LIMIT) {
+                setFeedback('📺 本日の広告上限（' + AD_DAILY_LIMIT + '回）に達しました。明日またどうぞ！');
+                return;
+            }
+            incrementAdCount();
             // 仮実装: 広告なしで即報酬付与（SDK実装後に置き換え）
             onRewarded();
         }
