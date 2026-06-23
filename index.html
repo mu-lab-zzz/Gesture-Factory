@@ -1716,10 +1716,8 @@
             <div class="stats-row"><span>ティア進行</span><span id="stat-tier">0</span></div>
         </div>
         <div class="stats-section">
-            <h3>コイン</h3>
+            <h3>広告</h3>
             <div class="stats-row"><span>広告視聴（累計）</span><span id="stat-ads">0</span></div>
-            <div class="stats-row"><span>獲得コイン（累計）</span><span id="stat-coins-earn">0</span></div>
-            <div class="stats-row"><span>消費コイン（累計）</span><span id="stat-coins-spend">0</span></div>
         </div>
         <button id="stats-close" onclick="closeStats()">閉じる</button>
     </div>
@@ -1729,7 +1727,7 @@
 <div id="parts-store-modal">
     <div id="parts-store-inner">
         <h2>🏪 <span data-i18n="parts_store_title">パーツストア</span></h2>
-        <div id="parts-store-coin-bar">🪙 <span id="store-coin-count">0</span> <span data-i18n="parts_store_balance">コイン所持</span></div>
+        <div id="parts-store-coin-bar">📺 本日あと <span id="store-ad-remain">4</span> 回広告を見られます</div>
         <div id="parts-store-grid"></div>
         <button id="parts-store-close" onclick="closePartsStore()" data-i18n="close">閉じる</button>
     </div>
@@ -1738,10 +1736,10 @@
 <!-- 広告視聴モーダル -->
 <div id="ad-modal">
     <div id="ad-modal-inner">
-        <h2 id="ad-modal-title">🪙 コインを獲得</h2>
+        <h2 id="ad-modal-title">📺 広告を視聴中</h2>
         <p id="ad-modal-desc"></p>
         <div id="ad-progress-bar"><div id="ad-progress-fill"></div></div>
-        <button id="ad-close-btn" onclick="finishAd()">🪙 ×5 受け取る</button>
+        <button id="ad-close-btn" onclick="finishAd()">受け取る</button>
         <button id="ad-skip-btn" onclick="closeAdModal()">閉じる</button>
     </div>
 </div>
@@ -1753,7 +1751,7 @@
         <img id="opening-logo" src="opening.png" alt="GESTURE&FACTORY">
         <button id="opening-start-btn" onclick="startGame()">TAP TO START</button>
     </div>
-    <div id="opening-version">Ver 1.57</div>
+    <div id="opening-version">Ver 1.58</div>
     <audio id="bgm" src="Thousandth_Rotation.mp3" loop></audio>
 </div>
 
@@ -1885,7 +1883,6 @@
             <span id="mini-hexagon" class="locked-mini">0</span>
         </div>
         <div class="mini-btn-row">
-            <div id="coin-display" onclick="openAdModal()" title="広告を見てコインを獲得">🪙 <span id="coin-count">0</span></div>
             <button id="settings-btn" onclick="openSettings()" title="設定">⚙ <span data-i18n="settings_title">設定</span></button>
         </div>
     </div>
@@ -1903,8 +1900,8 @@
         <div class="resource-card line locked" id="card-line">
             <div class="resource-name">線 (Lines) <span style="font-size:10px;color:#ff3366;">[未解放]</span></div>
             <div class="resource-value" id="line-val">0 / 20</div>
-            <button class="coin-btn" id="coin-refill-line" onclick="coinRefill('line')" disabled>🪙 ×3 補充 +100</button>
-            <button class="coin-btn" id="coin-storage-line" onclick="coinUpgradeStorage('line')" disabled>🪙 ×15 倉庫拡張 +50</button>
+            <button class="coin-btn" id="coin-refill-line" onclick="adRefill('line')">📺 広告を見て補充 +100</button>
+            <button class="coin-btn" id="coin-storage-line" onclick="adUpgradeStorage('line')">📺 広告を見て倉庫拡張 +50</button>
             <button class="upgrade-btn" id="up-line" onclick="upgradeStorage('line')" data-i18n-storage-expand="6" disabled style="margin-bottom: 5px;">📦 倉庫拡張 (■×6)</button>
             <button class="upgrade-btn" id="prod-line" onclick="upgradeProduction('line')" data-i18n-prod-boost="15" disabled style="margin-bottom: 5px;">⚡ 生産量強化 (🔺×15)</button>
             <button class="upgrade-btn" id="auto-prod-line" onclick="upgradeAutoProduction('line')" data-i18n-sym="auto_prod_btn_ln" disabled>🤖 自動生産強化 (⬠×5, ⬢×5)</button>
@@ -1912,29 +1909,29 @@
         <div class="resource-card triangle locked" id="card-triangle">
             <div class="resource-name">三角形 (Triangles) <span style="font-size:10px;color:#ff3366;">[未解放]</span></div>
             <div class="resource-value" id="triangle-val">0 / 20</div>
-            <button class="coin-btn" id="coin-refill-triangle" onclick="coinRefill('triangle')" disabled>🪙 ×3 補充 +100</button>
-            <button class="coin-btn" id="coin-storage-triangle" onclick="coinUpgradeStorage('triangle')" disabled>🪙 ×15 倉庫拡張 +50</button>
+            <button class="coin-btn" id="coin-refill-triangle" onclick="adRefill('triangle')">📺 広告を見て補充 +100</button>
+            <button class="coin-btn" id="coin-storage-triangle" onclick="adUpgradeStorage('triangle')">📺 広告を見て倉庫拡張 +50</button>
             <button class="upgrade-btn" id="up-triangle" onclick="upgradeStorage('triangle')" data-i18n-storage-expand="6" disabled>📦 倉庫拡張 (■×6)</button>
         </div>
         <div class="resource-card square locked" id="card-square">
             <div class="resource-name">四角形 (Squares) <span style="font-size:10px;color:#ff3366;">[未解放]</span></div>
             <div class="resource-value" id="square-val">0 / 20</div>
-            <button class="coin-btn" id="coin-refill-square" onclick="coinRefill('square')" disabled>🪙 ×3 補充 +100</button>
-            <button class="coin-btn" id="coin-storage-square" onclick="coinUpgradeStorage('square')" disabled>🪙 ×15 倉庫拡張 +50</button>
+            <button class="coin-btn" id="coin-refill-square" onclick="adRefill('square')">📺 広告を見て補充 +100</button>
+            <button class="coin-btn" id="coin-storage-square" onclick="adUpgradeStorage('square')">📺 広告を見て倉庫拡張 +50</button>
             <button class="upgrade-btn" id="up-square" onclick="upgradeStorage('square')" data-i18n-storage-expand="6" disabled>📦 倉庫拡張 (■×6)</button>
         </div>
         <div class="resource-card pentagon locked" id="card-pentagon">
             <div class="resource-name">五角形 (Pentagons) <span style="font-size:10px;color:#ff3366;">[未解放]</span></div>
             <div class="resource-value" id="pentagon-val">0 / 20</div>
-            <button class="coin-btn" id="coin-refill-pentagon" onclick="coinRefill('pentagon')" disabled>🪙 ×3 補充 +100</button>
-            <button class="coin-btn" id="coin-storage-pentagon" onclick="coinUpgradeStorage('pentagon')" disabled>🪙 ×15 倉庫拡張 +50</button>
+            <button class="coin-btn" id="coin-refill-pentagon" onclick="adRefill('pentagon')">📺 広告を見て補充 +100</button>
+            <button class="coin-btn" id="coin-storage-pentagon" onclick="adUpgradeStorage('pentagon')">📺 広告を見て倉庫拡張 +50</button>
             <button class="upgrade-btn" id="up-pentagon" onclick="upgradeStorage('pentagon')" data-i18n-storage-expand="6" disabled>📦 倉庫拡張 (■×6)</button>
         </div>
         <div class="resource-card hexagon locked" id="card-hexagon">
             <div class="resource-name">六角形 (Hexagons) <span style="font-size:10px;color:#ff3366;">[未解放]</span></div>
             <div class="resource-value" id="hexagon-val">0 / 20</div>
-            <button class="coin-btn" id="coin-refill-hexagon" onclick="coinRefill('hexagon')" disabled>🪙 ×3 補充 +100</button>
-            <button class="coin-btn" id="coin-storage-hexagon" onclick="coinUpgradeStorage('hexagon')" disabled>🪙 ×15 倉庫拡張 +50</button>
+            <button class="coin-btn" id="coin-refill-hexagon" onclick="adRefill('hexagon')">📺 広告を見て補充 +100</button>
+            <button class="coin-btn" id="coin-storage-hexagon" onclick="adUpgradeStorage('hexagon')">📺 広告を見て倉庫拡張 +50</button>
             <button class="upgrade-btn" id="up-hexagon" onclick="upgradeStorage('hexagon')" data-i18n-storage-expand="6" disabled>📦 倉庫拡張 (■×6)</button>
         </div>
     </div>
@@ -2226,7 +2223,6 @@
                 <button id="btn-prev-sector">◀</button>
                 <div id="sector-display">SECTOR 00</div>
                 <button id="btn-next-sector">▶</button>
-                <button id="coin-sector-btn" onclick="coinUnlockSector()" title="🪙×25でセクター解放" style="padding:3px 7px;border-radius:6px;border:1px solid #554400;background:#1a1500;color:#ffd700;font-size:11px;cursor:pointer;white-space:nowrap;display:none;">🪙×25</button>
             </div>
         </div>
 
@@ -2438,9 +2434,9 @@
                 dyson_sink_locked: '🔒 ダイソンスフィア納品口はT4解放後に使用できます',
                 parts_store_title: 'パーツストア',
                 parts_store_btn: 'パーツストア',
-                parts_store_balance: 'コイン所持',
-                coin_refill_btn: '🪙 ×3 補充 +100',
-                coin_storage_btn: '🪙 ×15 倉庫拡張 +50',
+                parts_store_balance: '本日の広告残り回数',
+                ad_refill_btn: '📺 広告を見て補充 +100',
+                ad_storage_btn: '📺 広告を見て倉庫拡張 +50',
                 storage_expand_btn: (n) => `📦 倉庫拡張 (■×${n})`,
                 prod_boost_btn: (n) => `⚡ 生産量強化 (🔺×${n})`,
                 auto_prod_btn_pt: '🤖 自動生産強化 (🔺×5, ■×5)',
@@ -2483,14 +2479,14 @@
                 casino_void: '虚無',
                 casino_void_feed: '🪙 チップを投入',
                 casino_void_absorbed: (n) => `🌑 ${n.toLocaleString()} chips 吸収済み`,
-                ad_modal_title: '🪙 コインを獲得',
+                ad_modal_title: '📺 広告を視聴中',
                 ad_modal_desc: (n) => `動画広告を視聴すると<br><strong style="color:#ffd700;">🪙 5枚</strong>獲得できます！<br><span id="ad-count-info" style="font-size:11px;color:#888;">今日残り ${n} 回</span>`,
                 ad_modal_done: '今日の広告視聴は終了しました。<br><span style="color:#888;font-size:12px;">明日またどうぞ！</span>',
-                ad_close_btn: '🪙 ×5 受け取る',
+                ad_close_btn: '受け取る',
                 ad_skip_btn: '閉じる',
-                coin_display_title: '広告を見てコインを獲得',
+                coin_display_title: '',
                 ad_remaining: (n) => `今日残り ${n} 回`,
-                parts_store_coin_title: '🪙 コインを獲得',
+                parts_store_coin_title: '📺 広告を視聴中',
             },
             en: {
                 settings_title: 'Settings', sfx: '🔊 Sound Effects', bgm: '🎵 BGM',
@@ -2569,9 +2565,9 @@
                 dyson_sink_locked: '🔒 Dyson Sphere output unlocks after Tier 4',
                 parts_store_title: 'Parts Store',
                 parts_store_btn: 'Parts Store',
-                parts_store_balance: 'coins',
-                coin_refill_btn: '🪙 ×3 Refill +100',
-                coin_storage_btn: '🪙 ×15 Expand +50',
+                parts_store_balance: 'ads remaining today',
+                ad_refill_btn: '📺 Watch ad to refill +100',
+                ad_storage_btn: '📺 Watch ad to expand +50',
                 storage_expand_btn: (n) => `📦 Expand Storage (■×${n})`,
                 prod_boost_btn: (n) => `⚡ Prod. Boost (🔺×${n})`,
                 auto_prod_btn_pt: '🤖 Auto-Prod (🔺×5, ■×5)',
@@ -2614,14 +2610,14 @@
                 casino_void_feed: '🪙 Feed Chip',
                 casino_void_absorbed: (n) => `🌑 ${n.toLocaleString()} chips absorbed`,
                 debug_genesis_clear: 'Instant Genesis Clear',
-                ad_modal_title: '🪙 Earn Coins',
+                ad_modal_title: '📺 Watching Ad',
                 ad_modal_desc: (n) => `Watch a video ad to earn<br><strong style="color:#ffd700;">🪙 5 coins</strong>!<br><span id="ad-count-info" style="font-size:11px;color:#888;">${n} left today</span>`,
                 ad_modal_done: 'No more ads available today.<br><span style="color:#888;font-size:12px;">Come back tomorrow!</span>',
-                ad_close_btn: '🪙 ×5 Collect',
+                ad_close_btn: 'Collect',
                 ad_skip_btn: 'Close',
-                coin_display_title: 'Watch ads to earn coins',
+                coin_display_title: '',
                 ad_remaining: (n) => `${n} left today`,
-                parts_store_coin_title: '🪙 Earn Coins',
+                parts_store_coin_title: '📺 Watching Ad',
             }
         };
 
@@ -6777,7 +6773,7 @@
         }
 
         function renderPartsStore() {
-            document.getElementById('store-coin-count').textContent = coins;
+            const remainEl = document.getElementById('store-ad-remain'); if (remainEl) remainEl.textContent = getRemainingAds();
             const grid = document.getElementById('parts-store-grid');
             grid.innerHTML = '';
             const nameMap = currentLang === 'en' ? PART_NAMES_EN : {
@@ -6833,7 +6829,7 @@
             // ストア内の表示を更新
             const stockEl = document.getElementById('store-stock-' + key);
             if (stockEl) stockEl.textContent = '×' + parts[key];
-            document.getElementById('store-coin-count').textContent = coins;
+            const remainEl = document.getElementById('store-ad-remain'); if (remainEl) remainEl.textContent = getRemainingAds();
             updateCoinDisplay();
             // ボタンの有効/無効を再描画
             renderPartsStore();
