@@ -20,12 +20,18 @@
         .coin-btn {
             width: 100%; margin-top: 5px;
             padding: 6px 8px; border-radius: 6px;
-            border: 1px solid #554400; background: #1a1500;
-            color: #ffd700; font-size: 11px; cursor: pointer;
+            border: 1px solid #1a5530; background: #0a1f18;
+            color: #44dd88; font-size: 11px; cursor: pointer;
             display: flex; align-items: center; justify-content: center; gap: 4px;
         }
-        .coin-btn:hover:not(:disabled) { border-color: #ffd700; background: #2a2000; }
+        .coin-btn:hover:not(:disabled) { border-color: #44dd88; background: #0f2e22; }
         .coin-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        #grid-toast button.ad-toast-btn {
+            margin-top: 6px; padding: 5px 14px; border-radius: 6px;
+            border: 1px solid #44dd88; background: #0a1f18;
+            color: #44dd88; font-size: 12px; font-weight: bold; cursor: pointer;
+            pointer-events: auto;
+        }
         .resource-value.over-limit { color: #ff9900 !important; }
 
         /* 広告視聴モーダル */
@@ -1747,7 +1753,7 @@
         <img id="opening-logo" src="opening.png" alt="GESTURE&FACTORY">
         <button id="opening-start-btn" onclick="startGame()">TAP TO START</button>
     </div>
-    <div id="opening-version">Ver 1.55</div>
+    <div id="opening-version">Ver 1.56</div>
     <audio id="bgm" src="Thousandth_Rotation.mp3" loop></audio>
 </div>
 
@@ -1888,8 +1894,8 @@
         <div class="resource-card point" id="card-point">
             <div class="resource-name">点 (Points)</div>
             <div class="resource-value" id="point-val">0 / 20</div>
-            <button class="coin-btn" id="coin-refill-point" onclick="coinRefill('point')" disabled>🪙 ×3 補充 +100</button>
-            <button class="coin-btn" id="coin-storage-point" onclick="coinUpgradeStorage('point')" disabled>🪙 ×15 倉庫拡張 +50</button>
+            <button class="coin-btn" id="coin-refill-point" onclick="adRefill('point')">📺 広告を見て補充 +100</button>
+            <button class="coin-btn" id="coin-storage-point" onclick="adUpgradeStorage('point')">📺 広告を見て倉庫拡張 +50</button>
             <button class="upgrade-btn" id="up-point" onclick="upgradeStorage('point')" data-i18n-storage-expand="6" style="margin-bottom: 5px;">📦 倉庫拡張 (■×6)</button>
             <button class="upgrade-btn" id="prod-point" onclick="upgradeProduction('point')" data-i18n-prod-boost="10" style="margin-bottom: 5px;">⚡ 生産量強化 (🔺×10)</button>
             <button class="upgrade-btn" id="auto-prod-point" onclick="upgradeAutoProduction('point')" data-i18n-sym="auto_prod_btn_pt">🤖 自動生産強化 (🔺×5, ■×5)</button>
@@ -3713,7 +3719,11 @@
                 // 部品インベントリを消費（デバッグモード時はスキップ）
                 if (!isDebugMode) {
                     if (parts[partKey] <= 0) {
-                        setFeedback(`⚠️ ${PART_NAMES[partKey]} が足りません！🔧 工場タブのクラフトモードで作ってください`);
+                        setGridToast(
+                            `⚠️ ${PART_NAMES[partKey]} が足りません！`,
+                            startX, startY,
+                            `<button class="ad-toast-btn" onclick="showRewardedAd(()=>adGrantParts('${partKey}',5))">📺 広告を見て5個もらう</button>`
+                        );
                         startCellX = null; startCellY = null; return;
                     }
                     parts[partKey]--;
@@ -6029,12 +6039,11 @@
         }
 
         let _gridToastTimer = null;
-        function setGridToast(msg, cx, cy) {
+        function setGridToast(msg, cx, cy, btnHtml) {
             const el = document.getElementById('grid-toast');
             if (!el) return;
-            el.textContent = msg;
+            el.innerHTML = `<div>${msg}</div>${btnHtml ? btnHtml : ''}`;
             el.style.display = 'block';
-            // 一度表示してサイズ計測
             const w = el.offsetWidth;
             const h = el.offsetHeight;
             const vw = window.innerWidth;
@@ -6044,7 +6053,8 @@
             el.style.left = x + 'px';
             el.style.top  = y + 'px';
             if (_gridToastTimer) clearTimeout(_gridToastTimer);
-            _gridToastTimer = setTimeout(() => { el.style.display = 'none'; }, 2500);
+            const delay = btnHtml ? 6000 : 2500;
+            _gridToastTimer = setTimeout(() => { el.style.display = 'none'; }, delay);
         }
 
         // UI表示更新
@@ -6845,26 +6855,37 @@
 
 
 
-        function coinRefill(type) {
-            if (coins < 3) return;
-            totalCoinsSpent += 3;
-            coins -= 3;
-            resources[type] = (resources[type] || 0) + 100;
-            updateCoinDisplay();
-            updateResourceDisplay();
-            saveGame();
-            setFeedback('🪙 ×3 消費 → ' + type + ' +100 補充！');
+        // ── リワード広告スタブ ──────────────────────────────────────────────────
+        // TODO: ここに実際の広告SDK（AdMobなど）を差し込む
+        // onRewarded は広告視聴完了後に呼ぶコールバック
+        function showRewardedAd(onRewarded) {
+            // 仮実装: 広告なしで即報酬付与（SDK実装後に置き換え）
+            onRewarded();
         }
 
-        function coinUpgradeStorage(type) {
-            if (coins < 15) return;
-            totalCoinsSpent += 15;
-            coins -= 15;
-            maxStorage[type] = (maxStorage[type] || 20) + 50;
-            updateCoinDisplay();
-            updateResourceDisplay();
+        function adRefill(type) {
+            showRewardedAd(() => {
+                resources[type] = (resources[type] || 0) + 100;
+                updateResourceDisplay();
+                saveGame();
+                setFeedback('📺 広告視聴完了 → ' + type + ' +100 補充！');
+            });
+        }
+
+        function adUpgradeStorage(type) {
+            showRewardedAd(() => {
+                maxStorage[type] = (maxStorage[type] || 20) + 50;
+                updateResourceDisplay();
+                saveGame();
+                setFeedback('📺 広告視聴完了 → ' + type + ' 倉庫拡張 +50！');
+            });
+        }
+
+        function adGrantParts(partKey, count) {
+            parts[partKey] = (parts[partKey] || 0) + count;
+            updatePartsDisplay();
             saveGame();
-            setFeedback('🪙 ×15 消費 → ' + type + ' 倉庫拡張 +50！');
+            setGridToast(`📺 広告視聴完了 → ${PART_NAMES[partKey]} +${count}個！`, null, null);
         }
 
         function updateResourceDisplay() {
