@@ -1747,7 +1747,7 @@
         <img id="opening-logo" src="opening.png" alt="GESTURE&FACTORY">
         <button id="opening-start-btn" onclick="startGame()">TAP TO START</button>
     </div>
-    <div id="opening-version">Ver 1.53</div>
+    <div id="opening-version">Ver 1.54</div>
     <audio id="bgm" src="Thousandth_Rotation.mp3" loop></audio>
 </div>
 
@@ -4886,7 +4886,7 @@
                 return false;
             }
             if (to.type === 'dyson-sink') return true;
-            if (to.type === 'sector-link' && to.work?.role === 'output' && to.work?.adjSector !== null && to.work?.adjSector !== undefined) return true;
+            if (to.type === 'sector-link' && to.work?.role === 'output' && to.work?.adjSector !== null && to.work?.adjSector !== undefined) return to.items.length === 0;
             if (to.type === 'storage-sink' && itemToMove.kind !== 'raw' && itemToMove.kind !== 'line') {
                 const kind = itemToMove.kind;
                 if (parts[kind] !== undefined) return true;
