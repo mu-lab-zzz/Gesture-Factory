@@ -1751,7 +1751,7 @@
         <img id="opening-logo" src="opening.png" alt="GESTURE&FACTORY">
         <button id="opening-start-btn" onclick="startGame()">TAP TO START</button>
     </div>
-    <div id="opening-version">Ver 1.59</div>
+    <div id="opening-version">Ver 1.60</div>
     <audio id="bgm" src="Thousandth_Rotation.mp3" loop></audio>
 </div>
 
@@ -6638,11 +6638,11 @@
                 const storage = document.getElementById('coin-storage-' + type);
                 const unlocked = isUnlocked(type === 'point' ? 'point' : type);
                 if (refill) {
-                    refill.disabled = !unlocked || coins < 3;
+                    refill.disabled = !unlocked;
                     refill.textContent = t('ad_refill_btn');
                 }
                 if (storage) {
-                    storage.disabled = !unlocked || coins < 15;
+                    storage.disabled = !unlocked;
                     storage.textContent = t('ad_storage_btn');
                 }
             });
