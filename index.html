@@ -1751,7 +1751,7 @@
         <img id="opening-logo" src="opening.png" alt="GESTURE&FACTORY">
         <button id="opening-start-btn" onclick="startGame()">TAP TO START</button>
     </div>
-    <div id="opening-version">Ver 1.63</div>
+    <div id="opening-version">Ver 1.64</div>
     <audio id="bgm" src="Thousandth_Rotation.mp3" loop></audio>
 </div>
 
@@ -7101,6 +7101,8 @@
                             row.map(cell => ({
                                 type: cell.type,
                                 dir: cell.dir,
+                                inDir: cell.inDir,
+                                outDir: cell.outDir,
                                 items: cell.items,
                                 work: cell.work,
                                 x: cell.x,
@@ -7189,6 +7191,8 @@
                                 }
                                 sectors[s][y][x].type = savedCell.type || 'empty';
                                 sectors[s][y][x].dir = savedCell.dir;
+                                sectors[s][y][x].inDir = savedCell.inDir || undefined;
+                                sectors[s][y][x].outDir = savedCell.outDir || undefined;
                                 sectors[s][y][x].items = savedCell.items || [];
                                 sectors[s][y][x].work = savedCell.work;
                                 sectors[s][y][x].anchor = savedCell.anchor || undefined;
