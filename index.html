@@ -1751,12 +1751,12 @@
         <img id="opening-logo" src="opening.png" alt="GESTURE&FACTORY">
         <button id="opening-start-btn" onclick="startGame()">TAP TO START</button>
     </div>
-    <div id="opening-version">Ver 1.68</div>
+    <div id="opening-version">Ver 1.69</div>
     <audio id="bgm" src="Thousandth_Rotation.mp3" loop></audio>
 </div>
 
     <div style="display:flex; align-items:center; padding:0 12px; width:100%; box-sizing:border-box;">
-        <h1 id="game-title" onclick="handleTitleClick()" style="margin:0; flex:1; text-align:center;">GESTURE&FACTORY</h1>
+        <h1 id="game-title" style="margin:0; flex:1; text-align:center;">GESTURE&FACTORY</h1>
     </div>
 
     <!-- 開発中告知モーダル（初回のみ） -->
@@ -1854,29 +1854,6 @@
             <button onclick="closeSettings(); openStats();" style="width:100%; margin-bottom:8px; padding:10px; background:none; border:1.5px solid #334; border-radius:10px; color:#aaa; font-size:14px; cursor:pointer;" data-i18n="stats_btn">📊 統計を見る</button>
             <a href="https://ko-fi.com/mulabs" target="_blank" style="display:block; width:100%; margin-top:16px; padding:10px; background:#ff5e5b; border:none; border-radius:10px; color:#fff; font-size:13px; font-weight:bold; text-align:center; text-decoration:none; box-sizing:border-box;" data-i18n="kofi_btn">☕ Ko-fiで開発を支援する</a>
             <!-- デバッグパネル -->
-            <details id="debug-panel" style="margin-top:16px; color:#ccc;">
-                <summary style="cursor:pointer; font-size:12px; color:#555; list-style:none; text-align:center; padding:4px 0;">🛠 DEBUG</summary>
-                <div style="margin-top:10px; display:flex; flex-direction:column; gap:8px; font-size:13px;">
-                    <div style="color:#888; font-size:11px; text-align:center; letter-spacing:1px;">── 素材・パーツ追加 ──</div>
-                    <div style="display:flex; gap:6px; flex-wrap:wrap;">
-                        <button onclick="dbgAddResources()" style="flex:1; padding:6px; background:#1a2a1a; border:1px solid #2d5a2d; border-radius:8px; color:#8f8; font-size:12px; cursor:pointer;">素材 +100</button>
-                        <button onclick="dbgAddParts()" style="flex:1; padding:6px; background:#1a1a2a; border:1px solid #2d2d5a; border-radius:8px; color:#88f; font-size:12px; cursor:pointer;">パーツ +10</button>
-                    </div>
-                    <div style="color:#888; font-size:11px; text-align:center; letter-spacing:1px;">── ティア ──</div>
-                    <div style="display:flex; gap:6px;">
-                        <button onclick="dbgTierUp()" style="flex:1; padding:6px; background:#2a1a0a; border:1px solid #5a3a0a; border-radius:8px; color:#fa8; font-size:12px; cursor:pointer;">ティア +1</button>
-                        <button onclick="dbgTierMax()" style="flex:1; padding:6px; background:#2a1a0a; border:1px solid #5a3a0a; border-radius:8px; color:#fa8; font-size:12px; cursor:pointer;">最終ティア</button>
-                    </div>
-                    <div style="color:#888; font-size:11px; text-align:center; letter-spacing:1px;">── ゲーム速度 ──</div>
-                    <div style="display:flex; gap:6px;" id="debug-speed-btns">
-                        <button onclick="dbgSetSpeed(1)" class="spd-btn spd-active" style="flex:1; padding:6px; background:#0d2a3d; border:1.5px solid #1a6a9a; border-radius:8px; color:#6cf; font-size:12px; cursor:pointer;">×1</button>
-                        <button onclick="dbgSetSpeed(2)" class="spd-btn" style="flex:1; padding:6px; background:#1a1a1a; border:1px solid #333; border-radius:8px; color:#aaa; font-size:12px; cursor:pointer;">×2</button>
-                        <button onclick="dbgSetSpeed(5)" class="spd-btn" style="flex:1; padding:6px; background:#1a1a1a; border:1px solid #333; border-radius:8px; color:#aaa; font-size:12px; cursor:pointer;">×5</button>
-                    </div>
-                    <div style="color:#888; font-size:11px; text-align:center; letter-spacing:1px;">── グリッド ──</div>
-                    <button onclick="dbgClearGrid()" style="padding:6px; background:#2a1515; border:1px solid #5a2020; border-radius:8px; color:#f88; font-size:12px; cursor:pointer;">現在のセクターをクリア</button>
-                </div>
-            </details>
             <button onclick="closeSettings()" style="width:100%; margin-top:8px; padding:11px; background:none; border:1.5px solid #444; border-radius:10px; color:#aaa; font-size:14px; cursor:pointer;" data-i18n="close">閉じる</button>
         </div>
     </div>
@@ -2833,9 +2810,6 @@
         let submittedResources = { point: 0, line: 0, triangle: 0, square: 0, pentagon: 0, hexagon: 0 };
 
         // デバッグモード状態
-        let isDebugMode = false;
-        let titleClickCount = 0;
-        let titleClickTimer = null;
 
         // 部品インベントリ
         let parts = { belt: 0, inserter: 0, assembler: 0, fastBelt: 0, fastInserter: 0, fastAssembler: 0, splitter: 0, merger: 0, storageSource: 0, storageSink: 0, longInserter: 0, factory: 0, crossBelt: 0, fastCrossBelt: 0, doubleBelt: 0, sectorLink: 0 };
@@ -3194,49 +3168,6 @@
             }
         }
         // ── デバッグ関数 ──
-        let _dbgTickInterval = null;
-        function dbgAddResources() {
-            ['point','line','triangle','square','pentagon','hexagon'].forEach(k => { resources[k] = (resources[k]||0) + 100; });
-            updateResourceDisplay();
-        }
-        function dbgAddParts() {
-            Object.keys(parts).forEach(k => { parts[k] = (parts[k]||0) + 10; });
-            updatePartsDisplay();
-        }
-        function dbgTierUp() {
-            if (currentTierIndex < TIER_CONFIGS.length - 1) {
-                currentTierIndex++;
-                updateTierUI();
-            }
-        }
-        function dbgTierMax() {
-            currentTierIndex = TIER_CONFIGS.length - 1;
-            updateTierUI();
-        }
-        function dbgSetSpeed(mult) {
-            if (_dbgTickInterval) clearInterval(_dbgTickInterval);
-            _dbgTickInterval = setInterval(tick, Math.round(TICK_MS / mult));
-            document.querySelectorAll('.spd-btn').forEach(b => {
-                const active = b.textContent === '×' + mult;
-                b.style.background = active ? '#0d2a3d' : '#1a1a1a';
-                b.style.borderColor = active ? '#1a6a9a' : '#333';
-                b.style.color = active ? '#6cf' : '#aaa';
-                b.style.borderWidth = active ? '1.5px' : '1px';
-            });
-        }
-        function dbgClearGrid() {
-            if (!confirm('現在のセクターをクリアしますか？')) return;
-            const grid = sectors[currentSectorId];
-            for (let y = 0; y < ROWS; y++)
-                for (let x = 0; x < COLS; x++) {
-                    grid[y][x].type = 'empty';
-                    grid[y][x].dir = 'right';
-                    grid[y][x].work = null;
-                    grid[y][x].item = null;
-                }
-            renderAll();
-        }
-        // ── デバッグ関数ここまで ──
 
         function toggleSFX() {
             sfxEnabled = !sfxEnabled;
@@ -3289,34 +3220,6 @@
             localStorage.setItem('gf_dev_notice_seen', '1');
             const m = document.getElementById('dev-notice-modal');
             m.style.display = 'none';
-        }
-
-        // タイトルクリックハンドラー
-        function handleTitleClick() {
-            titleClickCount++;
-            if (titleClickTimer) clearTimeout(titleClickTimer);
-            
-            titleClickTimer = setTimeout(() => {
-                titleClickCount = 0;
-            }, 1500);
-
-            if (titleClickCount >= 5) {
-                titleClickCount = 0;
-                clearTimeout(titleClickTimer);
-                isDebugMode = !isDebugMode;
-                
-                const titleEl = document.getElementById('game-title');
-                if (isDebugMode) {
-                    titleEl.innerHTML = 'GESTURE&FACTORY <span style="font-size:16px; color:#ff3366; vertical-align:middle;">[DEBUG]</span>';
-                    setFeedback("🔧 デバッグモード ON: 在庫なしでティアを解放できます");
-                } else {
-                    titleEl.innerHTML = 'GESTURE&FACTORY';
-                    setFeedback("🔧 デバッグモード OFF");
-                }
-                updateUI();
-                updateTierUI();
-            updateCoinDisplay();
-            }
         }
 
         // タブ切り替えロジック
@@ -3712,7 +3615,7 @@
                         const ax = anc.x, ay = anc.y;
                         const g = sectors[currentSectorId];
                         const partKeyAnc = CELL_TYPE_TO_PART_KEY[anc.type];
-                        if (partKeyAnc && !isDebugMode) { parts[partKeyAnc]++; updatePartsDisplay(); }
+                        if (partKeyAnc) { parts[partKeyAnc]++; updatePartsDisplay(); }
                         [[ay,ax],[ay,ax+1],[ay+1,ax],[ay+1,ax+1]].forEach(([gy,gx]) => {
                             if (gy>=0&&gy<ROWS&&gx>=0&&gx<COLS) {
                                 const gc=g[gy][gx]; gc.type='empty'; gc.dir=null; gc.items=[]; gc.work=null; gc.anchor=undefined;
@@ -3768,8 +3671,7 @@
                     setFeedback(`🔒 ${PART_NAMES[partKey]} はまだ解放されていません！`);
                     startCellX = null; startCellY = null; return;
                 }
-                // 部品インベントリを消費（デバッグモード時はスキップ）
-                if (!isDebugMode) {
+                {
                     if (parts[partKey] <= 0) {
                         const adBtn = MONETIZE_MODE === 'none' ? '' :
                             `<button class="ad-toast-btn" onclick="showRewardedAd(()=>adGrantParts('${partKey}',5))">📺 広告を見て5個もらう</button>`;
@@ -3795,15 +3697,13 @@
                     curveDrag = null;
                 } else if (currentTool === 'belt' && curveDrag && curveDrag.dir1 && curveDrag.dir2) {
                     // L字ドラッグ → カーブベルト設置（belt消費）
-                    if (!isDebugMode) {
-                        if ((parts['belt'] || 0) <= 0) {
-                            setFeedback('⌒ ベルトが足りません');
-                            updatePartsDisplay(); curveDrag = null;
-                            startCellX = null; startCellY = null; return;
-                        }
-                        parts['belt']--;
-                        updatePartsDisplay();
+                    if ((parts['belt'] || 0) <= 0) {
+                        setFeedback('⌒ ベルトが足りません');
+                        updatePartsDisplay(); curveDrag = null;
+                        startCellX = null; startCellY = null; return;
                     }
+                    parts['belt']--;
+                    updatePartsDisplay();
                     cell.type = 'curve-belt';
                     cell.inDir = curveDrag.dir1;
                     cell.outDir = curveDrag.dir2;
@@ -3812,30 +3712,26 @@
                     curveDrag = null;
                 } else if (currentTool === 'fast-belt' && curveDrag && curveDrag.dir1 && curveDrag.dir2) {
                     // L字ドラッグ → 高速カーブベルト設置（fastBelt消費）
-                    if (!isDebugMode) {
-                        if ((parts['fastBelt'] || 0) <= 0) {
-                            setFeedback('⚡⌒ 高速ベルトが足りません');
-                            updatePartsDisplay(); curveDrag = null;
-                            startCellX = null; startCellY = null; return;
-                        }
-                        parts['fastBelt']--;
-                        updatePartsDisplay();
+                    if ((parts['fastBelt'] || 0) <= 0) {
+                        setFeedback('⚡⌒ 高速ベルトが足りません');
+                        updatePartsDisplay(); curveDrag = null;
+                        startCellX = null; startCellY = null; return;
                     }
+                    parts['fastBelt']--;
+                    updatePartsDisplay();
                     cell.type = 'fast-curve-belt';
                     cell.inDir = curveDrag.dir1; cell.outDir = curveDrag.dir2;
                     cell.dir = curveDrag.dir1; cell.work = null;
                     curveDrag = null;
                 } else if (currentTool === 'double-belt' && curveDrag && curveDrag.dir1 && curveDrag.dir2) {
                     // L字ドラッグ → デュアルカーブベルト設置（doubleBelt消費）
-                    if (!isDebugMode) {
-                        if ((parts['doubleBelt'] || 0) <= 0) {
-                            setFeedback('〓 デュアルベルトが足りません');
-                            updatePartsDisplay(); curveDrag = null;
-                            startCellX = null; startCellY = null; return;
-                        }
-                        parts['doubleBelt']--;
-                        updatePartsDisplay();
+                    if ((parts['doubleBelt'] || 0) <= 0) {
+                        setFeedback('〓 デュアルベルトが足りません');
+                        updatePartsDisplay(); curveDrag = null;
+                        startCellX = null; startCellY = null; return;
                     }
+                    parts['doubleBelt']--;
+                    updatePartsDisplay();
                     cell.type = 'double-curve-belt';
                     cell.inDir = curveDrag.dir1; cell.outDir = curveDrag.dir2;
                     cell.dir = curveDrag.dir1; cell.work = null;
@@ -3852,7 +3748,7 @@
                     if (x + 1 >= COLS || y + 1 >= ROWS) {
                         setFeedback('⚠️ 部品工場を配置するスペースがありません（右・下に1マス必要）');
                         startCellX = null; startCellY = null;
-                        if (!isDebugMode) { parts[partKey]++; updatePartsDisplay(); }
+                        parts[partKey]++; updatePartsDisplay();
                         return;
                     }
                     const gf = sectors[currentSectorId];
@@ -3860,7 +3756,7 @@
                     if (neighbors2x2f.some(c => c.type !== 'empty')) {
                         setFeedback('⚠️ 部品工場には 2×2 のスペースが必要です');
                         startCellX = null; startCellY = null;
-                        if (!isDebugMode) { parts[partKey]++; updatePartsDisplay(); }
+                        parts[partKey]++; updatePartsDisplay();
                         return;
                     }
                     cell.type = 'factory'; cell.dir = null;
@@ -3875,7 +3771,7 @@
                     if (x + 1 >= COLS || y + 1 >= ROWS) {
                         setFeedback('⚠️ 組立機を配置するスペースがありません（右・下に1マス必要）');
                         startCellX = null; startCellY = null;
-                        if (!isDebugMode) { parts[partKey]++; updatePartsDisplay(); }
+                        parts[partKey]++; updatePartsDisplay();
                         return;
                     }
                     const g2 = sectors[currentSectorId];
@@ -3883,7 +3779,7 @@
                     if (neighbors2x2.some(c => c.type !== 'empty')) {
                         setFeedback('⚠️ 組立機には 2×2 のスペースが必要です');
                         startCellX = null; startCellY = null;
-                        if (!isDebugMode) { parts[partKey]++; updatePartsDisplay(); }
+                        parts[partKey]++; updatePartsDisplay();
                         return;
                     }
                     // アンカーセル
@@ -3906,14 +3802,14 @@
                 } else if (currentTool === 'sector-link') {
                     if (x !== 0 && x !== COLS - 1) {
                         setGridToast('⚠️ セクターリンクはグリッドの左端か右端にのみ設置できます', startX, startY);
-                        if (!isDebugMode) { parts[partKey]++; updatePartsDisplay(); }
+                        parts[partKey]++; updatePartsDisplay();
                         startCellX = null; startCellY = null; return;
                     }
                     const isRight = x === COLS - 1;
                     const adjSector = isRight ? currentSectorId + 1 : currentSectorId - 1;
                     if (!unlockedSectors.has(adjSector)) {
                         setGridToast(`⚠️ 隣のセクター(${adjSector})が解放されていません`, startX, startY);
-                        if (!isDebugMode) { parts[partKey]++; updatePartsDisplay(); }
+                        parts[partKey]++; updatePartsDisplay();
                         startCellX = null; startCellY = null; return;
                     }
                     // 向こう側に自動設置（INPUT ミラー）
@@ -3921,7 +3817,7 @@
                     const mirrorCell = sectors[adjSector][y][mirrorX];
                     if (mirrorCell.type !== 'empty') {
                         setGridToast(`⚠️ 向こう側（SECTOR ${String(adjSector).padStart(2,'0')} の${isRight ? '左' : '右'}端）が塞がっています`, startX, startY);
-                        if (!isDebugMode) { parts[partKey]++; updatePartsDisplay(); }
+                        parts[partKey]++; updatePartsDisplay();
                         startCellX = null; startCellY = null; return;
                     }
                     cell.type = 'sector-link';
@@ -5570,29 +5466,6 @@
             canvas.addEventListener('touchmove', (e) => { e.preventDefault(); const pos = getMousePos(e); moveDraw(pos.x, pos.y); }, {passive: false});
             canvas.addEventListener('touchend', (e) => { e.preventDefault(); if(strokePoints.length > 0) { const pos = strokePoints[strokePoints.length - 1]; endDraw(pos.x, pos.y); } }, {passive: false});
 
-            // デバッグ: mini-inventory クリックで素材+100
-            document.querySelector('.mini-inventory').addEventListener('click', (e) => {
-                if (!isDebugMode) return;
-                const span = e.target.closest('span[id^="mini-"]');
-                if (!span) return;
-                const type = span.id.replace('mini-', '');
-                if (resources[type] === undefined) return;
-                resources[type] = Math.min(resources[type] + 100, maxStorage[type]);
-                updateUI();
-                setFeedback(`🔧 [DEBUG] ${type} +100`);
-            });
-
-            // デバッグ: parts-display クリックで部品+100
-            document.getElementById('parts-display').addEventListener('click', (e) => {
-                if (!isDebugMode) return;
-                const span = e.target.closest('span[id^="disp-parts-"]');
-                if (!span) return;
-                const partKey = span.id.replace('disp-parts-', '');
-                if (parts[partKey] === undefined) return;
-                parts[partKey] += 100;
-                updatePartsDisplay();
-                setFeedback(`🔧 [DEBUG] ${partKey} +100`);
-            });
 
             // 自動生産ループ（毎秒実行）
             setInterval(() => {
@@ -5782,11 +5655,11 @@
                         setFeedback("技術ロック：まだ「三角形」の合成技術が解放されていません！");
                         return;
                     }
-                    if (isDebugMode || (Math.floor(resources.point) >= 3 && Math.floor(resources.line) >= 3)) {
+                    if (Math.floor(resources.point) >= 3 && Math.floor(resources.line) >= 3) {
                         if (addResource('triangle', 1)) {
-                            if (!isDebugMode) { resources.point -= 3; resources.line -= 3; }
+                            resources.point -= 3; resources.line -= 3;
                             addEffect({ type: 'triangle', points: [startPoint, corners[0], corners[1]] });
-                            setFeedback(isDebugMode ? "🔧[DEBUG] 「三角形」を合成" : "「三角形」を合成しました (点-3, 線-3)");
+                            setFeedback("「三角形」を合成しました (点-3, 線-3)");
                         } else {
                             setFeedback("「三角形」の倉庫が上限です！");
                         }
@@ -5801,11 +5674,11 @@
                         setFeedback("技術ロック：まだ「四角形」の合成技術が解放されていません！");
                         return;
                     }
-                    if (isDebugMode || (Math.floor(resources.point) >= 4 && Math.floor(resources.line) >= 4)) {
+                    if (Math.floor(resources.point) >= 4 && Math.floor(resources.line) >= 4) {
                         if (addResource('square', 1)) {
-                            if (!isDebugMode) { resources.point -= 4; resources.line -= 4; }
+                            resources.point -= 4; resources.line -= 4;
                             addEffect({ type: 'square', points: [startPoint, corners[0], corners[1], corners[2]] });
-                            setFeedback(isDebugMode ? "🔧[DEBUG] 「四角形」を合成" : "「四角形」を合成しました (点-4, 線-4)");
+                            setFeedback("「四角形」を合成しました (点-4, 線-4)");
                         } else {
                             setFeedback("「四角形」の倉庫が上限です！");
                         }
@@ -5820,11 +5693,11 @@
                         setFeedback("技術ロック：まだ「五角形」の合成技術が解放されていません！");
                         return;
                     }
-                    if (isDebugMode || (Math.floor(resources.point) >= 5 && Math.floor(resources.line) >= 5)) {
+                    if (Math.floor(resources.point) >= 5 && Math.floor(resources.line) >= 5) {
                         if (addResource('pentagon', 1)) {
-                            if (!isDebugMode) { resources.point -= 5; resources.line -= 5; }
+                            resources.point -= 5; resources.line -= 5;
                             addEffect({ type: 'pentagon', points: [startPoint, ...corners] });
-                            setFeedback(isDebugMode ? "🔧[DEBUG] 「五角形」を合成" : "「五角形」を合成しました (点-5, 線-5)");
+                            setFeedback("「五角形」を合成しました (点-5, 線-5)");
                         } else {
                             setFeedback("「五角形」の倉庫が上限です！");
                         }
@@ -5839,11 +5712,11 @@
                         setFeedback("技術ロック：まだ「六角形」の合成技術が解放されていません！");
                         return;
                     }
-                    if (isDebugMode || (Math.floor(resources.point) >= 6 && Math.floor(resources.line) >= 6)) {
+                    if (Math.floor(resources.point) >= 6 && Math.floor(resources.line) >= 6) {
                         if (addResource('hexagon', 1)) {
-                            if (!isDebugMode) { resources.point -= 6; resources.line -= 6; }
+                            resources.point -= 6; resources.line -= 6;
                             addEffect({ type: 'hexagon', points: [startPoint, ...corners] });
-                            setFeedback(isDebugMode ? "🔧[DEBUG] 「六角形」を合成" : "「六角形」を合成しました (点-6, 線-6)");
+                            setFeedback("「六角形」を合成しました (点-6, 線-6)");
                         } else {
                             setFeedback("「六角形」の倉庫が上限です！");
                         }
@@ -5888,8 +5761,8 @@
         // 倉庫拡張
         function upgradeStorage(type) {
             if (!isUnlocked(type)) return;
-            if (isDebugMode || Math.floor(resources.square) >= 6) {
-                if (!isDebugMode) resources.square -= 6;
+            if (Math.floor(resources.square) >= 6) {
+                resources.square -= 6;
                 maxStorage[type] += 10;
                 setFeedback(`📦 ストレージ拡張成功！最大容量が +10 されました`);
                 updateUI();
@@ -5900,15 +5773,15 @@
         function upgradeProduction(type) {
             if (!isUnlocked(type)) return;
             if (type === 'point') {
-                if (isDebugMode || Math.floor(resources.triangle) >= 10) {
-                    if (!isDebugMode) resources.triangle -= 10;
+                if (Math.floor(resources.triangle) >= 10) {
+                    if (true) resources.triangle -= 10;
                     productionRates.point += 0.1;
                     setFeedback(`⚡ 点の手動生産量が +0.1 されました (現在: ${productionRates.point.toFixed(1)})`);
                     updateUI();
                 }
             } else if (type === 'line') {
-                if (isDebugMode || Math.floor(resources.triangle) >= 15) {
-                    if (!isDebugMode) resources.triangle -= 15;
+                if (Math.floor(resources.triangle) >= 15) {
+                    if (true) resources.triangle -= 15;
                     productionRates.line += 0.1;
                     setFeedback(`⚡ 線の手動生産量が +0.1 されました (現在: ${productionRates.line.toFixed(1)})`);
                     updateUI();
@@ -5919,15 +5792,15 @@
         // 自動生産量アップグレード
         function upgradeAutoProduction(type) {
             if (type === 'point') {
-                if (isUnlocked('autoPoint') && (isDebugMode || (Math.floor(resources.triangle) >= 5 && Math.floor(resources.square) >= 5))) {
-                    if (!isDebugMode) { resources.triangle -= 5; resources.square -= 5; }
+                if (isUnlocked('autoPoint') && (Math.floor(resources.triangle) >= 5 && Math.floor(resources.square) >= 5)) {
+                    resources.triangle -= 5; resources.square -= 5;
                     autoProductionRates.point += 0.2;
                     setFeedback(`🤖 点の自動生産量が +0.2 されました (現在: ${autoProductionRates.point.toFixed(1)}/s)`);
                     updateUI();
                 }
             } else if (type === 'line') {
-                if (isUnlocked('autoLine') && (isDebugMode || (Math.floor(resources.pentagon) >= 5 && Math.floor(resources.hexagon) >= 5))) {
-                    if (!isDebugMode) { resources.pentagon -= 5; resources.hexagon -= 5; }
+                if (isUnlocked('autoLine') && (Math.floor(resources.pentagon) >= 5 && Math.floor(resources.hexagon) >= 5)) {
+                    resources.pentagon -= 5; resources.hexagon -= 5;
                     autoProductionRates.line += 0.2;
                     setFeedback(`🤖 線の自動生産量が +0.2 されました (現在: ${autoProductionRates.line.toFixed(1)}/s)`);
                     updateUI();
@@ -5945,14 +5818,6 @@
             const needed = config.reqs[type] - submittedResources[type];
             if (needed <= 0) return;
 
-            if (isDebugMode) {
-                submittedResources[type] += needed;
-                setFeedback(`🔧 [DEBUG] 「${type === 'point' ? '点' : type === 'line' ? '線' : '図形'}」の要求分 ${needed} 個を強制達成しました！`);
-                checkTierProgress();
-                updateUI();
-                updateTierUI();
-                return;
-            }
 
             const submitAmount = Math.min(Math.floor(resources[type]), needed);
 
@@ -6085,7 +5950,7 @@
                 const btn = document.createElement('button');
                 btn.className = 'submit-action-btn';
                 btn.innerText = isMet ? t('submit_done') : t('submit_btn');
-                btn.disabled = isMet || (!isDebugMode && Math.floor(resources[key]) === 0);
+                btn.disabled = isMet || Math.floor(resources[key]) === 0;
                 
                 btn.onclick = (function(k) {
                     return function() { submitResource(k); };
@@ -6277,12 +6142,6 @@
             const totalDone = Object.keys(reqs).filter(k => (prog[k]||0) >= reqs[k]).length;
             const totalKeys = Object.keys(reqs).length;
 
-            const debugButtons = isDebugMode ? `<div style="margin-top:10px;padding:8px;background:#1a0010;border:1px solid #ff3366;border-radius:6px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
-                    <span style="font-size:10px;color:#ff3366;font-weight:bold;">🔧 DEBUG</span>
-                    ${!dysonCleared ? `<button onclick="Object.keys(DYSON_REQUIREMENTS).forEach(k=>{dysonProgress[k]=DYSON_REQUIREMENTS[k];});checkDysonClear();updateDysonUI();updateUI();" style="padding:4px 10px;background:#200010;border:1px solid #ff3366;color:#ff8888;border-radius:4px;font-size:11px;cursor:pointer;">ダイソンスフィア即クリア</button>` : ''}
-                    ${dysonCleared && !genesisChallenging ? `<button onclick="startGenesisChallenge();Object.keys(GENESIS_REQUIREMENTS).forEach(k=>{genesisProgress[k]=GENESIS_REQUIREMENTS[k];});checkGenesisClear();updateDysonUI();updateUI();" style="padding:4px 10px;background:#200010;border:1px solid #ff3366;color:#ff8888;border-radius:4px;font-size:11px;cursor:pointer;">Genesis Omega即クリア</button>` : ''}
-                    ${genesisChallenging ? `<button onclick="Object.keys(GENESIS_REQUIREMENTS).forEach(k=>{genesisProgress[k]=GENESIS_REQUIREMENTS[k];});checkGenesisClear();updateDysonUI();updateUI();" style="padding:4px 10px;background:#200010;border:1px solid #ff3366;color:#ff8888;border-radius:4px;font-size:11px;cursor:pointer;">Genesis Omega即クリア</button>` : ''}
-                </div>` : '';
 
             content.innerHTML = `
                 <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;">
@@ -6298,7 +6157,6 @@
                 ${genesisChallenging ? `<div style="margin-top:10px;">
                     <button onclick="if(confirm(t('genesis_forfeit_confirm'))) { genesisChallenging=false; showDysonClearScreen(); }" style="padding:6px 14px;background:#0a0a1a;border:1px solid #556;color:#889;border-radius:6px;font-size:11px;cursor:pointer;">${t('genesis_forfeit_btn')}</button>
                 </div>` : ''}
-                ${debugButtons}
             `;
         }
 
@@ -6405,13 +6263,13 @@
             Object.entries(needed).forEach(([type, count]) => {
                 const have = Math.floor(resources[type]);
                 const btn = document.createElement('button');
-                btn.disabled = !isDebugMode && have < 1;
+                btn.disabled = have < 1;
 
                 btn.innerHTML =
                     `<span class="cmat-icon">${gemSVG(type === 'point' ? 'raw' : type, 22)}</span>` +
                     `<span class="cmat-label">${SHAPE_NAMES_JP[type]}</span>` +
                     `<span class="cmat-need">必要 ×${count}</span>` +
-                    `<span class="cmat-have" style="color:${(isDebugMode || have >= 1) ? '#00ffcc' : '#ff3366'}">` +
+                    `<span class="cmat-have" style="color:${(have >= 1) ? '#00ffcc' : '#ff3366'}">` +
                     `在庫: ${have}</span>`;
                 btn.className = 'craft-material-btn';
 
@@ -6448,13 +6306,13 @@
             }
 
             // 在庫チェック（デバッグモード時はスキップ）
-            if (!isDebugMode && Math.floor(resources[shapeType]) < 1) {
+            if (Math.floor(resources[shapeType]) < 1) {
                 setFeedback(`在庫が足りません（${SHAPE_NAMES_JP[shapeType]} が必要）`);
                 return;
             }
 
             // 投入（デバッグモード時は在庫消費なし）
-            if (!isDebugMode) resources[shapeType] -= 1;
+            resources[shapeType] -= 1;
             craftSlots[slotIdx].filled = true;
 
             const remaining = craftSlots.filter(s => !s.filled).length;
