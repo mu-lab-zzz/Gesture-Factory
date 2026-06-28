@@ -16,6 +16,6 @@ jobs:
         env:
           BUTLER_CREDENTIALS: ${{ secrets.BUTLER_CREDENTIALS }}
           CHANNEL: html
-          ITCH_GAME: gesture-and-factry
+          ITCH_GAME: gesture-and-factory
           ITCH_USER: mu-labs
           PACKAGE: index.html
