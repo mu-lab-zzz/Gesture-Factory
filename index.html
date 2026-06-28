@@ -1751,7 +1751,7 @@
         <img id="opening-logo" src="opening.png" alt="GESTURE&FACTORY">
         <button id="opening-start-btn" onclick="startGame()">TAP TO START</button>
     </div>
-    <div id="opening-version">Ver 1.66</div>
+    <div id="opening-version">Ver 1.67</div>
     <audio id="bgm" src="Thousandth_Rotation.mp3" loop></audio>
 </div>
 
@@ -3771,11 +3771,9 @@
                 // 部品インベントリを消費（デバッグモード時はスキップ）
                 if (!isDebugMode) {
                     if (parts[partKey] <= 0) {
-                        setGridToast(
-                            `⚠️ ${PART_NAMES[partKey]} が足りません！`,
-                            startX, startY,
-                            `<button class="ad-toast-btn" onclick="showRewardedAd(()=>adGrantParts('${partKey}',5))">📺 広告を見て5個もらう</button>`
-                        );
+                        const adBtn = MONETIZE_MODE === 'none' ? '' :
+                            `<button class="ad-toast-btn" onclick="showRewardedAd(()=>adGrantParts('${partKey}',5))">📺 広告を見て5個もらう</button>`;
+                        setGridToast(`⚠️ ${PART_NAMES[partKey]} が足りません！`, startX, startY, adBtn);
                         startCellX = null; startCellY = null; return;
                     }
                     parts[partKey]--;
@@ -6693,14 +6691,14 @@
                 const refill = document.getElementById('coin-refill-' + type);
                 const storage = document.getElementById('coin-storage-' + type);
                 const unlocked = isUnlocked(type === 'point' ? 'point' : type);
-                const adOver = getRemainingAds() <= 0;
+                const adOver = MONETIZE_MODE !== 'none' && getRemainingAds() <= 0;
                 if (refill) {
                     refill.disabled = !unlocked;
-                    refill.textContent = adOver ? '📺 本日の広告上限です' : t('ad_refill_btn');
+                    refill.textContent = MONETIZE_MODE === 'none' ? '🆓 補充 +100' : (adOver ? '📺 本日の広告上限です' : t('ad_refill_btn'));
                 }
                 if (storage) {
                     storage.disabled = !unlocked;
-                    storage.textContent = adOver ? '📺 本日の広告上限です' : t('ad_storage_btn');
+                    storage.textContent = MONETIZE_MODE === 'none' ? '🆓 倉庫拡張 +50' : (adOver ? '📺 本日の広告上限です' : t('ad_storage_btn'));
                 }
             });
         }
@@ -6830,6 +6828,8 @@
         }
 
         function renderPartsStore() {
+            const bar = document.getElementById('parts-store-coin-bar');
+            if (bar) bar.style.display = MONETIZE_MODE === 'none' ? 'none' : '';
             const remainEl = document.getElementById('store-ad-remain'); if (remainEl) remainEl.textContent = getRemainingAds();
             const grid = document.getElementById('parts-store-grid');
             grid.innerHTML = '';
@@ -6865,7 +6865,7 @@
                     <div class="store-name">${nameMap[cfg.key] || cfg.key}</div>
                     <div class="store-stock" id="store-stock-${cfg.key}">×${stock}</div>
                     <div class="store-btns">
-                        <button class="store-buy-btn" onclick="adGrantPartsFromStore('${cfg.key}',5)" id="store-ad-btn-${cfg.key}">${getRemainingAds() > 0 ? '📺 広告を見て+5' : '📺 本日の広告上限です'}</button>
+                        <button class="store-buy-btn" onclick="adGrantPartsFromStore('${cfg.key}',5)" id="store-ad-btn-${cfg.key}">${MONETIZE_MODE === 'none' ? '🆓 +5' : (getRemainingAds() > 0 ? '📺 広告を見て+5' : '📺 本日の広告上限です')}</button>
                     </div>
                 `;
                 grid.appendChild(card);
@@ -6907,6 +6907,9 @@
 
 
 
+        // ── マネタイズモード: 'none' = itch版（広告なし・無料補充）| 'admob' = 広告版 ──
+        const MONETIZE_MODE = 'none';
+
         // ── リワード広告スタブ ──────────────────────────────────────────────────
         const AD_DAILY_LIMIT = 4;
 
@@ -6928,12 +6931,12 @@
         // TODO: ここに実際の広告SDK（AdMobなど）を差し込む
         // onRewarded は広告視聴完了後に呼ぶコールバック
         function showRewardedAd(onRewarded) {
+            if (MONETIZE_MODE === 'none') { onRewarded(); return; }
             if (getAdCount() >= AD_DAILY_LIMIT) {
                 setFeedback('📺 本日の広告上限（' + AD_DAILY_LIMIT + '回）に達しました。明日またどうぞ！');
                 return;
             }
             incrementAdCount();
-            // 仮実装: 広告なしで即報酬付与（SDK実装後に置き換え）
             onRewarded();
         }
 
@@ -6942,7 +6945,7 @@
                 resources[type] = (resources[type] || 0) + 100;
                 updateResourceDisplay();
                 saveGame();
-                setFeedback('📺 広告視聴完了 → ' + type + ' +100 補充！');
+                setFeedback((MONETIZE_MODE === 'none' ? '' : '📺 広告視聴完了 → ') + type + ' +100 補充！');
             });
         }
 
@@ -6951,7 +6954,7 @@
                 maxStorage[type] = (maxStorage[type] || 20) + 50;
                 updateResourceDisplay();
                 saveGame();
-                setFeedback('📺 広告視聴完了 → ' + type + ' 倉庫拡張 +50！');
+                setFeedback((MONETIZE_MODE === 'none' ? '' : '📺 広告視聴完了 → ') + type + ' 倉庫拡張 +50！');
             });
         }
 
