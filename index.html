@@ -1751,12 +1751,34 @@
         <img id="opening-logo" src="opening.png" alt="GESTURE&FACTORY">
         <button id="opening-start-btn" onclick="startGame()">TAP TO START</button>
     </div>
-    <div id="opening-version">Ver 1.65</div>
+    <div id="opening-version">Ver 1.66</div>
     <audio id="bgm" src="Thousandth_Rotation.mp3" loop></audio>
 </div>
 
     <div style="display:flex; align-items:center; padding:0 12px; width:100%; box-sizing:border-box;">
         <h1 id="game-title" onclick="handleTitleClick()" style="margin:0; flex:1; text-align:center;">GESTURE&FACTORY</h1>
+    </div>
+
+    <!-- 開発中告知モーダル（初回のみ） -->
+    <div id="dev-notice-modal" style="display:none; position:fixed; inset:0; z-index:9500; background:rgba(0,0,0,0.75); align-items:center; justify-content:center;">
+        <div style="background:#1a1a2e; border:1.5px solid #444466; border-radius:16px; padding:26px 28px; max-width:340px; width:88%; text-align:center;">
+            <div style="font-size:22px; margin-bottom:10px;">🚧</div>
+            <div style="font-size:15px; font-weight:bold; color:#e2e2f0; margin-bottom:12px;">Early Access — Work in Progress</div>
+            <div style="font-size:12px; color:#aaa; line-height:1.7; margin-bottom:14px;">
+                This game is currently in active development.<br>
+                Save data may be lost or corrupted during updates.<br>
+                We recommend backing up your data regularly<br>
+                via <strong style="color:#ccc;">Settings → Export</strong>.
+            </div>
+            <hr style="border:none; border-top:1px solid #333355; margin:0 0 14px;">
+            <div style="font-size:13px; font-weight:bold; color:#c0c0e0; margin-bottom:10px;">開発中のお知らせ</div>
+            <div style="font-size:11px; color:#999; line-height:1.7; margin-bottom:20px;">
+                このゲームは現在開発中です。アップデートにより<br>
+                セーブデータが破損・消失する場合があります。<br>
+                <strong style="color:#bbb;">設定 → 書き出す</strong> で定期的なバックアップをお勧めします。
+            </div>
+            <button onclick="closeDevNotice()" style="width:100%; padding:12px; background:#2a2a4a; border:1.5px solid #555577; border-radius:10px; color:#e2e2f0; font-size:14px; font-weight:bold; cursor:pointer; letter-spacing:1px;">OK — Got it！ / わかった</button>
+        </div>
     </div>
 
     <!-- 設定モーダル -->
@@ -3254,7 +3276,19 @@
             bgm.volume = 0.5;
             bgm.play().catch(() => {});
             screen.classList.add('fade-out');
-            setTimeout(() => { screen.style.display = 'none'; }, 850);
+            setTimeout(() => {
+                screen.style.display = 'none';
+                if (!localStorage.getItem('gf_dev_notice_seen')) {
+                    const m = document.getElementById('dev-notice-modal');
+                    m.style.display = 'flex';
+                }
+            }, 850);
+        }
+
+        function closeDevNotice() {
+            localStorage.setItem('gf_dev_notice_seen', '1');
+            const m = document.getElementById('dev-notice-modal');
+            m.style.display = 'none';
         }
 
         // タイトルクリックハンドラー
