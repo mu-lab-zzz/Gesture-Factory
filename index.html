@@ -1751,7 +1751,7 @@
         <img id="opening-logo" src="opening.png" alt="GESTURE&FACTORY">
         <button id="opening-start-btn" onclick="startGame()">TAP TO START</button>
     </div>
-    <div id="opening-version">Ver 1.67</div>
+    <div id="opening-version">Ver 1.68</div>
     <audio id="bgm" src="Thousandth_Rotation.mp3" loop></audio>
 </div>
 
@@ -8419,14 +8419,19 @@
     });
 
     // ページを閉じる・離れるときに全BGMを強制停止
-    const _stopAllBgm = () => {
+    window.addEventListener('beforeunload', () => {
         const mainBgm = document.getElementById('bgm');
         const casBgm = window._casinoBgm;
         if (mainBgm) { mainBgm.pause(); mainBgm.currentTime = 0; }
         if (casBgm)  { casBgm.pause();  casBgm.currentTime = 0; }
-    };
-    window.addEventListener('beforeunload', _stopAllBgm);
-    window.addEventListener('pagehide', _stopAllBgm);
+    });
+    window.addEventListener('pagehide', (e) => {
+        if (e.persisted) return; // bfcacheに入る場合はスキップ
+        const mainBgm = document.getElementById('bgm');
+        const casBgm = window._casinoBgm;
+        if (mainBgm) { mainBgm.pause(); mainBgm.currentTime = 0; }
+        if (casBgm)  { casBgm.pause();  casBgm.currentTime = 0; }
+    });
     </script>
 
 <script>
