@@ -1751,7 +1751,7 @@
         <img id="opening-logo" src="opening.png" alt="GESTURE&FACTORY">
         <button id="opening-start-btn" onclick="startGame()">TAP TO START</button>
     </div>
-    <div id="opening-version">Ver 1.64</div>
+    <div id="opening-version">Ver 1.65</div>
     <audio id="bgm" src="Thousandth_Rotation.mp3" loop></audio>
 </div>
 
@@ -1787,7 +1787,15 @@
             <hr style="border:none; border-top:1px solid #333355; margin:0 0 20px;">
             <button onclick="checkUpdate()" id="update-btn" style="width:100%; padding:11px; background:#0d2a3d; border:1.5px solid #1a6a9a; border-radius:10px; color:#6cf; font-size:14px; font-weight:bold; cursor:pointer; letter-spacing:1px;">🔄 最新バージョンに更新</button>
             <button onclick="confirmReset()" style="width:100%; padding:11px; background:#3d1515; border:1.5px solid #7a2020; border-radius:10px; color:#f88; font-size:14px; font-weight:bold; cursor:pointer; letter-spacing:1px;" data-i18n="reset_data">データをリセット</button>
-            <hr style="border:none; border-top:1px solid #333355; margin:0 0 20px;">
+            <hr style="border:none; border-top:1px solid #333355; margin:16px 0 14px;">
+            <div style="font-size:14px; font-weight:bold; color:#aac8ff; margin-bottom:8px;" data-i18n="backup_section">💾 セーブデータのバックアップ</div>
+            <div style="font-size:12px; color:#999; line-height:1.6; margin-bottom:12px;" data-i18n="backup_desc">セーブデータをJSONファイルとして書き出し・読み込みできます。ゲーム更新前やデータが心配なときにエクスポートしておくと安心です。</div>
+            <div style="display:flex; gap:8px; margin-bottom:4px;">
+                <button onclick="exportSave()" style="flex:1; padding:10px; background:#0d2a1a; border:1.5px solid #1a7a3a; border-radius:10px; color:#4ef; font-size:13px; font-weight:bold; cursor:pointer;" data-i18n="backup_export_btn">📥 書き出す</button>
+                <button onclick="importSave()" style="flex:1; padding:10px; background:#1a1a0d; border:1.5px solid #5a5a1a; border-radius:10px; color:#fe8; font-size:13px; font-weight:bold; cursor:pointer;" data-i18n="backup_import_btn">📂 読み込む</button>
+            </div>
+            <input type="file" id="import-file-input" accept=".json" style="display:none;" onchange="onImportFileSelected(event)">
+            <hr style="border:none; border-top:1px solid #333355; margin:16px 0 20px;">
             <details style="color:#ccc;">
                 <summary style="cursor:pointer; font-size:15px; font-weight:bold; padding:4px 0; list-style:none; display:flex; align-items:center; gap:6px;">
                     <span data-i18n="help_summary">❓ 操作ヘルプ</span>
@@ -2361,6 +2369,13 @@
                 settings_title: '設定', sfx: '🔊 効果音', bgm: '🎵 BGM',
                 language: '🌐 言語',
                 reset_data: 'データをリセット', close: '閉じる',
+                backup_section: '💾 セーブデータのバックアップ',
+                backup_desc: 'セーブデータをJSONファイルとして書き出し・読み込みできます。ゲーム更新前やデータが心配なときにエクスポートしておくと安心です。',
+                backup_export_btn: '📥 書き出す',
+                backup_import_btn: '📂 読み込む',
+                backup_import_confirm: 'セーブデータを読み込みます。現在のデータは上書きされます。よろしいですか？',
+                backup_import_ok: '読み込みました！ページを再読み込みします。',
+                backup_import_err: 'ファイルの読み込みに失敗しました。正しいセーブファイルか確認してください。',
                 help_summary: '❓ 操作ヘルプ',
                 help_gesture_title: '✦ ジェスチャーで図形を作る',
                 help_tap: '・タップ：点を生産 (+1)',
@@ -2492,6 +2507,13 @@
                 settings_title: 'Settings', sfx: '🔊 Sound Effects', bgm: '🎵 BGM',
                 language: '🌐 Language',
                 reset_data: 'Reset Data', close: 'Close',
+                backup_section: '💾 Save Data Backup',
+                backup_desc: 'Export or import your save data as a JSON file. Back up before updates or when you\'re worried about data loss.',
+                backup_export_btn: '📥 Export',
+                backup_import_btn: '📂 Import',
+                backup_import_confirm: 'This will overwrite your current save data. Continue?',
+                backup_import_ok: 'Loaded! Reloading the page.',
+                backup_import_err: 'Failed to read the file. Please check that it is a valid save file.',
                 help_summary: '❓ Help',
                 help_gesture_title: '✦ Create Shapes with Gestures',
                 help_tap: '· Tap: Produce a Point (+1)',
@@ -7066,9 +7088,46 @@
             renderAll();
         }
 
+        function exportSave() {
+            const data = localStorage.getItem('shape_gesture_factory_v2_save');
+            if (!data) return;
+            const blob = new Blob([data], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            const date = new Date().toISOString().slice(0, 10);
+            a.download = `gesture-factory-save-${date}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function importSave() {
+            document.getElementById('import-file-input').click();
+        }
+
+        function onImportFileSelected(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            if (!confirm(t('backup_import_confirm'))) { e.target.value = ''; return; }
+            const reader = new FileReader();
+            reader.onload = ev => {
+                try {
+                    JSON.parse(ev.target.result);
+                    localStorage.setItem('shape_gesture_factory_v2_save', ev.target.result);
+                    alert(t('backup_import_ok'));
+                    location.reload();
+                } catch {
+                    alert(t('backup_import_err'));
+                }
+            };
+            reader.readAsText(file);
+            e.target.value = '';
+        }
+
         function saveGame() {
             try {
                 const saveData = {
+                    version: '1.65',
                     resources,
                     maxStorage,
                     productionRates,
