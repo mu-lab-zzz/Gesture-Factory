@@ -1751,7 +1751,7 @@
         <img id="opening-logo" src="opening.png" alt="GESTURE&FACTORY">
         <button id="opening-start-btn" onclick="startGame()">TAP TO START</button>
     </div>
-    <div id="opening-version">Ver 1.67</div>
+    <div id="opening-version">Ver 1.68</div>
     <audio id="bgm" src="Thousandth_Rotation.mp3" loop></audio>
 </div>
 
@@ -5536,10 +5536,23 @@
 
         }
 
+        function applyMonetizeMode() {
+            if (MONETIZE_MODE !== 'none') return;
+            // A: 倉庫タブの補充・拡張ボタンを非表示
+            document.querySelectorAll('[id^="coin-refill-"], [id^="coin-storage-"]').forEach(el => el.style.display = 'none');
+            // B: パーツストアの広告ボタンはrenderPartsStore内で制御済み（store-buy-btnを非表示）
+            // D: 統計タブの広告視聴行を非表示
+            const statAds = document.getElementById('stat-ads');
+            if (statAds) { const row = statAds.closest('.stats-row'); if (row) row.style.display = 'none'; }
+            // 統計タブの「広告」見出しを非表示
+            document.querySelectorAll('#content-stats h3').forEach(h => { if (h.textContent.trim() === '広告' || h.textContent.trim() === 'Ads') h.style.display = 'none'; });
+        }
+
         function init() {
             canvas.width = 800;
             canvas.height = 450;
 
+            applyMonetizeMode();
             createGrid();
             loadGame(); // 自動セーブデータの復元
             initIcons();
@@ -6865,7 +6878,7 @@
                     <div class="store-name">${nameMap[cfg.key] || cfg.key}</div>
                     <div class="store-stock" id="store-stock-${cfg.key}">×${stock}</div>
                     <div class="store-btns">
-                        <button class="store-buy-btn" onclick="adGrantPartsFromStore('${cfg.key}',5)" id="store-ad-btn-${cfg.key}">${MONETIZE_MODE === 'none' ? '🆓 +5' : (getRemainingAds() > 0 ? '📺 広告を見て+5' : '📺 本日の広告上限です')}</button>
+                        ${MONETIZE_MODE === 'none' ? '' : `<button class="store-buy-btn" onclick="adGrantPartsFromStore('${cfg.key}',5)" id="store-ad-btn-${cfg.key}">${getRemainingAds() > 0 ? '📺 広告を見て+5' : '📺 本日の広告上限です'}</button>`}
                     </div>
                 `;
                 grid.appendChild(card);
