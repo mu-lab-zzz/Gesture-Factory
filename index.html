@@ -1751,7 +1751,7 @@
         <img id="opening-logo" src="opening.png" alt="GESTURE&FACTORY">
         <button id="opening-start-btn" onclick="startGame()">TAP TO START</button>
     </div>
-    <div id="opening-version">Ver A1.02</div>
+    <div id="opening-version">Ver A1.03</div>
     <audio id="bgm" src="Thousandth_Rotation.mp3" loop></audio>
 </div>
 
@@ -3149,23 +3149,11 @@
         function closeSettings() {
             document.getElementById('settings-modal').style.display = 'none';
         }
-        async function checkUpdate() {
+        function checkUpdate() {
             const btn = document.getElementById('update-btn');
-            btn.textContent = '⏳ 確認中...';
+            btn.textContent = '⏳ 再読み込み中...';
             btn.disabled = true;
-            try {
-                if ('serviceWorker' in navigator) {
-                    const regs = await navigator.serviceWorker.getRegistrations();
-                    await Promise.all(regs.map(r => r.unregister()));
-                }
-                const keys = await caches.keys();
-                await Promise.all(keys.map(k => caches.delete(k)));
-                btn.textContent = '✅ 更新完了！再起動します...';
-                setTimeout(() => location.reload(true), 1200);
-            } catch(e) {
-                btn.textContent = '❌ エラー。手動でリロードしてください';
-                btn.disabled = false;
-            }
+            setTimeout(() => location.reload(true), 500);
         }
         // ── デバッグ関数 ──
 
